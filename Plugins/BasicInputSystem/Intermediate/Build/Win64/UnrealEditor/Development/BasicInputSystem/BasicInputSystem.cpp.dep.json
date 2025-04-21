@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "d:\\dev_x\\ue_project\\ue5.1\\fpsgame\\plugins\\basicinputsystem\\source\\basicinputsystem\\private\\basicinputsystem.cpp",
+        "ProvidedModule": "",
+        "PCH": "d:\\dev_x\\ue_project\\ue5.1\\fpsgame\\intermediate\\build\\win64\\fpsgameeditor\\development\\engine\\sharedpch.engine.shadowerrors.h.pch",
+        "Includes": [
+            "d:\\dev_x\\ue_project\\ue5.1\\fpsgame\\plugins\\basicinputsystem\\intermediate\\build\\win64\\unrealeditor\\development\\basicinputsystem\\definitions.basicinputsystem.h",
+            "d:\\dev_x\\ue_project\\ue5.1\\fpsgame\\plugins\\basicinputsystem\\source\\basicinputsystem\\public\\basicinputsystem.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "d:\\dev_x\\ue_project\\ue5.5\\dx_infinitecombat\\plugins\\basicinputsystem\\source\\basicinputsystem\\private\\basiccharacter.cpp",
+        "ProvidedModule": "",
+        "PCH": "d:\\dev_x\\ue_project\\ue5.5\\dx_infinitecombat\\intermediate\\build\\win64\\x64\\dx_infinitecombateditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "d:\\dev_x\\ue_project\\ue5.5\\dx_infinitecombat\\plugins\\basicinputsystem\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\basicinputsystem\\definitions.basicinputsystem.h",
+            "d:\\dev_x\\ue_project\\ue5.5\\dx_infinitecombat\\plugins\\basicinputsystem\\source\\basicinputsystem\\public\\basiccharacter.h",
+            "d:\\ue\\ue_5.5\\engine\\source\\runtime\\engine\\classes\\gameframework\\character.h",
+            "d:\\ue\\ue_5.5\\engine\\source\\runtime\\engine\\classes\\gameframework\\charactermovementreplication.h",
+            "d:\\ue\\ue_5.5\\engine\\source\\runtime\\net\\core\\public\\net\\core\\nettoken\\nettokenexportcontext.h",
+            "d:\\ue\\ue_5.5\\engine\\source\\runtime\\experimental\\iris\\core\\public\\iris\\serialization\\irisobjectreferencepackagemap.h",
+            "d:\\ue\\ue_5.5\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\iriscore\\uht\\irisobjectreferencepackagemap.generated.h",
+            "d:\\ue\\ue_5.5\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\charactermovementreplication.generated.h",
+            "d:\\ue\\ue_5.5\\engine\\source\\runtime\\engine\\classes\\gameframework\\rootmotionsource.h",
+            "d:\\ue\\ue_5.5\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\rootmotionsource.generated.h",
+            "d:\\ue\\ue_5.5\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\character.generated.h",
+            "d:\\dev_x\\ue_project\\ue5.5\\dx_infinitecombat\\plugins\\basicinputsystem\\intermediate\\build\\win64\\unrealeditor\\inc\\basicinputsystem\\uht\\basiccharacter.generated.h",
+            "d:\\ue\\ue_5.5\\engine\\source\\runtime\\engine\\classes\\camera\\cameracomponent.h",
+            "d:\\ue\\ue_5.5\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\cameracomponent.generated.h",
+            "d:\\ue\\ue_5.5\\engine\\source\\runtime\\engine\\classes\\gameframework\\springarmcomponent.h",
+            "d:\\ue\\ue_5.5\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\springarmcomponent.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

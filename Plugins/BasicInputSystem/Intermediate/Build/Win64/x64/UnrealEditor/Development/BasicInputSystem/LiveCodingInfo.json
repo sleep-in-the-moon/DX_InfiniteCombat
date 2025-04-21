@@ -1,0 +1,14 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.BasicInputSystem.cpp.obj": [
+			"BasicCharacter.gen.cpp.obj",
+			"BasicInputPlayerController.gen.cpp.obj",
+			"BasicInputSystem.init.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"BasicCharacter.cpp.obj",
+			"BasicInputPlayerController.cpp.obj",
+			"BasicInputSystem.cpp.obj"
+		]
+	}
+}

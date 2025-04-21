@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-DX_ReusableTool.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"D:\Dev_X\UE_Project\UE5.5\DX_InfiniteCombat\Intermediate\Build\Win64\x64\DX_InfiniteCombatEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.obj"
+"D:\Dev_X\UE_Project\UE5.5\DX_InfiniteCombat\Plugins\DX_ReusableTool\Intermediate\Build\Win64\x64\UnrealEditor\Development\DX_ReusableTool\Module.DX_ReusableTool.cpp.obj"
+"D:\Dev_X\UE_Project\UE5.5\DX_InfiniteCombat\Plugins\DX_ReusableTool\Intermediate\Build\Win64\x64\UnrealEditor\Development\DX_ReusableTool\DX_ReusableTool.cpp.obj"
+"D:\Dev_X\UE_Project\UE5.5\DX_InfiniteCombat\Plugins\DX_ReusableTool\Intermediate\Build\Win64\x64\UnrealEditor\Development\DX_ReusableTool\Default.rc2.res"
+/OUT:"D:\Dev_X\UE_Project\UE5.5\DX_InfiniteCombat\Plugins\DX_ReusableTool\Intermediate\Build\Win64\x64\UnrealEditor\Development\DX_ReusableTool\UnrealEditor-DX_ReusableTool.lib"
