@@ -1,9 +1,0 @@
-{
-	"RemapUnityFiles": 
-	{
-		"Module.DX_ReusableTool.cpp.obj": [
-			"PerModuleInline.gen.cpp.obj",
-			"DX_ReusableTool.cpp.obj"
-		]
-	}
-}

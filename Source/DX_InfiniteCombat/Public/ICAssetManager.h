@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/AssetManager.h"
-#include "Engine/DataAsset.h"
+#include "ICDataAsset.h"
 #include "ICAssetManager.generated.h"
 
 
-class UICDataAsset;
 /**
  * 
  */
@@ -36,7 +35,7 @@ protected:
 	}
 
 protected:
-	UPROPERTY(Config)
+	//UPROPERTY(Config)
 	TSoftObjectPtr<UICDataAsset> ICGameDataPath;
 	UPROPERTY(Transient)
 	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;

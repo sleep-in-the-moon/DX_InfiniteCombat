@@ -38,13 +38,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AppandCandidateActors(const TMap<AActor*, float>& AddActors);
 
-	UFUNCTION(BlueprintCallable)
-	void PauseLock();
-	UFUNCTION(BlueprintCallable)
-	void EndLock();
-private:
-	void UpdateActorScore();
-	void UpdateCurLockActor();
+//	UFUNCTION(BlueprintCallable)
+//	void PauseLock();
+//	UFUNCTION(BlueprintCallable)
+//	void EndLock();
+//private:
+//	void UpdateActorScore();
+//	void UpdateCurLockActor();
 
 private:
 	bool bEnableLock=false;
