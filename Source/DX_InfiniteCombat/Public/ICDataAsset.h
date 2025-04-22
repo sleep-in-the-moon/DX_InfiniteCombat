@@ -18,7 +18,7 @@ class DX_INFINITECOMBAT_API UICDataAsset : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	//static const UICDataAsset& Get();
+	static const UICDataAsset& Get();
 
 public:
 	UPROPERTY(EditDefaultsOnly)
