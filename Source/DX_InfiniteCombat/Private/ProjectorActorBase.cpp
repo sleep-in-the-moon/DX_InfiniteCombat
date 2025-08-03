@@ -127,12 +127,19 @@ bool AProjectorActorBase::LineTraceByMeshSockets(const TArray<AActor*>& ActorsTo
                 SetLifeSpan(0.4f);
             }
 
+            //停止发射物
             bEnableTrace = false;
+            ProjectileMovementComponent->StopMovementImmediately();
             ProjectileMovementComponent->bSimulationEnabled = false;
 
             //伤害感知事件发送
             UAISense_Damage::ReportDamageEvent(GetOwner()->GetWorld(), OutHit.GetActor(), GetOwner(), 0.f, GetOwner()->GetActorLocation(), OutHit.GetActor()->GetActorLocation());
             
+            //冲力
+            UPrimitiveComponent* Primi = OutHit.GetActor()->FindComponentByClass<UPrimitiveComponent>();
+            if(Primi->IsSimulatingPhysics())
+                Primi->AddImpulse(OutHit.ImpactNormal*-1*700, NAME_None, true);
+
             //广播到蓝图
             DG_ProjectorHitObj.Broadcast(OutHit);
 

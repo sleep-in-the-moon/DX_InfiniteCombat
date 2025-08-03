@@ -21,6 +21,8 @@ struct FAbilityInput
 
 };
 
+DECLARE_DELEGATE_OneParam(FMoveInputTrigger, const FVector2D& /*InputValue*/);
+
 /**
  * 
  */
@@ -34,6 +36,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<FAbilityInput> AbilityInputArray;
+
+	FMoveInputTrigger DG_MoveInputTrigger;
 
 protected:
 	virtual void BeginPlay() override;

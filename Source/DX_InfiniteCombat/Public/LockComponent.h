@@ -36,7 +36,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddToCandidateActors(AActor* AddActor, float score=1.f);
 	UFUNCTION(BlueprintCallable)
-	void AppandCandidateActors(const TMap<AActor*, float>& AddActors);
+	void AppendCandidateActors(const TMap<AActor*, float>& AddActors);
 
 //	UFUNCTION(BlueprintCallable)
 //	void PauseLock();

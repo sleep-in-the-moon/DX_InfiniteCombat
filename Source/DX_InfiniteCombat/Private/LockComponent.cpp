@@ -72,7 +72,7 @@ void ULockComponent::AddToCandidateActors(AActor* AddActor, float score)
 	CandidateActors.Add(AddActor, score);
 }
 
-void ULockComponent::AppandCandidateActors(const TMap<AActor*, float>& AddActors)
+void ULockComponent::AppendCandidateActors(const TMap<AActor*, float>& AddActors)
 {
 	CandidateActors.Append(AddActors);
 }

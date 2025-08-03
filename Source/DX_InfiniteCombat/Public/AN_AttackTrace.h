@@ -44,7 +44,7 @@ protected:
 	int8 TracePointNum = 5;*/
 	
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
-	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)) };
+	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)), TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_PhysicsBody)) };
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
 	bool bTraceComplex=false;
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
@@ -53,10 +53,28 @@ protected:
 	TArray<AActor*> ActorsToIgnore;
 
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Effect")
-	TArray<FGEApplyArg> GameplayEffectsToApply;
+	TArray<FGEApplyArg> GameplayEffectsToApplyTarget;
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Effect")
+	TArray<FGEApplyArg> GameplayEffectsToApplySource;
 	/*UPROPERTY(EditAnywhere, Category = "HitApply|Effect")
 	FGameplayEffectContextHandle GEContextHandle;
 	UPROPERTY(EditAnywhere, Category = "HitApply|Effect")*/
+
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Hit")
+	FVector ImpulseScale = FVector(1600, 1600, 600);
+
+	//ºıÀŸ ∂Ÿ∏–
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack")
+	bool bSlowdown = false;
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack", meta = (EditCondition = "bSlowdown", EditConditionHides))
+	float SlowdownScale = 0.7;
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack", meta = (EditCondition = "bSlowdown", EditConditionHides))
+	float SlowdownTime = 0.6;
+	//Ã¯÷° Õ£÷Õ∏–
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack")
+	bool bSkipFrames = false;
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack", meta = (EditCondition = "bSkipFrames", EditConditionHides))
+	float SkipSeconds = 0.04;
 
 private:
 	
@@ -71,5 +89,7 @@ private:
 	TObjectPtr<UICAbilitySystemComponent> OwnerASC;
 	UPROPERTY()
 	TArray<AActor*> ApplyedObjs;
+
+	bool bOnce = true;
 
 };

@@ -64,7 +64,7 @@ private:
 	bool bEnableTrace = false;
 	TMap<FName, FVector> PreSocketLoc;
 	TArray<FName> AttackTraceSockets;
-	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes;
+	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)), TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_PhysicsBody)) };
 	bool bTrace = false;
 	AActor* TraceActor;
 };
