@@ -8,7 +8,7 @@
 //#include "Components/Widget.h"
 #include "Animation/WidgetAnimation.h"
 
-void UWidgetCombatStates::SpawnTransientWidgetByWorldLoc(const FVector& WorldLoc, TSubclassOf<UUserWidget> WidgetClass, float LifeTime, const FString& ShowInfos)
+void UWidgetCombatStates::SpawnTransientWidgetByWorldLoc(const FVector& WorldLoc, TSubclassOf<UUserWidget> WidgetClass, float TransientTime, const FString& ShowInfos)
 {
 	if (!GetOwningPlayer() || !WidgetClass)
 		return;
@@ -70,39 +70,50 @@ void UWidgetCombatStates::SpawnTransientWidgetByWorldLoc(const FVector& WorldLoc
 
 	CanvasSlot->SetPosition(CanvasPosition);
 
-	if (LifeTime > 0)
+	UE_LOG(LogTemp, Warning, TEXT("CanvasPosition::%s"),*CanvasPosition.ToString());
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("CanvasPosition::%s"), *CanvasPosition.ToString()));
+
+	if (TransientTime > 0)
 	{
-		GetOwningPlayer()->GetWorld()->GetTimerManager().SetTimer(LifeTimer, [this, Widget]()
+		FTimerHandle LifeTimer;
+		GetOwningPlayer()->GetWorld()->GetTimerManager().SetTimer(LifeTimer, [this, Widget, TransientTime]()
 			{
 				WidgetPool->RecycleObject(Widget);
 				Widget->SetVisibility(ESlateVisibility::Collapsed);
-				GetOwningPlayer()->GetWorld()->GetTimerManager().ClearTimer(LifeTimer);
-			}, LifeTime, false);
+				//GetOwningPlayer()->GetWorld()->GetTimerManager().ClearTimer(LifeTimer);
+			}, TransientTime, false);
 	}
-	else if (LifeTime == 0)
+	/*else if (TransientTime == 0)
 	{
 		GetOwningPlayer()->GetWorld()->GetTimerManager().SetTimerForNextTick([this, Widget]()
 			{
 				WidgetPool->RecycleObject(Widget);
 				Widget->SetVisibility(ESlateVisibility::Collapsed);
 			});
-	}
+	}*/
 
 }
 
-void UWidgetCombatStates::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-
-	if (!MainCanvasPanel)
-	{
-		MainCanvasPanel = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("MainCanvas"));
-		WidgetTree->RootWidget = MainCanvasPanel;
-	}
-}
+//void UWidgetCombatStates::NativePreConstruct()
+//{
+//	Super::NativePreConstruct();
+//
+//	if (!MainCanvasPanel)
+//	{
+//		MainCanvasPanel = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("MainCanvas"));
+//		WidgetTree->RootWidget = MainCanvasPanel;
+//	}
+//}
 
 void UWidgetCombatStates::NativeConstruct()
 {
 	Super::NativeConstruct();
 	WidgetPool = MakeUnique<DX_ObjectPool<UUserWidget> >();
+}
+
+void UWidgetCombatStates::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	//TODO::Update TransientWidget's position
 }
