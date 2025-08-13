@@ -19,7 +19,7 @@
  */
 //UCLASS()
 template<typename T>
-class DX_REUSABLETOOL_API Trie final
+class Trie final	//DX_REUSABLETOOL_API
 {
 	//GENERATED_BODY()
 

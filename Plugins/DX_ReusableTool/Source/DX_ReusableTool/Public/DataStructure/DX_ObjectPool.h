@@ -4,73 +4,111 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Blueprint/UserWidget.h"
 
 /**
  * 
  */
 template<typename T>
-class DX_REUSABLETOOL_API DX_ObjectPool final
+class DX_ObjectPool final : public FGCObject
 {
 
-	using OriginType = std::remove_cv_t<std::remove_reference_t<T>>;
+	using OriginType = std::remove_cv_t<std::remove_reference_t<T> >;
 	static constexpr bool bIsUObject = TIsDerivedFrom<OriginType, UObject>::Value;
-	using ElementType = std::conditional_t<bIsUObject, OriginType*, TSharedPtr<OriginType>>;
+	static constexpr bool bIsWidget = TIsDerivedFrom<OriginType, UUserWidget>::Value;
+	using ElementType = std::conditional_t<bIsUObject, TObjectPtr<OriginType>, TSharedPtr<OriginType> >;
 
 public:
-	DX_ObjectPool<T>();
+	DX_ObjectPool() = default;
+	~DX_ObjectPool() override = default;
 
-	ElementType AccessObject() const 
+	// 禁用拷贝/移动（避免 FGCObject 注册问题）
+	DX_ObjectPool(const DX_ObjectPool&) = delete;
+	DX_ObjectPool& operator=(const DX_ObjectPool&) = delete;
+	DX_ObjectPool(DX_ObjectPool&&) = delete;
+	DX_ObjectPool& operator=(DX_ObjectPool&&) = delete;
+
+
+	template <typename = std::enable_if_t<bIsUObject && !bIsWidget> >
+	//typename std::enable_if<bIsUObject&&!bIsWidget, TObjectPtr<OriginType> >::type
+	ElementType AccessObject(UObject* Outer, TSubclassOf<UObject> SubClass)
 	{
-		if(!UnusedObjectArray.IsEmpty())
+		if (!UnusedObjectArray.IsEmpty())
 			return UnusedObjectArray.Pop();
 
-		if (bIsUObject)
-			return NewObject<T>();
-
-		return MakeShared<T>();
+		return NewObject<OriginType>(Outer, SubClass.Get());
 	}
-	/*TArray<ElementType> AccessObjects(uint16 Num) const 
-	{
-		return TArray<ElementType>();
-	}*/
 
-	void RecycleObject(ElementType UnusedObject);
-	void RecycleObjects(const TArray<ElementType>& UnusedObject);
-	void ClearPool();
+	template <typename = std::enable_if_t<bIsWidget> >
+	//typename std::enable_if<bIsWidget, TObjectPtr<OriginType> >::type
+	ElementType AccessObject(UUserWidget* OuterWidget, TSubclassOf<UUserWidget> SubClass)
+	{
+		if (!UnusedObjectArray.IsEmpty())
+			return UnusedObjectArray.Pop();
+
+		return CreateWidget<UUserWidget>(OuterWidget, SubClass);
+	}
+
+	template <
+		typename... Args,
+		typename = std::enable_if_t<!bIsUObject>,
+		typename = void
+	>
+	ElementType AccessObject(Args&&... InArgs)
+	{
+		if (!UnusedObjectArray.IsEmpty())
+			return UnusedObjectArray.Pop();
+
+		return MakeShared<OriginType>(Forward<Args>(InArgs)...);
+	}
+
+	inline void RecycleObject(ElementType UnusedObject);
+	//void RecycleObjects(const TArray<ElementType>& UnusedObject);
+	inline void ClearPool();
 
 private:
-	void AddToUnused(ElementType UnusedObject);
-	void AppendToUnused(const TArray<ElementType>& UnusedObjects);
-	void AddToActive(ElementType ActiveObject);
-	void AppendToActive(const TArray<ElementType>& ActiveObjects);
+	inline void AddToUnused(ElementType UnusedObject);
+	inline void AppendToUnused(const TArray<ElementType>& UnusedObjects);
+	/*void AddToActive(ElementType ActiveObject);
+	void AppendToActive(const TArray<ElementType>& ActiveObjects);*/
 
 private:
 	TArray<ElementType> UnusedObjectArray;
-	TArray<ElementType> ActiveObjectArray;
+	//TArray<ElementType> ActiveObjectArray;
 	
-};
+	// FGCObject 接口：在 GC 时被调用，报告我们持有的 UObject*
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override
+	{
+		if constexpr (bIsUObject)
+		{
+			for (ElementType Obj : UnusedObjectArray)
+			{
+				if (Obj)
+				{
+					Collector.AddReferencedObject(Obj);
+				}
+			}
+		}
+	}
 
-template<typename T>
-inline DX_ObjectPool<T>::DX_ObjectPool()
-{
-}
+	virtual FString GetReferencerName() const override
+	{
+		return TEXT("DX_ObjectPool");
+	}
+
+};
 
 template<typename T>
 inline void DX_ObjectPool<T>::RecycleObject(ElementType UnusedObject)
 {
+	//ActiveObjectArray.Remove(UnusedObject);
 	AddToUnused(UnusedObject);
-}
-
-template<typename T>
-inline void DX_ObjectPool<T>::RecycleObjects(const TArray<ElementType>& UnusedObject)
-{
-	AppendToUnused(UnusedObject);
 }
 
 template<typename T>
 inline void DX_ObjectPool<T>::ClearPool()
 {
-	ActiveObjectArray.Empty();
+	//ActiveObjectArray.Empty();
 	UnusedObjectArray.Empty();
 }
 
@@ -86,14 +124,14 @@ inline void DX_ObjectPool<T>::AppendToUnused(const TArray<ElementType>& UnusedOb
 	UnusedObjectArray.Append(UnusedObjects);
 }
 
-template<typename T>
-inline void DX_ObjectPool<T>::AddToActive(ElementType ActiveObject)
-{
-	ActiveObjectArray.Add(ActiveObject);
-}
-
-template<typename T>
-inline void DX_ObjectPool<T>::AppendToActive(const TArray<ElementType>& ActiveObjects)
-{
-	ActiveObjectArray.Append(ActiveObjects);
-}
+//template<typename T>
+//inline void DX_ObjectPool<T>::AddToActive(ElementType ActiveObject)
+//{
+//	ActiveObjectArray.Add(ActiveObject);
+//}
+//
+//template<typename T>
+//inline void DX_ObjectPool<T>::AppendToActive(const TArray<ElementType>& ActiveObjects)
+//{
+//	ActiveObjectArray.Append(ActiveObjects);
+//}

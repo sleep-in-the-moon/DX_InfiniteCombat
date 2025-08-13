@@ -6,9 +6,9 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/CanvasPanel.h"
 //#include "Components/Widget.h"
-#include "DX_ReusableTool/Public/DataStructure/DX_ObjectPool.h"
+#include "Animation/WidgetAnimation.h"
 
-void UWidgetCombatStates::SpawnTransientWidgetByWorldLoc(const FVector& WorldLoc, float LifeTime, TSubclassOf<UUserWidget> WidgetClass)
+void UWidgetCombatStates::SpawnTransientWidgetByWorldLoc(const FVector& WorldLoc, TSubclassOf<UUserWidget> WidgetClass, float LifeTime, const FString& ShowInfos)
 {
 	if (!GetOwningPlayer() || !WidgetClass)
 		return;
@@ -31,11 +31,63 @@ void UWidgetCombatStates::SpawnTransientWidgetByWorldLoc(const FVector& WorldLoc
 	FVector2D CanvasPosition = FVector2D(ScreenPosition.X / ViewportSize.X * CanvasSize.X,
 										 ScreenPosition.Y / ViewportSize.Y * CanvasSize.Y);
 
-	TSharedPtr<DX_ObjectPool<UUserWidget>> WidgetPool;
-	UUserWidget* Widget = WidgetPool->AccessObject();
+	if (!WidgetPool)
+		return;
 
+	UUserWidget* Widget = WidgetPool->AccessObject(this, WidgetClass);
 	MainCanvasPanel->AddChildToCanvas(Widget);
-	Widget->Slot; 
+
+	if (WidgetClass.Get())
+	{
+		if (UFunction* InitFunc = WidgetClass.Get()->FindFunctionByName(FName(TEXT("Init"))))
+		{
+			struct InitParam
+			{
+				FString Infos;
+			};
+			InitParam InitFuncParam;
+			InitFuncParam.Infos = ShowInfos;
+			Widget->ProcessEvent(InitFunc, &InitFuncParam);
+		}
+
+		FProperty* TransientAnimProp = WidgetClass.Get()->FindPropertyByName(FName(TEXT("TransientAnim")));
+		if (TransientAnimProp && TransientAnimProp->GetCPPType().Equals("UWidgetAnimation*"))
+		{
+			FClassProperty* TransientAnimClassProp = static_cast<FClassProperty*>(TransientAnimProp);
+
+			const void* ValuePtr = TransientAnimClassProp->ContainerPtrToValuePtr<void>(Widget);
+			TObjectPtr<UObject> TransientAnimObj = TransientAnimClassProp->GetPropertyValue(ValuePtr);
+
+			UWidgetAnimation* TransientAnim = Cast<UWidgetAnimation>(TransientAnimObj);
+			Widget->PlayAnimationForward(TransientAnim);
+			
+		}
+	}
+
+	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Widget->Slot);
+	if (!CanvasSlot)
+		return;
+
+	CanvasSlot->SetPosition(CanvasPosition);
+
+	if (LifeTime > 0)
+	{
+		GetOwningPlayer()->GetWorld()->GetTimerManager().SetTimer(LifeTimer, [this, Widget]()
+			{
+				WidgetPool->RecycleObject(Widget);
+				Widget->SetVisibility(ESlateVisibility::Collapsed);
+				GetOwningPlayer()->GetWorld()->GetTimerManager().ClearTimer(LifeTimer);
+			}, LifeTime, false);
+	}
+	else if (LifeTime == 0)
+	{
+		GetOwningPlayer()->GetWorld()->GetTimerManager().SetTimerForNextTick([this, Widget]()
+			{
+				WidgetPool->RecycleObject(Widget);
+				Widget->SetVisibility(ESlateVisibility::Collapsed);
+			});
+	}
+
 }
 
 void UWidgetCombatStates::NativePreConstruct()
@@ -47,4 +99,10 @@ void UWidgetCombatStates::NativePreConstruct()
 		MainCanvasPanel = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("MainCanvas"));
 		WidgetTree->RootWidget = MainCanvasPanel;
 	}
+}
+
+void UWidgetCombatStates::NativeConstruct()
+{
+	Super::NativeConstruct();
+	WidgetPool = MakeUnique<DX_ObjectPool<UUserWidget> >();
 }
