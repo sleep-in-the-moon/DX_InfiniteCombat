@@ -3,6 +3,8 @@
 
 #include "LockComponent.h"
 #include "ICAbilitySystemComponent.h"
+#include "ICWorldSubsystem.h"
+#include "KismetTraceUtils.h"
 
 // Sets default values for this component's properties
 ULockComponent::ULockComponent()
@@ -93,6 +95,10 @@ bool ULockComponent::DoOnceTrace()
 		FVector EndLoc = StartLoc + FRotationMatrix(CameraYaw).GetUnitAxis(EAxis::X) * TraceDist;
 
 		FCollisionShape TraceShape = FCollisionShape::MakeSphere(TraceHalf);
+
+		UICWorldSubsystem* ICSubSystem = UWorld::GetSubsystem<UICWorldSubsystem>(GetWorld());
+		if (ICSubSystem && ICSubSystem->GetShowDebug())
+			DrawDebugSphereTraceMulti(GetOwner()->GetWorld(), StartLoc, EndLoc, TraceHalf, EDrawDebugTrace::Type::ForDuration, false, OutHits, FLinearColor::Blue, FLinearColor::Green, 10.0f);
 
 	}
 

@@ -19,7 +19,7 @@ class DX_INFINITECOMBAT_API UWidgetCombatStates : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	void SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime = 2.0f, const FString& ShowInfos="");
+	void SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime = 1.4f, const FString& ShowInfos="");
 
 protected:
 	//virtual void NativePreConstruct() override;
