@@ -33,12 +33,12 @@ void ULockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
-void ULockComponent::SetLockEnable(bool Enable)
+void ULockComponent::SetAutoLockEnable(bool Enable)
 {
-	bEnableLock = Enable;
+	bAutoTrace = Enable;
 }
 
-bool ULockComponent::GetIsLockOnTarget()
+bool ULockComponent::GetIsLockingOnTarget()
 {
 	UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>();
 	if (ASC)
@@ -49,7 +49,7 @@ bool ULockComponent::GetIsLockOnTarget()
 	return false;
 }
 
-void ULockComponent::SetIsLockOnTarget(bool IsLockOn)
+void ULockComponent::SetIsLockingOnTarget(bool IsLockOn)
 {
 	UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>();
 	if (ASC)
@@ -75,4 +75,26 @@ void ULockComponent::AddToCandidateActors(AActor* AddActor, float score)
 void ULockComponent::AppendCandidateActors(const TMap<AActor*, float>& AddActors)
 {
 	CandidateActors.Append(AddActors);
+}
+
+bool ULockComponent::DoOnceTrace()
+{
+	TArray<FHitResult> OutHits;
+	float TraceHalf=500.f, TraceDist=7000.f;
+
+	if (APawn* pawn = Cast<APawn>(GetOwner()))
+	{
+		APlayerController* playerController =  Cast<APlayerController>(pawn->GetController());
+		if(!playerController)
+			return false;
+		
+		FVector StartLoc = playerController->PlayerCameraManager->GetCameraLocation();
+		FRotator CameraYaw = FRotator(0, playerController->PlayerCameraManager->GetCameraRotation().Yaw, 0);
+		FVector EndLoc = StartLoc + FRotationMatrix(CameraYaw).GetUnitAxis(EAxis::X) * TraceDist;
+
+		FCollisionShape TraceShape = FCollisionShape::MakeSphere(TraceHalf);
+
+	}
+
+	return false;
 }

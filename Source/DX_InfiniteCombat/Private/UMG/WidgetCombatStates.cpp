@@ -5,31 +5,15 @@
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/CanvasPanel.h"
-//#include "Components/Widget.h"
 #include "Animation/WidgetAnimation.h"
 
-void UWidgetCombatStates::SpawnTransientWidgetByWorldLoc(const FVector& WorldLoc, TSubclassOf<UUserWidget> WidgetClass, float TransientTime, const FString& ShowInfos)
+void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime, const FString& ShowInfos)
 {
-	if (!GetOwningPlayer() || !WidgetClass)
+	if (!WidgetClass || !AttachActor)
 		return;
 
-	FVector2D ScreenPosition;
-	if (!GetOwningPlayer()->ProjectWorldLocationToScreen(WorldLoc, ScreenPosition))
-		return;
-
-	FVector2D ViewportSize;
-	GEngine->GameViewport->GetViewportSize(ViewportSize);
-
-	if (!(ScreenPosition.X >= 0 && ScreenPosition.X <= ViewportSize.X &&
-		ScreenPosition.Y >= 0 && ScreenPosition.Y <= ViewportSize.Y))
-		return;
-
-	if (!MainCanvasPanel)
-		return;
-
-	FVector2D CanvasSize = MainCanvasPanel->GetCachedGeometry().GetLocalSize();
-	FVector2D CanvasPosition = FVector2D(ScreenPosition.X / ViewportSize.X * CanvasSize.X,
-										 ScreenPosition.Y / ViewportSize.Y * CanvasSize.Y);
+	FVector2D CanvasPosition = GetCanvasPositionByWorldLoc(AttachActor->GetActorLocation());
+	TransientWidgetAttachActor = MakeWeakObjectPtr(AttachActor);
 
 	if (!WidgetPool)
 		return;
@@ -115,5 +99,39 @@ void UWidgetCombatStates::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	//TODO::Update TransientWidget's position
+	//Update TransientWidget's position
+	if (WidgetPool && WidgetPool->GetAllActives().Num() > 0 && TransientWidgetAttachActor.IsValid())
+	{
+		for (TObjectPtr<UUserWidget> widget : WidgetPool->GetAllActives())
+		{
+			if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(widget->Slot))
+				CanvasSlot->SetPosition(GetCanvasPositionByWorldLoc(TransientWidgetAttachActor.Get()->GetActorLocation()));
+		}
+	}
+}
+
+FVector2D UWidgetCombatStates::GetCanvasPositionByWorldLoc(const FVector& WorldLoc)
+{
+	if (!GetOwningPlayer())
+		return FVector2D();
+
+	FVector2D ScreenPosition;
+	if (!GetOwningPlayer()->ProjectWorldLocationToScreen(WorldLoc, ScreenPosition))
+		return FVector2D();
+
+	FVector2D ViewportSize;
+	GEngine->GameViewport->GetViewportSize(ViewportSize);
+
+	if (!(ScreenPosition.X >= 0 && ScreenPosition.X <= ViewportSize.X &&
+		ScreenPosition.Y >= 0 && ScreenPosition.Y <= ViewportSize.Y))
+		return FVector2D();
+
+	if (!MainCanvasPanel)
+		return FVector2D();
+
+	FVector2D CanvasSize = MainCanvasPanel->GetCachedGeometry().GetLocalSize();
+	FVector2D CanvasPosition = FVector2D(ScreenPosition.X / ViewportSize.X * CanvasSize.X,
+		ScreenPosition.Y / ViewportSize.Y * CanvasSize.Y);
+
+	return CanvasPosition;
 }

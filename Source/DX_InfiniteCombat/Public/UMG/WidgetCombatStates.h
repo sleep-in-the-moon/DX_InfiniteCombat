@@ -19,12 +19,15 @@ class DX_INFINITECOMBAT_API UWidgetCombatStates : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	void SpawnTransientWidgetByWorldLoc(const FVector& WorldLoc, TSubclassOf<UUserWidget> WidgetClass, float TransientTime = 2.0f, const FString& ShowInfos="");
+	void SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime = 2.0f, const FString& ShowInfos="");
 
 protected:
 	//virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+private:
+	FVector2D GetCanvasPositionByWorldLoc(const FVector& WorldLoc);
 
 public:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
@@ -32,4 +35,5 @@ public:
 
 private:
 	TUniquePtr<DX_ObjectPool<UUserWidget> > WidgetPool;
+	TWeakObjectPtr<AActor> TransientWidgetAttachActor;
 };
