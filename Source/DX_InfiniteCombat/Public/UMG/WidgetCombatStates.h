@@ -21,6 +21,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime = 1.4f, const FString& ShowInfos="");
 
+	UFUNCTION(BlueprintCallable)
+	void RegisterPersistentWidget(FName UniqueID, UUserWidget* RegisteredWidget);
+
+	/*UFUNCTION(BlueprintCallable)
+	void UpdatePersistentWidget(FName UniqueID, );*/
+
 protected:
 	//virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
@@ -36,4 +42,7 @@ public:
 private:
 	TUniquePtr<DX_ObjectPool<UUserWidget> > WidgetPool;
 	TWeakObjectPtr<AActor> TransientWidgetAttachActor;
+
+	UPROPERTY()
+	TMap<FName, UUserWidget*> PersistentWidgets;
 };

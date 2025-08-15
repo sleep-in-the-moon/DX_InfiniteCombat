@@ -4,31 +4,31 @@
 #include "DX_StaticFunlib.h"
 #include "CollisionQueryParams.h"
 
-void UDX_StaticFunlib::MakeCollisionParam(const AActor* Owner, FCollisionQueryParams& CollisionQueryParams, FCollisionObjectQueryParams& ObjectQueryParams, TArray<AActor*> ActorsToIgnore, TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes, bool bTraceComplex, bool bIgnoreSelf)
+void UDX_StaticFunlib::MakeCollisionParam(const AActor* Avatar, FCollisionQueryParams& CollisionQueryParams, FCollisionObjectQueryParams& ObjectQueryParams, TArray<AActor*> ActorsToIgnore, TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes, bool bTraceComplex, bool bIgnoreSelf)
 {
-	static const FName LineTraceMultiName(TEXT("LineTraceMultiForObjects"));
+	static const FName LineTraceTag(TEXT("LineTraceMultiForObjects"));
 	//ConfigureCollisionParams(LineTraceMultiName, bTraceComplex, ActorsToIgnore, bIgnoreSelf, MeshComp->GetOwner());
-	CollisionQueryParams = FCollisionQueryParams(LineTraceMultiName, bTraceComplex);
+	CollisionQueryParams = FCollisionQueryParams(LineTraceTag, bTraceComplex);
 	CollisionQueryParams.bReturnPhysicalMaterial = true;
 	CollisionQueryParams.AddIgnoredActors(ActorsToIgnore);
 
 	if (bIgnoreSelf)
 	{
-		if (Owner)
+		if (Avatar)
 		{
-			CollisionQueryParams.AddIgnoredActor(Owner);
+			CollisionQueryParams.AddIgnoredActor(Avatar);
 		}
 		else
 		{
 			// find owner
-			const UObject* CurrentObject = Owner;
+			const UObject* CurrentObject = Avatar;
 			while (CurrentObject)
 			{
 				CurrentObject = CurrentObject->GetOuter();
-				Owner = Cast<AActor>(CurrentObject);
-				if (Owner)
+				Avatar = Cast<AActor>(CurrentObject);
+				if (Avatar)
 				{
-					CollisionQueryParams.AddIgnoredActor(Owner);
+					CollisionQueryParams.AddIgnoredActor(Avatar);
 					break;
 				}
 			}

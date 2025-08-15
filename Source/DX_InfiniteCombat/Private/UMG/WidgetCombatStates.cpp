@@ -78,6 +78,14 @@ void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubc
 
 }
 
+void UWidgetCombatStates::RegisterPersistentWidget(FName UniqueID, UUserWidget* RegisteredWidget)
+{
+	if (UniqueID.IsNone() || !RegisteredWidget)
+		return;
+
+	PersistentWidgets.Add(UniqueID, RegisteredWidget);
+}
+
 //void UWidgetCombatStates::NativePreConstruct()
 //{
 //	Super::NativePreConstruct();

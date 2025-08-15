@@ -39,7 +39,10 @@ public:
 	void AppendCandidateActors(const TMap<AActor*, float>& AddActors);
 
 	UFUNCTION(BlueprintCallable)
-	bool DoOnceTrace();
+	AActor* GetCurLockActor() const
+	{
+		return CurLockActor;
+	}
 
 //	UFUNCTION(BlueprintCallable)
 //	void EndLock();
@@ -47,20 +50,25 @@ public:
 //	void UpdateCurLockActor();
 
 private:
-	UFUNCTION(BlueprintCallable)
+	bool DoOnceTrace();
 	void SetIsLockingOnTarget(bool IsLockOn);
+	void WhenLockingOnActor(AActor* LockedActor);
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)) };
+	//被锁定者身上显示的UI
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> LockedWidget;
 
 private:
 	UPROPERTY()
-	TMap<AActor*, float> CandidateActors;
+	TObjectPtr<AActor> CurLockActor;
 	UPROPERTY()
-	AActor* CurLockActor;
+	TMap<AActor*, float> CandidateActors;
 
 	bool bAutoTrace = false;
 	float AutoTraceInterval = 0.1f;
+	FTimerHandle AutoTraceTimer;
 
-	//被锁定者的UI组件
-	UPROPERTY()
-	UWidgetComponent* LockWidgetComp;
-	
 };

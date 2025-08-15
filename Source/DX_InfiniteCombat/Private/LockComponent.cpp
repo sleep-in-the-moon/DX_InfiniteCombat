@@ -5,6 +5,7 @@
 #include "ICAbilitySystemComponent.h"
 #include "ICWorldSubsystem.h"
 #include "KismetTraceUtils.h"
+#include "DX_ReusableTool/Public/DX_StaticFunlib.h"
 
 // Sets default values for this component's properties
 ULockComponent::ULockComponent()
@@ -37,7 +38,22 @@ void ULockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void ULockComponent::SetAutoLockEnable(bool Enable)
 {
+	if (bAutoTrace == Enable)
+		return;
+
 	bAutoTrace = Enable;
+
+	if (bAutoTrace && GetOwner())
+	{
+		GetOwner()->GetWorld()->GetTimerManager().SetTimer(AutoTraceTimer, [this]() {
+			DoOnceTrace();
+		}, AutoTraceInterval, true);
+	}
+	else if(!bAutoTrace && AutoTraceTimer.IsValid() && GetOwner())
+	{
+		GetOwner()->GetWorld()->GetTimerManager().ClearTimer(AutoTraceTimer); 
+		AutoTraceTimer.Invalidate();
+	}
 }
 
 bool ULockComponent::GetIsLockingOnTarget()
@@ -67,6 +83,15 @@ void ULockComponent::SetIsLockingOnTarget(bool IsLockOn)
 		UE_LOG(LogTemp, Warning, TEXT("setLock::ASC not valid"));
 	}
 	
+}
+
+void ULockComponent::WhenLockingOnActor(AActor* LockedActor)
+{
+	if (CurLockActor)
+	{
+		//WidgetProcess
+	}
+	CurLockActor = LockedActor;
 }
 
 void ULockComponent::AddToCandidateActors(AActor* AddActor, float score)
@@ -100,6 +125,19 @@ bool ULockComponent::DoOnceTrace()
 		if (ICSubSystem && ICSubSystem->GetShowDebug())
 			DrawDebugSphereTraceMulti(GetOwner()->GetWorld(), StartLoc, EndLoc, TraceHalf, EDrawDebugTrace::Type::ForDuration, false, OutHits, FLinearColor::Blue, FLinearColor::Green, 10.0f);
 
+		FCollisionQueryParams CollisionQueryParams;
+		FCollisionObjectQueryParams CollisionObjectQueryParams;
+		UDX_StaticFunlib::MakeCollisionParam(GetOwner(), CollisionQueryParams, CollisionObjectQueryParams, TArray<AActor*>(), TraceObjectTypes);
+
+		bool const bHit = GetOwner()->GetWorld()->SweepMultiByObjectType(OutHits, StartLoc, EndLoc, FQuat::Identity, CollisionObjectQueryParams, TraceShape, CollisionQueryParams);
+
+		if (bHit)
+		{
+			WhenLockingOnActor(OutHits.Last().GetActor());
+		}
+		SetIsLockingOnTarget(bHit);
+
+		return bHit;
 	}
 
 	return false;

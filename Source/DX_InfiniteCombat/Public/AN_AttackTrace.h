@@ -44,7 +44,8 @@ protected:
 	int8 TracePointNum = 5;*/
 	
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
-	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)), TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_PhysicsBody)) };
+	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)),
+															TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_PhysicsBody)) };
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
 	bool bTraceComplex=false;
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
