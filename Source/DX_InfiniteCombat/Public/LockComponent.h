@@ -68,7 +68,7 @@ private:
 	TMap<AActor*, float> CandidateActors;
 
 	bool bAutoTrace = false;
-	float AutoTraceInterval = 0.1f;
+	float AutoTraceInterval = 0.4f;
 	FTimerHandle AutoTraceTimer;
 
 };

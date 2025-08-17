@@ -33,7 +33,12 @@ void ULockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (GetIsLockingOnTarget() && GetOwner())
+	{
+		FRotator TargetRot = FRotationMatrix::MakeFromX(CurLockActor->GetActorLocation() - GetOwner()->GetActorLocation()).Rotator();
+
+		GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, TargetRot.Yaw, GetOwner()->GetActorRotation().Roll));
+	}
 }
 
 void ULockComponent::SetAutoLockEnable(bool Enable)
@@ -61,7 +66,7 @@ bool ULockComponent::GetIsLockingOnTarget()
 	UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>();
 	if (ASC)
 	{
-		return ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.OnLockTarget")));
+		return ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.OnLockTarget"))) && CurLockActor;
 	}
 
 	return false;
