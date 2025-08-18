@@ -65,6 +65,7 @@ void ABasicInputPlayerController::SetupInputComponent()
 
 void ABasicInputPlayerController::BeginPlay()
 {
+	Super::BeginPlay();
 	//TODO:输入绑定时机
 	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
