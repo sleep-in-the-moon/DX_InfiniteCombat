@@ -8,6 +8,30 @@
 #include "WidgetCombatStates.generated.h"
 
 
+UENUM()
+enum class EWidgetAttachMode : uint8
+{
+	AttachToLocation,
+	AttachToActor
+};
+
+USTRUCT()
+struct FPersistentWidgetHandle 
+{
+	GENERATED_BODY()
+
+	UUserWidget* PersistentWidget;
+	EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToLocation;
+	AActor* AttachActor = nullptr;
+	FVector AttachToLocation = FVector::ZeroVector;
+
+	FPersistentWidgetHandle(UUserWidget* PersistentWidget, AActor* AttachActor, EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToActor) :PersistentWidget(PersistentWidget), AttachActor(AttachActor), WidgetAttachMode(WidgetAttachMode)
+	{}
+
+	FPersistentWidgetHandle(UUserWidget* PersistentWidget, FVector AttachToLocation, EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToLocation) :PersistentWidget(PersistentWidget), AttachToLocation(AttachToLocation), WidgetAttachMode(WidgetAttachMode)
+	{}
+};
+
 class UCanvasPanel;
 /**
  * 
@@ -21,8 +45,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime = 1.4f, const FString& ShowInfos="");
 
-	UFUNCTION(BlueprintCallable)
-	void RegisterPersistentWidget(FName UniqueID, UUserWidget* RegisteredWidget);
+	//UFUNCTION(BlueprintCallable)
+	void RegisterPersistentWidget(FName UniqueID, FPersistentWidgetHandle RegisteredWidgetHandle);
 
 	/*UFUNCTION(BlueprintCallable)
 	void UpdatePersistentWidget(FName UniqueID, );*/
@@ -44,5 +68,5 @@ private:
 	TWeakObjectPtr<AActor> TransientWidgetAttachActor;
 
 	UPROPERTY()
-	TMap<FName, UUserWidget*> PersistentWidgets;
+	TMap<FName, FPersistentWidgetHandle> PersistentWidgets;
 };
