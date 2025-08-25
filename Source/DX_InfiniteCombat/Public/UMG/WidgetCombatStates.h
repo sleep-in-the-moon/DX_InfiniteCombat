@@ -20,15 +20,18 @@ struct FPersistentWidgetHandle
 {
 	GENERATED_BODY()
 
-	UUserWidget* PersistentWidget;
+	TWeakObjectPtr<UUserWidget> PersistentWidget;
 	EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToLocation;
-	AActor* AttachActor = nullptr;
-	FVector AttachToLocation = FVector::ZeroVector;
+	AActor* AttachedActor = nullptr;
+	FVector AttachedLocation = FVector::ZeroVector;
 
-	FPersistentWidgetHandle(UUserWidget* PersistentWidget, AActor* AttachActor, EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToActor) :PersistentWidget(PersistentWidget), AttachActor(AttachActor), WidgetAttachMode(WidgetAttachMode)
+	FPersistentWidgetHandle() {};
+	FPersistentWidgetHandle(UUserWidget* PersistentWidget, AActor* AttachActor, EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToActor) 
+		:PersistentWidget(PersistentWidget), AttachedActor(AttachActor), WidgetAttachMode(WidgetAttachMode)
 	{}
 
-	FPersistentWidgetHandle(UUserWidget* PersistentWidget, FVector AttachToLocation, EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToLocation) :PersistentWidget(PersistentWidget), AttachToLocation(AttachToLocation), WidgetAttachMode(WidgetAttachMode)
+	FPersistentWidgetHandle(UUserWidget* PersistentWidget, FVector AttachToLocation, EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToLocation) 
+		:PersistentWidget(PersistentWidget), AttachedLocation(AttachToLocation), WidgetAttachMode(WidgetAttachMode)
 	{}
 };
 
@@ -47,6 +50,7 @@ public:
 
 	//UFUNCTION(BlueprintCallable)
 	void RegisterPersistentWidget(FName UniqueID, FPersistentWidgetHandle RegisteredWidgetHandle);
+	void UnRegisterPersistentWidget(FName UniqueID);
 
 	/*UFUNCTION(BlueprintCallable)
 	void UpdatePersistentWidget(FName UniqueID, );*/

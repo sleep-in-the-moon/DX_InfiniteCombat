@@ -7,6 +7,7 @@
 #include "LockComponent.generated.h"
 
 class UWidgetComponent;
+class UWidgetCombatStates;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DX_INFINITECOMBAT_API ULockComponent : public UActorComponent
@@ -32,6 +33,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool GetIsLockingOnTarget();
+	UFUNCTION(BlueprintCallable)
+	void SetIsLockingOnTarget(bool IsLockOn);
 
 	UFUNCTION(BlueprintCallable)
 	void AddToCandidateActors(AActor* AddActor, float score=1.f);
@@ -46,24 +49,28 @@ public:
 
 //	UFUNCTION(BlueprintCallable)
 //	void EndLock();
-//private:
-//	void UpdateCurLockActor();
 
 private:
 	bool DoOnceTrace();
-	void SetIsLockingOnTarget(bool IsLockOn);
 	void WhenLockingOnActor(AActor* LockedActor);
+	void UpdateLockState();
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)) };
+
 	//被锁定者身上显示的UI
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UUserWidget> LockedWidget;
+	TSubclassOf<UUserWidget> LockedWidgetClass;
 
 private:
 	UPROPERTY()
-	TObjectPtr<AActor> CurLockActor;
+	UUserWidget* LockedWidget= nullptr;
+	FName LockedWidgetPersistentID = TEXT("LockedWidget");
+	TWeakObjectPtr<UWidgetCombatStates> CombatStatesWidget;
+
+	UPROPERTY()
+	AActor* CurLockActor= nullptr;
 	UPROPERTY()
 	TMap<AActor*, float> CandidateActors;
 

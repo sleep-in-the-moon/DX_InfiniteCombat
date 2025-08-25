@@ -9,7 +9,7 @@
 
 void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime, const FString& ShowInfos)
 {
-	if (!WidgetClass || !AttachActor)
+	if (!WidgetClass || !AttachActor ||!MainCanvasPanel)
 		return;
 
 	FVector2D CanvasPosition = GetCanvasPositionByWorldLoc(AttachActor->GetActorLocation());
@@ -19,7 +19,9 @@ void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubc
 		return;
 
 	UUserWidget* Widget = WidgetPool->AccessObject(this, WidgetClass);
-	MainCanvasPanel->AddChildToCanvas(Widget);
+	UCanvasPanelSlot* CanvasSlot = MainCanvasPanel->AddChildToCanvas(Widget);
+	if (!CanvasSlot)
+		return;
 
 	if (WidgetClass.Get())
 	{
@@ -47,10 +49,6 @@ void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubc
 			
 		}
 	}
-
-	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Widget->Slot);
-	if (!CanvasSlot)
-		return;
 
 	CanvasSlot->SetPosition(CanvasPosition);
 
@@ -80,10 +78,20 @@ void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubc
 
 void UWidgetCombatStates::RegisterPersistentWidget(FName UniqueID, FPersistentWidgetHandle RegisteredWidgetHandle)
 {
-	if (UniqueID.IsNone() || !RegisteredWidgetHandle.PersistentWidget)
+	if (UniqueID.IsNone() || !RegisteredWidgetHandle.PersistentWidget.IsValid() || !MainCanvasPanel)
 		return;
 
+	MainCanvasPanel->AddChildToCanvas(RegisteredWidgetHandle.PersistentWidget.Get());
 	PersistentWidgets.Add(UniqueID, RegisteredWidgetHandle);
+}
+
+void UWidgetCombatStates::UnRegisterPersistentWidget(FName UniqueID)
+{
+	if (PersistentWidgets.Contains(UniqueID))
+	{
+		MainCanvasPanel->RemoveChild(PersistentWidgets.Find(UniqueID)->PersistentWidget.Get());
+		PersistentWidgets.Remove(UniqueID);
+	}
 }
 
 //void UWidgetCombatStates::NativePreConstruct()
@@ -114,6 +122,29 @@ void UWidgetCombatStates::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 		{
 			if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(widget->Slot))
 				CanvasSlot->SetPosition(GetCanvasPositionByWorldLoc(TransientWidgetAttachActor.Get()->GetActorLocation()));
+		}
+	}
+	//Update PersistentWidget's position
+	for (auto& map : PersistentWidgets)
+	{
+		if (!map.Value.PersistentWidget.IsValid())
+			continue;
+
+		UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(map.Value.PersistentWidget->Slot);
+		if (!CanvasSlot)
+			continue;
+
+		switch (map.Value.WidgetAttachMode)
+		{
+		case EWidgetAttachMode::AttachToLocation:
+			CanvasSlot->SetPosition(GetCanvasPositionByWorldLoc(map.Value.AttachedLocation));
+			break;
+		case EWidgetAttachMode::AttachToActor:
+			if(map.Value.AttachedActor)
+				CanvasSlot->SetPosition(GetCanvasPositionByWorldLoc(map.Value.AttachedActor->GetActorLocation()));
+			break;
+		default:
+			break;
 		}
 	}
 }

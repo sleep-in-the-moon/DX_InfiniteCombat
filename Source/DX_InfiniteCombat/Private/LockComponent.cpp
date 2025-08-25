@@ -6,6 +6,7 @@
 #include "ICWorldSubsystem.h"
 #include "KismetTraceUtils.h"
 #include "DX_ReusableTool/Public/DX_StaticFunlib.h"
+#include "UMG/WidgetCombatStates.h"
 
 // Sets default values for this component's properties
 ULockComponent::ULockComponent()
@@ -24,7 +25,28 @@ void ULockComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	if (APawn* ownerP = Cast<APawn>(GetOwner()))
+	{
+		APlayerController* playerControl = Cast<APlayerController>(ownerP->GetController());
+		if (playerControl && LockedWidgetClass)
+		{
+			LockedWidget = CreateWidget<UUserWidget>(playerControl, LockedWidgetClass);
+
+			FProperty* CombatStatesWidgetPro = playerControl->GetClass()->FindPropertyByName(TEXT("CombatStatesWidget"));
+			if (CombatStatesWidgetPro)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("CombatStatesWidgetClass::%s"), *CombatStatesWidgetPro->GetCPPType()));
+				UE_LOG(LogTemp, Warning, TEXT("CombatStatesWidgetClass::%s"), *CombatStatesWidgetPro->GetCPPType());
+
+				FClassProperty* CombatStatesWidgetClassPro = static_cast<FClassProperty*>(CombatStatesWidgetPro);
+				const void* ValuePtr = CombatStatesWidgetClassPro->ContainerPtrToValuePtr<void>(playerControl);
+				TObjectPtr<UObject> CombatStatesWidgetObj = CombatStatesWidgetClassPro->GetPropertyValue(ValuePtr);
+
+				if (Cast<UWidgetCombatStates>(CombatStatesWidgetObj))
+					CombatStatesWidget = Cast<UWidgetCombatStates>(CombatStatesWidgetObj);
+			}
+		}
+	}
 }
 
 
@@ -35,10 +57,17 @@ void ULockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 	if (GetIsLockingOnTarget() && GetOwner())
 	{
-		FRotator TargetRot = FRotationMatrix::MakeFromX(CurLockActor->GetActorLocation() - GetOwner()->GetActorLocation()).Rotator();
+		FRotator LookRot = FRotationMatrix::MakeFromX(CurLockActor->GetActorLocation() - GetOwner()->GetActorLocation()).Rotator();
 
-		GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, TargetRot.Yaw, GetOwner()->GetActorRotation().Roll));
+		GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, LookRot.Yaw, GetOwner()->GetActorRotation().Roll));
+
+		if (APawn* ownerP = Cast<APawn>(GetOwner()))
+		{
+			ownerP->GetController()->SetControlRotation(FRotator(LookRot.Pitch, LookRot.Yaw, ownerP->GetController()->GetControlRotation().Roll));
+		}
+		
 	}
+	UpdateLockState();
 }
 
 void ULockComponent::SetAutoLockEnable(bool Enable)
@@ -80,7 +109,10 @@ void ULockComponent::SetIsLockingOnTarget(bool IsLockOn)
 		if(IsLockOn)
 			ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.OnLockTarget")));
 		else
+		{
+			//CurLockActor = nullptr;
 			ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.OnLockTarget")));
+		}
 	}
 	else
 	{
@@ -94,9 +126,33 @@ void ULockComponent::WhenLockingOnActor(AActor* LockedActor)
 {
 	if (CurLockActor)
 	{
-		//WidgetProcess
+		//处理旧锁定目标上的逻辑
 	}
+	SetIsLockingOnTarget(true);
 	CurLockActor = LockedActor;
+	//处理新锁定目标上的逻辑
+	if (CurLockActor && CombatStatesWidget.IsValid() && LockedWidget)
+		CombatStatesWidget->RegisterPersistentWidget(LockedWidgetPersistentID, FPersistentWidgetHandle(LockedWidget, CurLockActor));
+}
+
+void ULockComponent::UpdateLockState()
+{
+	if (CurLockActor)
+	{
+		UAbilitySystemComponent* LockActorASC = CurLockActor->FindComponentByClass<UAbilitySystemComponent>();
+		if (LockActorASC)
+		{
+			if (LockActorASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.Died")))
+			{
+				SetIsLockingOnTarget(false);
+				CurLockActor = nullptr;
+
+				if (CombatStatesWidget.IsValid())
+					CombatStatesWidget->UnRegisterPersistentWidget(LockedWidgetPersistentID);
+			}
+		}
+	}
+
 }
 
 void ULockComponent::AddToCandidateActors(AActor* AddActor, float score)
@@ -140,7 +196,6 @@ bool ULockComponent::DoOnceTrace()
 		{
 			WhenLockingOnActor(OutHits.Last().GetActor());
 		}
-		SetIsLockingOnTarget(bHit);
 
 		return bHit;
 	}
