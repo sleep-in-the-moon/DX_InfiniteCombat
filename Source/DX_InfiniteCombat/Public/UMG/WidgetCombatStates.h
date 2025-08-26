@@ -16,22 +16,27 @@ enum class EWidgetAttachMode : uint8
 };
 
 USTRUCT()
-struct FPersistentWidgetHandle 
+struct FPersistentWidgetInfos
 {
 	GENERATED_BODY()
 
-	TWeakObjectPtr<UUserWidget> PersistentWidget;
+	TWeakObjectPtr<UUserWidget> PersistentWidget = nullptr;
 	EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToLocation;
 	AActor* AttachedActor = nullptr;
 	FVector AttachedLocation = FVector::ZeroVector;
+	FVector2D Alignment = FVector2D(0.5, 0.5);
+	int32 ZOrder = 0;
 
-	FPersistentWidgetHandle() {};
-	FPersistentWidgetHandle(UUserWidget* PersistentWidget, AActor* AttachActor, EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToActor) 
-		:PersistentWidget(PersistentWidget), AttachedActor(AttachActor), WidgetAttachMode(WidgetAttachMode)
+	FPersistentWidgetInfos(): FPersistentWidgetInfos(nullptr, FVector::ZeroVector) {}
+
+	FPersistentWidgetInfos(UUserWidget* PersistentWidget, AActor* AttachActor, const FVector2D& Alignment = FVector2D(0.5, 0.5), int32 ZOrder = 0)
+		:PersistentWidget(PersistentWidget), AttachedActor(AttachActor), Alignment(Alignment), ZOrder(ZOrder)
+		, WidgetAttachMode(EWidgetAttachMode::AttachToActor)
 	{}
 
-	FPersistentWidgetHandle(UUserWidget* PersistentWidget, FVector AttachToLocation, EWidgetAttachMode WidgetAttachMode = EWidgetAttachMode::AttachToLocation) 
-		:PersistentWidget(PersistentWidget), AttachedLocation(AttachToLocation), WidgetAttachMode(WidgetAttachMode)
+	FPersistentWidgetInfos(UUserWidget* PersistentWidget, const FVector& AttachToLocation, const FVector2D& Alignment = FVector2D(0.5, 0.5), int32 ZOrder = 0)
+		:PersistentWidget(PersistentWidget), AttachedLocation(AttachToLocation), Alignment(Alignment), ZOrder(ZOrder)
+		, WidgetAttachMode(EWidgetAttachMode::AttachToLocation)
 	{}
 };
 
@@ -49,7 +54,7 @@ public:
 	void SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime = 1.4f, const FString& ShowInfos="");
 
 	//UFUNCTION(BlueprintCallable)
-	void RegisterPersistentWidget(FName UniqueID, FPersistentWidgetHandle RegisteredWidgetHandle);
+	void RegisterPersistentWidget(FName UniqueID, const FPersistentWidgetInfos& PersistentWidgetInfos);
 	void UnRegisterPersistentWidget(FName UniqueID);
 
 	/*UFUNCTION(BlueprintCallable)
@@ -72,5 +77,5 @@ private:
 	TWeakObjectPtr<AActor> TransientWidgetAttachActor;
 
 	UPROPERTY()
-	TMap<FName, FPersistentWidgetHandle> PersistentWidgets;
+	TMap<FName, FPersistentWidgetInfos> PersistentWidgets;
 };

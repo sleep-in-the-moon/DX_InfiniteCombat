@@ -23,6 +23,15 @@ void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubc
 	if (!CanvasSlot)
 		return;
 
+	CanvasSlot->SetAlignment(FVector2D(0.5, 0.5));
+	CanvasSlot->SetAutoSize(true);
+	CanvasSlot->ZOrder = 0;
+	//CanvasSlot->SetAnchors();
+	CanvasSlot->SetPosition(CanvasPosition);
+
+	UE_LOG(LogTemp, Warning, TEXT("CanvasPosition::%s"), *CanvasPosition.ToString());
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("CanvasPosition::%s"), *CanvasPosition.ToString()));
+
 	if (WidgetClass.Get())
 	{
 		if (UFunction* InitFunc = WidgetClass.Get()->FindFunctionByName(FName(TEXT("Init"))))
@@ -50,11 +59,6 @@ void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubc
 		}
 	}
 
-	CanvasSlot->SetPosition(CanvasPosition);
-
-	UE_LOG(LogTemp, Warning, TEXT("CanvasPosition::%s"),*CanvasPosition.ToString());
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("CanvasPosition::%s"), *CanvasPosition.ToString()));
-
 	if (TransientTime > 0)
 	{
 		FTimerHandle LifeTimer;
@@ -76,13 +80,19 @@ void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubc
 
 }
 
-void UWidgetCombatStates::RegisterPersistentWidget(FName UniqueID, FPersistentWidgetHandle RegisteredWidgetHandle)
+void UWidgetCombatStates::RegisterPersistentWidget(FName UniqueID, const FPersistentWidgetInfos& PersistentWidgetInfos)
 {
-	if (UniqueID.IsNone() || !RegisteredWidgetHandle.PersistentWidget.IsValid() || !MainCanvasPanel)
+	if (UniqueID.IsNone() || !PersistentWidgetInfos.PersistentWidget.IsValid() || !MainCanvasPanel)
 		return;
 
-	MainCanvasPanel->AddChildToCanvas(RegisteredWidgetHandle.PersistentWidget.Get());
-	PersistentWidgets.Add(UniqueID, RegisteredWidgetHandle);
+	MainCanvasPanel->AddChildToCanvas(PersistentWidgetInfos.PersistentWidget.Get());
+	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PersistentWidgetInfos.PersistentWidget.Get()->Slot);
+	CanvasSlot->SetAlignment(PersistentWidgetInfos.Alignment);
+	CanvasSlot->SetAutoSize(true);
+	CanvasSlot->SetZOrder(PersistentWidgetInfos.ZOrder);
+	//CanvasSlot->SetAnchors();
+
+	PersistentWidgets.Add(UniqueID, PersistentWidgetInfos);
 }
 
 void UWidgetCombatStates::UnRegisterPersistentWidget(FName UniqueID)

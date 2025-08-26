@@ -132,7 +132,7 @@ void ULockComponent::WhenLockingOnActor(AActor* LockedActor)
 	CurLockActor = LockedActor;
 	//处理新锁定目标上的逻辑
 	if (CurLockActor && CombatStatesWidget.IsValid() && LockedWidget)
-		CombatStatesWidget->RegisterPersistentWidget(LockedWidgetPersistentID, FPersistentWidgetHandle(LockedWidget, CurLockActor));
+		CombatStatesWidget->RegisterPersistentWidget(LockedWidgetPersistentID, FPersistentWidgetInfos(LockedWidget, CurLockActor));
 }
 
 void ULockComponent::UpdateLockState()
