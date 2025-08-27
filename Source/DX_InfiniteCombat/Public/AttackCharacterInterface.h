@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "ICStructs.h"
+#include "ICTypes.h"
 #include "AttackCharacterInterface.generated.h"
 
 class UAbilitySystemComponent;

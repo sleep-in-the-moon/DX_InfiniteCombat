@@ -1,11 +1,50 @@
-// Copyright DX_IC
-
 #pragma once
 
 #include "CoreMinimal.h"
 //#include "UObject/NoExportTypes.h"
 #include "GameplayTagContainer.h"
-#include "ICStructs.generated.h"
+#include "ICTypes.generated.h"
+
+
+USTRUCT(BlueprintType)
+struct FAttackInfo
+{
+	GENERATED_BODY()
+
+public:
+	FAttackInfo(float ATKBonusCoefficient) : ATKBonusCoefficient(ATKBonusCoefficient){}
+	FAttackInfo() :FAttackInfo(1.0) {}
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar << ATKBonusCoefficient;
+
+		// 简单健壮性：防 NaN / 非法值
+		if (Ar.IsLoading())
+		{
+			if (!FMath::IsFinite(ATKBonusCoefficient))
+			{
+				ATKBonusCoefficient = 1.0f;
+			}
+		}
+
+		bOutSuccess = true;
+		return true;
+	}
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float ATKBonusCoefficient = 1.0;
+
+	//AttackDiretion;
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FAttackInfo> : public TStructOpsTypeTraitsBase2<FAttackInfo>
+{
+	enum { WithNetSerializer = true };
+};
 
 class UStaticMesh;
 class UICGameplayAbilityBase;
@@ -46,3 +85,9 @@ public:
 //	TMap<FGameplayTag, FWeaponStruct> WeaponList;
 //};
 
+UENUM(BlueprintType)
+enum class EComboSource : uint8
+{
+	Normal,
+	Skill1
+};
