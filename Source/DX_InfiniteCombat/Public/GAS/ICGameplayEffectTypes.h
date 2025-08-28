@@ -14,6 +14,9 @@ struct DX_INFINITECOMBAT_API FICGameplayEffectContext : public FGameplayEffectCo
 	GENERATED_BODY()
 
 public:
+	FICGameplayEffectContext() :FICGameplayEffectContext(FAttackInfo(1.0)) {}
+	FICGameplayEffectContext(FAttackInfo AttackInfo) :AttackInfo(AttackInfo) {}
+
 	FAttackInfo GetAttackInfo() const
 	{
 		return AttackInfo;

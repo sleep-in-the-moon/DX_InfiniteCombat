@@ -57,9 +57,9 @@ protected:
 	TArray<FGEApplyArg> GameplayEffectsToApplyTarget;
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Effect")
 	TArray<FGEApplyArg> GameplayEffectsToApplySource;
-	/*UPROPERTY(EditAnywhere, Category = "HitApply|Effect")
-	FGameplayEffectContextHandle GEContextHandle;
-	UPROPERTY(EditAnywhere, Category = "HitApply|Effect")*/
+
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Effect")
+	float DamageATKCoefficient = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Hit")
 	FVector ImpulseScale = FVector(1600, 1600, 600);

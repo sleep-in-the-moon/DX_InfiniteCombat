@@ -11,6 +11,8 @@
 #include "Runtime/AIModule/Classes/Perception/AISense_Damage.h"
 #include "ICWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ICTypes.h"
+#include "GAS/ICGameplayEffectTypes.h"
 
 
 void UAN_AttackTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
@@ -118,8 +120,16 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 						{
 							if (GE.EffectToTargets)
 							{
-								if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(GE.EffectToTargets->GetDefaultObject()))
-									OwnerASC->ApplyGameplayEffectToTarget(GECDO, TargetASC, GE.Level);
+								FAttackInfo AttackInfo(DamageATKCoefficient);
+								FICGameplayEffectContext* ICEffectContext = new FICGameplayEffectContext(AttackInfo);
+								FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(ICEffectContext);
+								FGameplayEffectSpecHandle GESpecHandle = TargetASC->MakeOutgoingSpec(GE.EffectToTargets, GE.Level, ContextHandle);
+
+								OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
+								//SetByCaller
+
+								/*if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(GE.EffectToTargets->GetDefaultObject()))
+									OwnerASC->ApplyGameplayEffectToTarget(GECDO, TargetASC, GE.Level);*/
 							}
 						}
 
