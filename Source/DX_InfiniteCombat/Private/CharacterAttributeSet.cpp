@@ -10,7 +10,12 @@ void UCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 
 	if (Data.EvaluatedData.Attribute == GetHPAttribute())
 	{
-		SetHP(FMath::Clamp(GetHP(), 0.0, GetMaxHP()));
+		SetHP(FMath::Clamp(GetHP(), 0.0f, GetMaxHP()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		SetHP(FMath::Clamp(GetHP() - GetIncomingDamage(), 0.0f, GetMaxHP()));
+		SetIncomingDamage(0.0f);
 	}
 
 }

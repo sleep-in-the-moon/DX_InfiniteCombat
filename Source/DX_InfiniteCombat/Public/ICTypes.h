@@ -13,11 +13,12 @@ struct FAttackInfo
 
 public:
 	FAttackInfo(float ATKBonusCoefficient) : ATKBonusCoefficient(ATKBonusCoefficient){}
-	FAttackInfo() :FAttackInfo(1.0) {}
+	FAttackInfo() :FAttackInfo(0.0) {}
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 	{
 		Ar << ATKBonusCoefficient;
+		Ar << FinalDamage;
 
 		// 简单健壮性：防 NaN / 非法值
 		if (Ar.IsLoading())
@@ -32,9 +33,30 @@ public:
 		return true;
 	}
 
-public:
+	float GetATKBonusCoefficient() const
+	{
+		return ATKBonusCoefficient;
+	}
+	void SetATKBonusCoefficient(float NewValue)
+	{
+		ATKBonusCoefficient = NewValue;
+	}
+
+	float GetFinalDamage() const
+	{
+		return FinalDamage;
+	}
+	void SetFinalDamage(float NewValue)
+	{
+		FinalDamage = NewValue;
+	}
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	float ATKBonusCoefficient = 1.0;
+	float ATKBonusCoefficient = 0.0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float FinalDamage = 0.0;
 
 	//AttackDiretion;
 
@@ -45,6 +67,7 @@ struct TStructOpsTypeTraits<FAttackInfo> : public TStructOpsTypeTraitsBase2<FAtt
 {
 	enum { WithNetSerializer = true };
 };
+
 
 class UStaticMesh;
 class UICGameplayAbilityBase;

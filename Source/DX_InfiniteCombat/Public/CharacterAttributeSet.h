@@ -24,26 +24,39 @@ class DX_INFINITECOMBAT_API UCharacterAttributeSet : public UAttributeSet
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute")
-	FGameplayAttributeData HP;
 	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, HP);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute")
-	FGameplayAttributeData MaxHP;
+	
 	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, MaxHP);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute")
-	FGameplayAttributeData ATK;
+	
 	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, ATK)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute")
-	FGameplayAttributeData Defense;
 	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, Defense)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute")
-	FGameplayAttributeData DamageReduce;
 	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, DamageReduce)
 
+	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, IncomingDamage)
+
+protected:
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 	
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData HP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxHP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData ATK;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Defense;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData DamageReduce;
+
+	//Meta Attribute, consumed in PostGameplayEffectExecute
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterAttribute", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData IncomingDamage;
+
 };
