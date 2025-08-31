@@ -19,6 +19,8 @@ class DX_INFINITECOMBAT_API UICWorldSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 	
+public:
+	UICWorldSubsystem();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -33,8 +35,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FMDG_DebugChange MDG_ShowDebugChange;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<TSubclassOf<UGameplayEffect> > DamageApplyGEs;
+	UPROPERTY(BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DamageApplyGE;
+	UPROPERTY(BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> AttackFeedbackGE;
 
 private:
 	bool bShowDebug=false;

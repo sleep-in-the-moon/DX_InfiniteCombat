@@ -15,17 +15,6 @@ struct FCollisionQueryParams;
 struct FCollisionObjectQueryParams;
 //struct FGameplayEffectContextHandle;
 
-USTRUCT(BlueprintType)
-struct FGEApplyArg
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere)
-	float Level=0;
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayEffect> EffectToTargets;
-
-};
 
 /**
  * 
@@ -53,12 +42,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace", meta = (AllowPrivateAccess = "true"))
 	TArray<AActor*> ActorsToIgnore;
 
-	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Effect")
-	TArray<FGEApplyArg> GameplayEffectsToApplyTarget;
-	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Effect")
-	TArray<FGEApplyArg> GameplayEffectsToApplySource;
-
-	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Effect")
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Damage")
 	float DamageATKCoefficient = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Hit")

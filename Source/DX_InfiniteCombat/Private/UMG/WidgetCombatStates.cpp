@@ -19,6 +19,8 @@ void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubc
 		return;
 
 	UUserWidget* Widget = WidgetPool->AccessObject(this, WidgetClass);
+	Widget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
 	UCanvasPanelSlot* CanvasSlot = MainCanvasPanel->AddChildToCanvas(Widget);
 	if (!CanvasSlot)
 		return;

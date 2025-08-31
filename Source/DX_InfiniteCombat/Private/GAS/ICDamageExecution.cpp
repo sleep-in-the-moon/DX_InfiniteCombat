@@ -64,11 +64,8 @@ void UICDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 	FinalDamage = FMath::Clamp(FinalDamage, 1.0f, FinalDamage);
 
 	AttackInfo.SetFinalDamage(FinalDamage);
-	EffectContext->SetAttackInfo(AttackInfo);
 
-	FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(EffectContext);
-
-	OwningSpec->SetContext(ContextHandle);//更新EffectContext信息以提供给GameplayCues使用
+	EffectContext->SetAttackInfo(AttackInfo);//更新EffectContext信息以提供给GameplayCues使用
 	
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UCharacterAttributeSet::GetHPAttribute(), EGameplayModOp::Additive, -FinalDamage));
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UCharacterAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, FinalDamage));

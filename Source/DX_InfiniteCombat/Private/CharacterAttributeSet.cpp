@@ -17,5 +17,16 @@ void UCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 		SetHP(FMath::Clamp(GetHP() - GetIncomingDamage(), 0.0f, GetMaxHP()));
 		SetIncomingDamage(0.0f);
 	}
-
+	else if (Data.EvaluatedData.Attribute == GetATKAttribute())
+	{
+		SetATK(FMath::Clamp(GetATK(), 0.0f, GetATK()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetDefenseAttribute())
+	{
+		SetDefense(FMath::Clamp(GetDefense(), 0.0f, GetDefense()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetDamageReduceAttribute())
+	{
+		SetDamageReduce(FMath::Clamp(GetDamageReduce(), 0.0f, 1.0f));
+	}
 }

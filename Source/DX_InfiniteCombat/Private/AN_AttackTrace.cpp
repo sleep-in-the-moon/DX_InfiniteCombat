@@ -116,21 +116,22 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					if (UAbilitySystemComponent* TargetASC = res.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
 					{
 						//应用GE
-						for (auto& GE : GameplayEffectsToApplyTarget)
+						if (ICSubSystem && ICSubSystem->DamageApplyGE)
 						{
-							if (GE.EffectToTargets)
-							{
-								FAttackInfo AttackInfo(DamageATKCoefficient);
-								FICGameplayEffectContext* ICEffectContext = new FICGameplayEffectContext(AttackInfo);
-								FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(ICEffectContext);
-								FGameplayEffectSpecHandle GESpecHandle = TargetASC->MakeOutgoingSpec(GE.EffectToTargets, GE.Level, ContextHandle);
+							FAttackInfo AttackInfo(DamageATKCoefficient);
 
-								OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
-								//SetByCaller
+							FICGameplayEffectContext* ICEffectContext = new FICGameplayEffectContext(AttackInfo);
+							ICEffectContext->AddInstigator(MeshComp->GetOwner(), MeshComp->GetOwner());
+							ICEffectContext->AddSourceObject(MeshComp->GetOwner());
 
-								/*if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(GE.EffectToTargets->GetDefaultObject()))
-									OwnerASC->ApplyGameplayEffectToTarget(GECDO, TargetASC, GE.Level);*/
-							}
+							FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(ICEffectContext);
+							FGameplayEffectSpecHandle GESpecHandle = OwnerASC->MakeOutgoingSpec(ICSubSystem->DamageApplyGE, 0, ContextHandle);
+
+							OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
+							//SetByCaller
+
+							/*if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(GE.EffectToTargets->GetDefaultObject()))
+								OwnerASC->ApplyGameplayEffectToTarget(GECDO, TargetASC, GE.Level);*/
 						}
 
 					}
@@ -166,13 +167,10 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 		{
 			bOnce = false;
 			//镜头抖动，时间膨胀 等GEGC
-			for (auto& GE : GameplayEffectsToApplySource)
+			if (ICSubSystem && ICSubSystem->AttackFeedbackGE)
 			{
-				if (GE.EffectToTargets)
-				{
-					if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(GE.EffectToTargets->GetDefaultObject()))
-						OwnerASC->ApplyGameplayEffectToSelf(GECDO, GE.Level, FGameplayEffectContextHandle());
-				}
+				if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(ICSubSystem->AttackFeedbackGE->GetDefaultObject()))
+					OwnerASC->ApplyGameplayEffectToSelf(GECDO, 0, FGameplayEffectContextHandle());
 			}
 
 			//减速 顿感
