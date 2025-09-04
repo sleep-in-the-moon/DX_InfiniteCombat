@@ -111,6 +111,8 @@ public:
 UENUM(BlueprintType)
 enum class EComboSource : uint8
 {
+	Ignore,
+	Interrupt,
 	NormalAttack UMETA(DisplayName = "ÆÕÍ¨¹¥»÷"),
 	Skill1,
 	Skill2,
