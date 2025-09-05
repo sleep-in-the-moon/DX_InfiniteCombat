@@ -114,11 +114,21 @@ enum class EComboSource : uint8
 	Ignore,
 	Interrupt,
 	NormalAttack UMETA(DisplayName = "ÆÕÍ¨¹¥»÷"),
-	Skill1,
-	Skill2,
-	Skill3,
-	Skill4,
-	Skill5,
-	Skill6,
-	Skill7,
+	Input1,
+	Input2,
+	Input3,
+	Input4,
+	Input5,
+	Input6,
+	Input7,
+};
+
+USTRUCT(BlueprintType)
+struct FInputComboInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	EComboSource InputComboSource;
 };

@@ -15,6 +15,9 @@ class DX_REUSABLETOOL_API UDX_StaticFunlib : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
+	/*UFUNCTION(BlueprintCallable)
+	static void PrintStr();*/
+
 	static void MakeCollisionParam(const AActor* Avatar, FCollisionQueryParams& CollisionQueryParams, FCollisionObjectQueryParams& ObjectQueryParams, TArray<AActor*> ActorsToIgnore, TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes, bool bTraceComplex=false, bool bIgnoreSelf=true);
 	
 	//UFUNCTION(BlueprintCallable)

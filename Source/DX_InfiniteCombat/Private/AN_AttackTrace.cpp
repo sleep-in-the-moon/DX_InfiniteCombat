@@ -173,7 +173,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					OwnerASC->ApplyGameplayEffectToSelf(GECDO, 0, FGameplayEffectContextHandle());
 			}
 
-			//减速 顿感
+			//缓速 顿感
 			UAnimMontage* AnimMon = Cast<UAnimMontage>(Animation);
 			if (bSlowdown && AnimMon)
 			{

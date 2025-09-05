@@ -34,6 +34,7 @@ public:
 	void PrintComboTrie();*/
 
 private:
+	//void ActiveComboReal();
 	void InitialComboTrie(const TArray<TArray<EComboSource> >& TotalCombo);
 
 public:

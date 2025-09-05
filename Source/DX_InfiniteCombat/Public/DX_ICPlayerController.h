@@ -21,7 +21,9 @@ struct FAbilityInput
 
 };
 
-DECLARE_DELEGATE_OneParam(FMoveInputTrigger, const FVector2D& /*InputValue*/);
+struct FInstancedStruct;
+
+DECLARE_DELEGATE_OneParam(FMoveInputTrigger, const FInstancedStruct& /*InputValue*/);
 
 /**
  * 

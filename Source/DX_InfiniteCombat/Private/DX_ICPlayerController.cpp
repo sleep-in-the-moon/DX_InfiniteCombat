@@ -5,6 +5,7 @@
 #include "DX_ICCharacter.h"
 #include "ICAbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
+#include "StructUtils/InstancedStruct.h"
 
 
 void ADX_ICPlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
@@ -36,8 +37,8 @@ void ADX_ICPlayerController::MoveEvent(const FInputActionValue& InputValue)
 			character->StopAnimMontage();
 		}
 	}
-
-	DG_MoveInputTrigger.ExecuteIfBound(InputValue.Get<FVector2D>());
+	
+	DG_MoveInputTrigger.ExecuteIfBound(FInstancedStruct::Make(InputValue.Get<FVector2D>()));
 }
 
 void ADX_ICPlayerController::Jump()

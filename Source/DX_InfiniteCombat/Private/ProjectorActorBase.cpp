@@ -10,7 +10,7 @@
 #include "ICWorldSubsystem.h"
 
 // Sets default values
-AProjectorActorBase::AProjectorActorBase()
+AProjectorActorBase::AProjectorActorBase():TraceActor(nullptr)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;

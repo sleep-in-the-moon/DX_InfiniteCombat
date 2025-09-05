@@ -6,13 +6,21 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/CanvasPanel.h"
 #include "Animation/WidgetAnimation.h"
+#include "Components/CapsuleComponent.h"
 
 void UWidgetCombatStates::SpawnTransientWidgetByActor(AActor* AttachActor, TSubclassOf<UUserWidget> WidgetClass, float TransientTime, const FString& ShowInfos)
 {
 	if (!WidgetClass || !AttachActor ||!MainCanvasPanel)
 		return;
 
-	FVector2D CanvasPosition = GetCanvasPositionByWorldLoc(AttachActor->GetActorLocation());
+	FVector SpawnLoc = AttachActor->GetActorLocation();
+	if (UCapsuleComponent* Capsule = AttachActor->FindComponentByClass<UCapsuleComponent>())
+	{
+		SpawnLoc = FVector(SpawnLoc.X, SpawnLoc.Y, SpawnLoc.Z+ Capsule->GetScaledCapsuleHalfHeight());
+		AttachActorCapsuleCompo = Capsule;
+	}
+
+	FVector2D CanvasPosition = GetCanvasPositionByWorldLoc(SpawnLoc);
 	TransientWidgetAttachActor = MakeWeakObjectPtr(AttachActor);
 
 	if (!WidgetPool)
@@ -133,7 +141,15 @@ void UWidgetCombatStates::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 		for (TObjectPtr<UUserWidget> widget : WidgetPool->GetAllActives())
 		{
 			if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(widget->Slot))
-				CanvasSlot->SetPosition(GetCanvasPositionByWorldLoc(TransientWidgetAttachActor.Get()->GetActorLocation()));
+			{
+				FVector NewLoc = TransientWidgetAttachActor.Get()->GetActorLocation();
+				if (AttachActorCapsuleCompo.IsValid())
+				{
+					NewLoc = FVector(NewLoc.X, NewLoc.Y, NewLoc.Z + AttachActorCapsuleCompo->GetScaledCapsuleHalfHeight());
+				}
+				CanvasSlot->SetPosition(GetCanvasPositionByWorldLoc(NewLoc));
+			}
+				
 		}
 	}
 	//Update PersistentWidget's position

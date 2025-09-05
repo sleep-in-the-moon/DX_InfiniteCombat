@@ -17,7 +17,7 @@ struct FCollisionObjectQueryParams;
 
 
 /**
- * 
+ * UANS_AttackTrace
  */
 UCLASS()
 class DX_INFINITECOMBAT_API UAN_AttackTrace : public UAnimNotifyState

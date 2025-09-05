@@ -41,6 +41,7 @@ struct FPersistentWidgetInfos
 };
 
 class UCanvasPanel;
+class UCapsuleComponent;
 /**
  * 
  */
@@ -74,7 +75,8 @@ public:
 
 private:
 	TUniquePtr<DX_ObjectPool<UUserWidget> > WidgetPool;
-	TWeakObjectPtr<AActor> TransientWidgetAttachActor;
+	TWeakObjectPtr<AActor> TransientWidgetAttachActor = nullptr;
+	TWeakObjectPtr<UCapsuleComponent> AttachActorCapsuleCompo=nullptr;
 
 	UPROPERTY()
 	TMap<FName, FPersistentWidgetInfos> PersistentWidgets;

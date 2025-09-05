@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "DX_ICPlayerController.h"
+#include "ICTypes.h"
 #include "ANS_ListeningWindow.generated.h"
 
 
@@ -19,11 +20,13 @@ UENUM(BlueprintType)
 enum class ETriggerEventType : uint8
 {
 	None,
-	Interrupt,
-	Combo,
+	Interrupt UMETA(DisplayName = "打断当前Montage"),
+	Combo UMETA(DisplayName = "可监听输入触发连招"),
 	Ability
 };
 
+
+struct FInstancedStruct;
 /**
  * 
  */
@@ -44,7 +47,9 @@ protected:
 	ETriggerEventType TriggerEventType = ETriggerEventType::None;
 
 private:
-	void StopMontageByInput(const FVector2D& Value);
+	void StopMontageByInput(const FInstancedStruct& Value);
+
+	void TryActiveCombo(const FInstancedStruct& ComboInfo);
 
 	UFUNCTION()
 	void OnMontageInterruptedEvent(UAnimMontage* montage, bool bInterrupted);
@@ -54,7 +59,7 @@ private:
 	template<typename TriggerEventFuncType>
 	void BindTriggerEventByLitenType(USkeletalMeshComponent* MeshComp, TriggerEventFuncType TriggerEventFunc);
 
-	USkeletalMeshComponent* SafeMeshComp;
+	USkeletalMeshComponent* SaveMeshComp;
 
 };
 
@@ -73,6 +78,9 @@ inline void UANS_ListeningWindow::BindTriggerEventByLitenType(USkeletalMeshCompo
 				ICPlayerController->DG_MoveInputTrigger.BindUObject(this, TriggerEventFunc);
 			}
 		}
+		break;
+	case EListenType::AbilityInput:
+		//TODO
 		break;
 	}
 }
