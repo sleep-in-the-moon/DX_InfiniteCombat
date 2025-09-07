@@ -14,7 +14,7 @@ struct FAbilityInput
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	UInputAction* InputAction;
+	UInputAction* InputAction = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	FGameplayTag InputTag;
