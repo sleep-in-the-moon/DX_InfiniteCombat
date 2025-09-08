@@ -6,6 +6,7 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "DX_ICPlayerController.h"
 #include "ICTypes.h"
+#include "ICAbilitySystemComponent.h"
 #include "ANS_ListeningWindow.generated.h"
 
 
@@ -80,7 +81,10 @@ inline void UANS_ListeningWindow::BindTriggerEventByLitenType(USkeletalMeshCompo
 		}
 		break;
 	case EListenType::AbilityInput:
-		//TODO
+		if (UICAbilitySystemComponent* ICASC = MeshComp->GetOwner()->FindComponentByClass<UICAbilitySystemComponent>())
+		{
+			ICASC->DG_InputComboPress.BindUObject(this, TriggerEventFunc);
+		}
 		break;
 	}
 }

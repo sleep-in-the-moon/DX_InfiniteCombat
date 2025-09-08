@@ -42,7 +42,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Landed(const FHitResult& Hit) override;
 
-	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
+	void Input_AbilityInputTagPressed(FGameplayTag InputTag, EComboSource InputComboSource);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
 	void Input_AbilityInputTagClick(FGameplayTag InputTag);
 

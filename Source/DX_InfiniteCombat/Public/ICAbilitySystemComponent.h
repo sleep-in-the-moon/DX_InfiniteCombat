@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "ICTypes.h"
 #include "ICAbilitySystemComponent.generated.h"
+
+struct FInstancedStruct;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInputReleaseDelegate, const FGameplayTag&, AbilityInputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmunityGECallback, const FGameplayTagContainer&, ImmunityGETags);
+DECLARE_DELEGATE_OneParam(FInputComboPress, const FInstancedStruct& /**/);
 
 USTRUCT(BlueprintType)
 struct FGAGive
@@ -30,7 +34,7 @@ class DX_INFINITECOMBAT_API UICAbilitySystemComponent : public UAbilitySystemCom
 	
 public:
 	UICAbilitySystemComponent();
-	void AbilityInputTagPressed(const FGameplayTag& InputTag);
+	void AbilityInputTagPressed(const FGameplayTag& InputTag, EComboSource InputComboSource);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 	void AbilityInputTagClick(const FGameplayTag& InputTag);
 
@@ -45,6 +49,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplySetByCallerGEToTarget(UAbilitySystemComponent* TargetASC, TSubclassOf<UGameplayEffect> ApplyGE, FGameplayTag DataTag, float Magnitude, float Level=0.0f);
 
+	FInputComboPress DG_InputComboPress;
 
 protected:
 

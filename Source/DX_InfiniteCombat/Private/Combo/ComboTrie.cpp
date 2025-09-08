@@ -37,18 +37,20 @@ bool UComboTrie::TryActiveCombo(EComboSource ComboSource)
 		if (GetOwner())
 		{
 			UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>();
-			if (ASC && ComboStateTag.IsValid() && !ASC->HasMatchingGameplayTag(ComboStateTag))
+			if (ASC && ComboStateTag.IsValid() && ComboDispatcherGATag.IsValid())
 			{
-				ASC->AddLooseGameplayTag(ComboStateTag);
+				if(!ASC->HasMatchingGameplayTag(ComboStateTag))
+					ASC->AddLooseGameplayTag(ComboStateTag);
+
+				return ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(ComboDispatcherGATag));
 			}
 		}
-
-		return true;
 	}
 	else
 	{
 		EndCombo();
 	}
+
 	return false;
 }
 
@@ -69,10 +71,15 @@ void UComboTrie::EndCombo()
 TArray<FText> UComboTrie::GetCurrentComboText() const
 {
 	TArray<FText> Res;
+	FText ComboText;
+
 	UEnum* ComboSourceUEnum = StaticEnum<EComboSource>();
 	for(EComboSource ComboSource: CurrentCombo)
 	{
-		Res.Add(ComboSourceUEnum->GetDisplayNameTextByValue(static_cast<int64>(ComboSource)));
+		if (ComboSourceUEnum->FindDisplayNameTextByValue(ComboText, static_cast<int64>(ComboSource)))//优先获取DisplayName
+			Res.Add(ComboText);
+		else
+			Res.Add(FText::FromString(ComboSourceUEnum->GetNameStringByValue(static_cast<int64>(ComboSource))));
 	}
 	return Res;
 }

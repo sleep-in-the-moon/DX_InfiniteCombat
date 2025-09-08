@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 #include "CoreMinimal.h"
 //#include "UObject/NoExportTypes.h"
@@ -6,6 +6,56 @@
 #include "ICTypes.generated.h"
 
 
+UENUM(BlueprintType)
+enum class EComboSource : uint8
+{
+	Ignore,
+	Interrupt,
+	NormalAttack UMETA(DisplayName = "ÊôÆÈÄöÊîªÂáª"),
+	Input1,
+	Input2,
+	Input3,
+	Input4,
+	Input5,
+	Input6,
+	Input7,
+};
+
+class UInputAction;
+
+USTRUCT(BlueprintType)
+struct FAbilityInput
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* InputAction = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag InputTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EComboSource InputComboSource = EComboSource::Ignore;
+
+};
+
+/*Â∞ÜEComboSourceÂ∞ÅË£ÖÁªôFInstancedStruct‰ΩøÁî®*/
+USTRUCT(BlueprintType)
+struct FInputComboInfo
+{
+	GENERATED_BODY()
+
+public:
+	FInputComboInfo():FInputComboInfo(EComboSource::Ignore){}
+	FInputComboInfo(EComboSource InputComboSource):InputComboSource(InputComboSource){}
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	EComboSource InputComboSource;
+};
+
+
+/*---------------------------------------------------------------------------------------------------------------------------------*/
 USTRUCT(BlueprintType)
 struct FAttackInfo
 {
@@ -20,7 +70,7 @@ public:
 		Ar << ATKBonusCoefficient;
 		Ar << FinalDamage;
 
-		// ºÚµ•Ω°◊≥–‘£∫∑¿ NaN / ∑«∑®÷µ
+		// ÁÆÄÂçïÂÅ•Â£ÆÊÄßÔºöÈò≤ NaN / ÈùûÊ≥ïÂÄº
 		if (Ar.IsLoading())
 		{
 			if (!FMath::IsFinite(ATKBonusCoefficient))
@@ -59,9 +109,7 @@ protected:
 	float FinalDamage = 0.0;
 
 	//AttackDiretion;
-
 };
-
 template<>
 struct TStructOpsTypeTraits<FAttackInfo> : public TStructOpsTypeTraitsBase2<FAttackInfo>
 {
@@ -69,6 +117,7 @@ struct TStructOpsTypeTraits<FAttackInfo> : public TStructOpsTypeTraitsBase2<FAtt
 };
 
 
+/*---------------------------------------------------------------------------------------------------------------------------------*/
 class UStaticMesh;
 class UICGameplayAbilityBase;
 
@@ -107,28 +156,3 @@ public:
 //	UPROPERTY(BlueprintReadWrite)
 //	TMap<FGameplayTag, FWeaponStruct> WeaponList;
 //};
-
-UENUM(BlueprintType)
-enum class EComboSource : uint8
-{
-	Ignore,
-	Interrupt,
-	NormalAttack UMETA(DisplayName = "∆’Õ®π•ª˜"),
-	Input1,
-	Input2,
-	Input3,
-	Input4,
-	Input5,
-	Input6,
-	Input7,
-};
-
-USTRUCT(BlueprintType)
-struct FInputComboInfo
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	EComboSource InputComboSource;
-};

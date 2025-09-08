@@ -77,7 +77,10 @@ void UANS_ListeningWindow::ClearBind()
 
 		break;
 	case EListenType::AbilityInput:
-		//TODO
+		if (UICAbilitySystemComponent* ICASC = SaveMeshComp->GetOwner()->FindComponentByClass<UICAbilitySystemComponent>())
+		{
+			ICASC->DG_InputComboPress.Unbind();
+		}
 		break;
 	}
 }

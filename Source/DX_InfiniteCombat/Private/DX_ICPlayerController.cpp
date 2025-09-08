@@ -46,7 +46,8 @@ void ADX_ICPlayerController::Jump()
 	Super::Jump();
 	if (ACharacter* character = GetCharacter())
 	{
-		if (UAbilitySystemComponent* ASC =  character->FindComponentByClass<UAbilitySystemComponent>())
+		UAbilitySystemComponent* ASC = character->FindComponentByClass<UAbilitySystemComponent>();
+		if (ASC && !ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir"))))
 		{
 			ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir")));
 		}

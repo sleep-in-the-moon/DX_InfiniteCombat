@@ -4,13 +4,14 @@
 #include "ICAbilitySystemComponent.h"
 #include "ICGameplayAbilityBase.h"
 #include "GameplayTagsManager.h"
+#include "StructUtils/InstancedStruct.h"
 
 UICAbilitySystemComponent::UICAbilitySystemComponent()
 {
 	ClearAbilityInput();
 }
 
-void UICAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
+void UICAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag, EComboSource InputComboSource)
 {
 	if (InputTag.IsValid())
 	{
@@ -26,6 +27,8 @@ void UICAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Input
 			}
 		}
 	}
+
+	DG_InputComboPress.ExecuteIfBound(FInstancedStruct::Make(FInputComboInfo(InputComboSource)));//To listening window ANS
 }
 
 void UICAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)

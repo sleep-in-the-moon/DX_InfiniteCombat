@@ -44,6 +44,8 @@ protected:
 	float ComboDuration = 0.7f;
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTag ComboStateTag=FGameplayTag::RequestGameplayTag(TEXT("State.InCombo"), false);
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag ComboDispatcherGATag = FGameplayTag::RequestGameplayTag(TEXT("Ability.Combo.ComboDispatcher"), false);
 
 private:
 	Trie<EComboSource> ComboTrie;

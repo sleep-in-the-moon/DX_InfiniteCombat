@@ -8,19 +8,8 @@
 
 #include "DX_ICPlayerController.generated.h"
 
-USTRUCT(BlueprintType)
-struct FAbilityInput
-{
-	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
-	UInputAction* InputAction = nullptr;
-
-	UPROPERTY(EditAnywhere)
-	FGameplayTag InputTag;
-
-};
-
+struct FAbilityInput;
 struct FInstancedStruct;
 
 DECLARE_DELEGATE_OneParam(FMoveInputTrigger, const FInstancedStruct& /*InputValue*/);

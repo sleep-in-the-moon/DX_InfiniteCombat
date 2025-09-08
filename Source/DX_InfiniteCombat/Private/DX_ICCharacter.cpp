@@ -11,6 +11,7 @@
 #include "CombatCharacterComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "ICWorldSubsystem.h"
+#include "ICTypes.h"
 
 
 UAbilitySystemComponent* ADX_ICCharacter::GetAbilitySystemComponent() const
@@ -40,13 +41,13 @@ void ADX_ICCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	{
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 		{
-			for (auto& GAI : ICPlayerController->AbilityInputArray)
+			for (const FAbilityInput& GAI : ICPlayerController->AbilityInputArray)
 			{
 				if (GAI.InputAction && GAI.InputTag.IsValid())
 				{
 					//EnhancedInputComponent->BindAction(GAI.InputAction, ETriggerEvent::Started, this, &ADX_ICCharacter::Input_AbilityInputTagClick, GAI.InputTag);
 					//EnhancedInputComponent->BindAction(GAI.InputAction, ETriggerEvent::Triggered, this, &ADX_ICCharacter::Input_AbilityInputTagPressed, GAI.InputTag);
-					EnhancedInputComponent->BindAction(GAI.InputAction, ETriggerEvent::Started, this, &ADX_ICCharacter::Input_AbilityInputTagPressed, GAI.InputTag);
+					EnhancedInputComponent->BindAction(GAI.InputAction, ETriggerEvent::Started, this, &ADX_ICCharacter::Input_AbilityInputTagPressed, GAI.InputTag, GAI.InputComboSource);
 					EnhancedInputComponent->BindAction(GAI.InputAction, ETriggerEvent::Completed, this, &ADX_ICCharacter::Input_AbilityInputTagReleased, GAI.InputTag);
 				}
 
@@ -85,12 +86,15 @@ void ADX_ICCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
+	UE_LOG(LogTemp, Warning, TEXT("Character land"));
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("Character land"));
+
 	ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir")));
 }
 
-void ADX_ICCharacter::Input_AbilityInputTagPressed(FGameplayTag InputTag)
+void ADX_ICCharacter::Input_AbilityInputTagPressed(FGameplayTag InputTag, EComboSource InputComboSource)
 {
-	ASC->AbilityInputTagPressed(InputTag);
+	ASC->AbilityInputTagPressed(InputTag, InputComboSource);
 }
 
 void ADX_ICCharacter::Input_AbilityInputTagReleased(FGameplayTag InputTag)
