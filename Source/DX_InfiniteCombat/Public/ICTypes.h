@@ -11,7 +11,7 @@ enum class EComboSource : uint8
 {
 	Ignore,
 	Interrupt,
-	NormalAttack UMETA(DisplayName = "普通攻击"),
+	NormalAttack UMETA(DisplayName = "Mele"), //UMETA(DisplayName = "普通攻击"),
 	Input1,
 	Input2,
 	Input3,
