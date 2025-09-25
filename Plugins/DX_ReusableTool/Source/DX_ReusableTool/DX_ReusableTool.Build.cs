@@ -39,6 +39,7 @@ public class DX_ReusableTool : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+                "ImageWrapper",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
