@@ -41,9 +41,7 @@ public:
 	{
 		if (Root)
 		{
-			TrieNode* node = Root;//it delete
-
-			delete Root;
+			ClearRecursively(Root);
 		}
 	}
 
@@ -54,7 +52,7 @@ public:
 		{
 			if (!node->ChildNodesMap.Find(item))
 			{
-				node->ChildNodesMap.Add(item, new TrieNode());
+				node->ChildNodesMap.Emplace(item, new TrieNode());
 			}
 
 			node = node->ChildNodesMap[item];
@@ -67,7 +65,7 @@ public:
 		return SearchPrefix(prefix) != nullptr;
 	}
 
-	void PrintTrie() const
+	void LayerIt() const
 	{
 		TQueue<TrieNode*> NodeQueue;
 		TrieNode* node = nullptr;
@@ -106,8 +104,40 @@ public:
 		}
 	}
 
+	void PrintTrie() const
+	{
+		PrintTrieRecursively(Root);
+	}
+
+	void SplitEndNode(const TArray<T>& prefix)
+	{
+		if (prefix.Num()<2)
+			return;
+
+		TrieNode* node = Root;
+		TrieNode* ParentNode = nullptr;
+		for (uint16 i = 0; i < prefix.Num(); ++i)
+		{
+			if (!node->ChildNodesMap.Find(prefix[i]))
+				return;
+			node = node->ChildNodesMap[prefix[i]];
+
+			if (i == prefix.Num() - 2)
+			{
+				ParentNode = node;
+			}
+			if (i == prefix.Num() - 1)
+			{
+				ParentNode->ChildNodesMap.Remove(prefix[i]);
+				Root->ChildNodesMap.Emplace(prefix[i], node);
+				break;
+			}
+
+		}
+	}
 
 private:
+
 	TrieNode* SearchPrefix(const TArray<T>& prefix) const
 	{
 		TrieNode* node = Root;
@@ -121,4 +151,61 @@ private:
 		return node;
 	}
 
+	void PrintTrieRecursively(TrieNode* node, const FString& prefix = "", const FString& ch = "*", bool isLast = true)
+	{
+		if (ch != "*") // 根节点用 * 
+		{	
+			FString str = prefix + (isLast ? "└── " : "├── ") + ch + "\n";
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("(root)\n"));
+		}
+
+		// 遍历子节点
+		uint16 i = 0;
+		for (const auto& pair : node->ChildNodesMap)
+		{
+			++i;
+			bool lastChild = (i == node->ChildNodesMap.Num());
+
+			FString Nextch="xx";
+			if constexpr (std::is_same_v<T, FString>)
+			{
+				Nextch = pair.Key;
+			}
+			else if constexpr (std::is_integral_v<T>)
+			{
+				Nextch = FString::FromInt(pair.Key);
+			}
+			else if constexpr (std::is_same_v<T, float>)
+			{
+				Nextch = FString::SanitizeFloat(pair.Key);
+			}
+			else
+				Nextch = pair.Key.GetString();
+			
+			// 进入下一层时，prefix 要追加合适的前缀
+			PrintTrieRecursively(pair.Value,
+				prefix + (ch == "*" ? "" : (isLast ? "    " : "│   ")),
+				Nextch,
+				lastChild);
+		}
+	}
+
+	void ClearRecursively(TrieNode* node)  // 后序遍历，递归delete
+	{
+		if (node == nullptr)
+		{
+			return;
+		}
+
+		for (auto& pair : node->ChildNodesMap)
+		{
+			ClearRecursively(pair.Value);
+		}
+
+		delete node;
+	}
 };
