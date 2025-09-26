@@ -18,6 +18,9 @@ public:
 	/*UFUNCTION(BlueprintCallable)
 	static void PrintStr();*/
 
+	UFUNCTION(BlueprintPure)
+	static bool GetAllFilesInFolder(const FString& RootDir, TArray<FString>& OutSubDirs, TArray<FString>& OutSubFiles, const FString& ExtentName="");
+
 	static void MakeCollisionParam(const AActor* Avatar, FCollisionQueryParams& CollisionQueryParams, FCollisionObjectQueryParams& ObjectQueryParams, TArray<AActor*> ActorsToIgnore, TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes, bool bTraceComplex=false, bool bIgnoreSelf=true);
 	
 	//UFUNCTION(BlueprintCallable)
