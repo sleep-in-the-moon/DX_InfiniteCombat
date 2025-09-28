@@ -109,10 +109,15 @@ public:
 		PrintTrieRecursively(Root);
 	}
 
-	TArray<TArray<T> > GetNodeAllChildBranches(TrieNode* node) const
+	TArray<TArray<T> > GetNodeAllChildBranches(TrieNode* node, T nodeElemT) const
 	{
 		TArray<TArray<T> > Res;
-		GetChildBranchsRecursively(node, Res);
+		TArray<T> CurElem;
+
+		if (node != Root)
+			CurElem.Add(nodeElemT);
+
+		GetChildBranchsRecursively(node, Res, CurElem);
 		
 		return Res;
 	}
@@ -138,7 +143,7 @@ public:
 			{
 				ParentNode->ChildNodesMap.Remove(prefix[i]);
 
-				for(const TArray<T>& Elems : GetNodeAllChildBranches(node))
+				for(const TArray<T>& Elems : GetNodeAllChildBranches(node, prefix[i]))
 					Insert(Elems);  // 将node剩下的全部重新插入到Root
 
 				break;
@@ -230,17 +235,19 @@ private:
 		delete node;
 	}
 
-	void GetChildBranchsRecursively(TrieNode* node, TArray<TArray<T> >& Res)  // TODO::回溯算法
+	void GetChildBranchsRecursively(TrieNode* node, TArray<TArray<T> >& Res, TArray<T>& CurElem) const  // 回溯算法
 	{
+		if(node->ChildNodesMap.Num()==0)
+			Res.Emplace(CurElem);
+
 		for (auto& childPair : node->ChildNodesMap)
 		{
 			if (!childPair.Value)
-				return;
+				break;
 
-			TArray<T> Childs;
-			Childs.Add(childPair.Kay);
-			GetChildBranchsRecursively(childPair.Value, Res);
-			
+			CurElem.Add(childPair.Key);
+			GetChildBranchsRecursively(childPair.Value, Res, CurElem);
+			CurElem.Pop();
 		}
 	}
 };
