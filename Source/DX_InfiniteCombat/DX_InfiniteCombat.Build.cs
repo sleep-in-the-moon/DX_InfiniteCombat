@@ -8,7 +8,7 @@ public class DX_InfiniteCombat : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities", "GameplayTags", "GameplayTasks", "DX_REUSABLETOOL" , "AIModule" , "StructUtils" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities", "GameplayTags", "GameplayTasks", "DX_ReusableTool", "AIModule" , "StructUtils" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

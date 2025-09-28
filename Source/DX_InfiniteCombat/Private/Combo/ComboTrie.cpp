@@ -1,4 +1,4 @@
-// Copyright DX_IC
+ï»¿// Copyright DX_IC
 
 
 #include "Combo/ComboTrie.h"
@@ -17,6 +17,21 @@ void UComboTrie::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{
 		EndCombo();
 	}
+}
+
+void UComboTrie::AddToComboTrie(const TArray<EComboSource>& items)
+{
+	ComboTrie.Insert(items);
+}
+
+void UComboTrie::PrintComboTrie() const
+{
+	ComboTrie.PrintTrie();
+}
+
+void UComboTrie::SplitEndComboNode(const TArray<EComboSource>& items)
+{
+	ComboTrie.SplitEndNode(items);
 }
 
 bool UComboTrie::TryActiveCombo(EComboSource ComboSource)
@@ -76,7 +91,7 @@ TArray<FText> UComboTrie::GetCurrentComboText() const
 	UEnum* ComboSourceUEnum = StaticEnum<EComboSource>();
 	for(EComboSource ComboSource: CurrentCombo)
 	{
-		if (ComboSourceUEnum->FindDisplayNameTextByValue(ComboText, static_cast<int64>(ComboSource)))//ÓÅÏÈ»ñÈ¡DisplayName
+		if (ComboSourceUEnum->FindDisplayNameTextByValue(ComboText, static_cast<int64>(ComboSource)))//ä¼˜å…ˆèŽ·å–DisplayName
 			Res.Add(ComboText);
 		else
 			Res.Add(FText::FromString(ComboSourceUEnum->GetNameStringByValue(static_cast<int64>(ComboSource))));

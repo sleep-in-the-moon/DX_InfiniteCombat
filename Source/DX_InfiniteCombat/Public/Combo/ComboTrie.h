@@ -1,4 +1,4 @@
-// Copyright DX_IC
+﻿// Copyright DX_IC
 
 #pragma once
 
@@ -19,6 +19,13 @@ class DX_INFINITECOMBAT_API UComboTrie : public UActorComponent
 	
 public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintCallable)
+	void AddToComboTrie(const TArray<EComboSource>& items);
+	UFUNCTION(BlueprintCallable)
+	void PrintComboTrie() const;
+	UFUNCTION(BlueprintCallable)
+	void SplitEndComboNode(const TArray<EComboSource>& items);
 
 	UFUNCTION(BlueprintCallable)
 	bool TryActiveCombo(EComboSource ComboSource);

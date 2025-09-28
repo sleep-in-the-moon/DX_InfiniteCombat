@@ -1,4 +1,4 @@
-// Copyright DX_IC
+ï»¿// Copyright DX_IC
 
 #pragma once
 
@@ -109,6 +109,14 @@ public:
 		PrintTrieRecursively(Root);
 	}
 
+	TArray<TArray<T> > GetNodeAllChildBranches(TrieNode* node) const
+	{
+		TArray<TArray<T> > Res;
+		GetChildBranchsRecursively(node, Res);
+		
+		return Res;
+	}
+
 	void SplitEndNode(const TArray<T>& prefix)
 	{
 		if (prefix.Num()<2)
@@ -129,7 +137,10 @@ public:
 			if (i == prefix.Num() - 1)
 			{
 				ParentNode->ChildNodesMap.Remove(prefix[i]);
-				Root->ChildNodesMap.Emplace(prefix[i], node);
+
+				for(const TArray<T>& Elems : GetNodeAllChildBranches(node))
+					Insert(Elems);  // å°†nodeå‰©ä¸‹çš„å…¨éƒ¨é‡æ–°æ’å…¥åˆ°Root
+
 				break;
 			}
 
@@ -151,19 +162,19 @@ private:
 		return node;
 	}
 
-	void PrintTrieRecursively(TrieNode* node, const FString& prefix = "", const FString& ch = "*", bool isLast = true)
+	void PrintTrieRecursively(TrieNode* node, const FString& prefix = "", const FString& ch = "*", bool isLast = true) const
 	{
-		if (ch != "*") // ¸ù½ÚµãÓÃ * 
+		if (ch != "*") // æ ¹èŠ‚ç‚¹ç”¨ * 
 		{	
-			FString str = prefix + (isLast ? "©¸©¤©¤ " : "©À©¤©¤ ") + ch + "\n";
+			FString str = prefix + (isLast ? TEXT("â””â”€â”€ ") : TEXT("â”œâ”€â”€ ")) + ch + "\n";
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("(root)\n"));
+			UE_LOG(LogTemp, Warning, TEXT("(Root)\n"));
 		}
 
-		// ±éÀú×Ó½Úµã
+		// éå†å­èŠ‚ç‚¹
 		uint16 i = 0;
 		for (const auto& pair : node->ChildNodesMap)
 		{
@@ -183,18 +194,28 @@ private:
 			{
 				Nextch = FString::SanitizeFloat(pair.Key);
 			}
+			else if constexpr (std::is_enum_v<T>)
+			{
+				UEnum* TUEnum = StaticEnum<T>();
+				FText EnumText;
+
+				if (TUEnum->FindDisplayNameTextByValue(EnumText, static_cast<int64>(pair.Key)))
+					Nextch = EnumText.ToString();
+				else
+					Nextch = TUEnum->GetNameStringByValue(static_cast<int64>(pair.Key));
+			}
 			else
 				Nextch = pair.Key.GetString();
 			
-			// ½øÈëÏÂÒ»²ãÊ±£¬prefix Òª×·¼ÓºÏÊÊµÄÇ°×º
+			// è¿›å…¥ä¸‹ä¸€å±‚æ—¶ï¼Œprefix è¦è¿½åŠ åˆé€‚çš„å‰ç¼€
 			PrintTrieRecursively(pair.Value,
-				prefix + (ch == "*" ? "" : (isLast ? "    " : "©¦   ")),
+				prefix + (ch == "*" ? TEXT("") : (isLast ? TEXT("    ") : TEXT("â”‚   "))),
 				Nextch,
 				lastChild);
 		}
 	}
 
-	void ClearRecursively(TrieNode* node)  // ºóĞò±éÀú£¬µİ¹édelete
+	void ClearRecursively(TrieNode* node)  // ååºéå†ï¼Œé€’å½’delete
 	{
 		if (node == nullptr)
 		{
@@ -207,5 +228,19 @@ private:
 		}
 
 		delete node;
+	}
+
+	void GetChildBranchsRecursively(TrieNode* node, TArray<TArray<T> >& Res)  // TODO::å›æº¯ç®—æ³•
+	{
+		for (auto& childPair : node->ChildNodesMap)
+		{
+			if (!childPair.Value)
+				return;
+
+			TArray<T> Childs;
+			Childs.Add(childPair.Kay);
+			GetChildBranchsRecursively(childPair.Value, Res);
+			
+		}
 	}
 };
