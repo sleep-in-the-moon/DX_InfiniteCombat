@@ -123,6 +123,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 							FICGameplayEffectContext* ICEffectContext = new FICGameplayEffectContext(AttackInfo);
 							ICEffectContext->AddInstigator(MeshComp->GetOwner(), MeshComp->GetOwner());
 							ICEffectContext->AddSourceObject(MeshComp->GetOwner());
+							ICEffectContext->AddHitResult(res);
 
 							FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(ICEffectContext);
 							FGameplayEffectSpecHandle GESpecHandle = OwnerASC->MakeOutgoingSpec(ICSubSystem->DamageApplyGE, 0, ContextHandle);
