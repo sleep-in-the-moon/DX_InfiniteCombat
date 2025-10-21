@@ -2,6 +2,7 @@
 
 
 #include "GAS/GA_ComboDispatcher.h"
+#include "ICAbilitySystemComponent.h"
 
 UGA_ComboDispatcher::UGA_ComboDispatcher()
 {
@@ -26,7 +27,8 @@ void UGA_ComboDispatcher::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 		EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	}
 
-	
+	UICAbilitySystemComponent* ICASC = Cast<UICAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+
 }
 
 void UGA_ComboDispatcher::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

@@ -26,6 +26,8 @@ public:
 	void PrintComboTrie() const;
 	UFUNCTION(BlueprintCallable)
 	void SplitEndComboNode(const TArray<EComboSource>& items);
+	UFUNCTION(BlueprintCallable)
+	void ClearTrie();
 
 	UFUNCTION(BlueprintCallable)
 	bool TryActiveCombo(EComboSource ComboSource);

@@ -34,6 +34,11 @@ void UComboTrie::SplitEndComboNode(const TArray<EComboSource>& items)
 	ComboTrie.SplitEndNode(items);
 }
 
+void UComboTrie::ClearTrie()
+{
+	ComboTrie.Clear();
+}
+
 bool UComboTrie::TryActiveCombo(EComboSource ComboSource)
 {
 	if (ComboSource == EComboSource::Ignore)

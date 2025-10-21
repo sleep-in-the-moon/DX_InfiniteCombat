@@ -17,11 +17,9 @@
 /**
  * 
  */
-//UCLASS()
 template<typename T>
-class Trie final	//DX_REUSABLETOOL_API
+class Trie final
 {
-	//GENERATED_BODY()
 
 	struct TrieNode 
 	{
@@ -39,14 +37,20 @@ public:
 
 	~Trie()
 	{
+		Clear();
+
 		if (Root)
 		{
-			ClearRecursively(Root);
+			delete Root;
+			Root = nullptr;
 		}
 	}
 
 	void Insert(const TArray<T>& items)
 	{
+		/*if(!Root)
+			Root = new TrieNode();*/
+
 		TrieNode* node = Root;
 		for (const T item : items)
 		{
@@ -104,6 +108,14 @@ public:
 		}
 	}
 
+	void Clear()
+	{
+		if (Root)
+		{
+			ClearRecursively(Root);
+		}
+	}
+
 	void PrintTrie() const
 	{
 		PrintTrieRecursively(Root);
@@ -141,7 +153,8 @@ public:
 			}
 			if (i == prefix.Num() - 1)
 			{
-				ParentNode->ChildNodesMap.Remove(prefix[i]);
+				if(ParentNode)
+					ParentNode->ChildNodesMap.Remove(prefix[i]);
 
 				for(const TArray<T>& Elems : GetNodeAllChildBranches(node, prefix[i]))
 					Insert(Elems);  // 将node剩下的全部重新插入到Root
@@ -220,7 +233,7 @@ private:
 		}
 	}
 
-	void ClearRecursively(TrieNode* node)  // 后序遍历，递归delete
+	void ClearRecursively(TrieNode* node)  // 后序遍历，递归delete非Root点
 	{
 		if (node == nullptr)
 		{
@@ -232,7 +245,13 @@ private:
 			ClearRecursively(pair.Value);
 		}
 
-		delete node;
+		node->ChildNodesMap.Empty();
+		if (node != Root)
+		{
+			delete node;
+			node = nullptr;
+		}
+		
 	}
 
 	void GetChildBranchsRecursively(TrieNode* node, TArray<TArray<T> >& Res, TArray<T>& CurElem) const  // 回溯算法

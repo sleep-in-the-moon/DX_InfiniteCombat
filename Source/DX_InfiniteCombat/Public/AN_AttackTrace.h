@@ -15,6 +15,12 @@ struct FCollisionQueryParams;
 struct FCollisionObjectQueryParams;
 //struct FGameplayEffectContextHandle;
 
+UENUM(BlueprintType)
+enum class EAttackTraceShape : uint8
+{
+	Line,
+	Box
+};
 
 /**
  * UANS_AttackTrace
@@ -36,11 +42,15 @@ protected:
 	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)),
 															TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_PhysicsBody)) };
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
+	EAttackTraceShape AttackTraceShape = EAttackTraceShape::Line;
+	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
 	bool bTraceComplex=false;
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace")
 	bool bIgnoreSelf=true;
 	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace", meta = (AllowPrivateAccess = "true"))
 	TArray<AActor*> ActorsToIgnore;
+	UPROPERTY(EditAnywhere, Category = "IC|AttackTrace", meta = (EditCondition = "AttackTraceShape==EAttackTraceShape::Box", EditConditionHides))
+	FVector BoxHalf;
 
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Damage")
 	float DamageATKCoefficient = 1.0f;
