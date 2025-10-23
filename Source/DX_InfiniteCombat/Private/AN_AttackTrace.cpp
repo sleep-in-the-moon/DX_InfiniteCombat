@@ -172,6 +172,9 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 						Skele->SetPhysicsBlendWeight(0.5);
 						Skele->SetBodySimulatePhysics(TEXT("Pelvis"), false);
 					}*/
+
+					//Clash
+
 					//..ÆäËü
 
 				}
