@@ -121,6 +121,18 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 
 		if (bHit)
 		{
+			//Clash
+			TArray<AActor*> ClashActors;
+			FGameplayEffectQuery ClashGEQuery = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(TEXT("GameplayEffect.Clash"), false)));
+			TArray<FActiveGameplayEffectHandle> ClashGEHandles = OwnerASC->GetActiveEffects(ClashGEQuery);
+			for (FActiveGameplayEffectHandle& ClashGEHandle : ClashGEHandles)
+			{
+				if (AActor* Instigator = OwnerASC->GetActiveGameplayEffect(ClashGEHandle)->Spec.GetContext().Get()->GetInstigator())
+				{
+					ClashActors.Emplace(Instigator);
+				}
+			}
+
 			if (OwnerASC && IsValid(OwnerASC) && HitRes.Num() > 0)
 			{
 				for (auto& res : HitRes)
@@ -156,7 +168,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					//伤害感知事件发送
 					UAISense_Damage::ReportDamageEvent(MeshComp->GetOwner()->GetWorld(), res.GetActor(), MeshComp->GetOwner(), 0.f, MeshComp->GetOwner()->GetActorLocation(), res.GetActor()->GetActorLocation());
 
-					//施加推力
+					//施加冲力
 					if (UCharacterMovementComponent* CharaMoveCom = res.GetActor()->FindComponentByClass<UCharacterMovementComponent>())
 					{
 						FVector Impulse = res.ImpactNormal * -1; //+(res.GetActor()->GetActorUpVector() * 300);
@@ -174,6 +186,18 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					}*/
 
 					//Clash
+					if (ClashActors.Contains(res.GetActor()))
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Clash success"));
+						GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("Clash success")));
+					}
+					else if (UAbilitySystemComponent* TargetASC = res.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
+					{
+						FGameplayEffectContextHandle ContextHandle = OwnerASC->MakeEffectContext();
+						//ContextHandle.cont SetDuration
+						FGameplayEffectSpecHandle GESpecHandle = OwnerASC->MakeOutgoingSpec(ICSubSystem->ClashGE, 0, ContextHandle);
+						OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
+					}
 
 					//..其它
 

@@ -39,6 +39,8 @@ public:
 	TSubclassOf<UGameplayEffect> DamageApplyGE;
 	UPROPERTY(BlueprintReadOnly)
 	TSubclassOf<UGameplayEffect> AttackFeedbackGE;
+	UPROPERTY(BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> ClashGE;
 
 private:
 	bool bShowDebug=false;
