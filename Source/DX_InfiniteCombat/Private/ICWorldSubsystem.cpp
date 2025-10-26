@@ -17,6 +17,12 @@ UICWorldSubsystem::UICWorldSubsystem()
 	{
 		AttackFeedbackGE = FeedbackGEClass.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UGameplayEffect> ClashGEClass(TEXT("/Game/Character/GAS/GE/GE_Clash.GE_Clash_C"));
+	if (ClashGEClass.Succeeded())
+	{
+		ClashGE = ClashGEClass.Class;
+	}
 }
 
 void UICWorldSubsystem::SetShowDebug(bool ShowDebug)
