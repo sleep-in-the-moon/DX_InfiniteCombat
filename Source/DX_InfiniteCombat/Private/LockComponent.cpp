@@ -60,7 +60,7 @@ void ULockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		FRotator LookRot = FRotationMatrix::MakeFromX(CurLockActor->GetActorLocation() - GetOwner()->GetActorLocation()).Rotator();
 
 		GetOwner()->SetActorRotation(FMath::RInterpTo(GetOwner()->GetActorRotation()
-			, FRotator(GetOwner()->GetActorRotation().Pitch, LookRot.Yaw, GetOwner()->GetActorRotation().Roll), DeltaTime, 2.0f));
+			, FRotator(GetOwner()->GetActorRotation().Pitch, LookRot.Yaw, GetOwner()->GetActorRotation().Roll), DeltaTime, 4.0f));
 
 		if (APawn* ownerP = Cast<APawn>(GetOwner()))
 		{

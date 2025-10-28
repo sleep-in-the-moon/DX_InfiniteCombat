@@ -186,18 +186,18 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					}*/
 
 					//Clash
-					if (ClashActors.Contains(res.GetActor()))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Clash success"));
-						GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("Clash success")));
-					}
-					else if (UAbilitySystemComponent* TargetASC = res.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
-					{
-						FGameplayEffectContextHandle ContextHandle = OwnerASC->MakeEffectContext();
-						//ContextHandle.cont SetDuration
-						FGameplayEffectSpecHandle GESpecHandle = OwnerASC->MakeOutgoingSpec(ICSubSystem->ClashGE, 0, ContextHandle);
-						OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
-					}
+					//if (ClashActors.Contains(res.GetActor()))
+					//{
+					//	UE_LOG(LogTemp, Warning, TEXT("Clash success"));
+					//	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("Clash success")));
+					//}
+					//else if (UAbilitySystemComponent* TargetASC = res.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
+					//{
+					//	FGameplayEffectContextHandle ContextHandle = OwnerASC->MakeEffectContext();
+					//	//ContextHandle.cont SetDuration
+					//	FGameplayEffectSpecHandle GESpecHandle = OwnerASC->MakeOutgoingSpec(ICSubSystem->ClashGE, 0, ContextHandle);
+					//	OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
+					//}
 
 					//..ÆäËü
 
