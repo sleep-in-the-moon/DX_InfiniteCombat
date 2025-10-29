@@ -187,7 +187,7 @@ void UICAbilitySystemComponent::ApplySetByCallerGEToTarget(UAbilitySystemCompone
 	if (!TargetASC || !ApplyGE)
 		return;
 
-	FGameplayEffectSpecHandle SpecHandle = TargetASC->MakeOutgoingSpec(ApplyGE, Level, TargetASC->MakeEffectContext());
+	FGameplayEffectSpecHandle SpecHandle = this->MakeOutgoingSpec(ApplyGE, Level, this->MakeEffectContext());
 
 	if (SpecHandle.IsValid())
 	{

@@ -18,7 +18,7 @@ public:
 	UGC_AttakHit(const FObjectInitializer& ObjectInit);
 
 protected:
-	bool OnExecute_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters) const override;
+	//bool OnExecute_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters) const override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
