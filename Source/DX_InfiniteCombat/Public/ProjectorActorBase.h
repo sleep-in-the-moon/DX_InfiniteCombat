@@ -50,12 +50,19 @@ protected:
 	UProjectileMovementComponent* ProjectileMovementComponent;
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComp;
+
 	UPROPERTY(BlueprintAssignable)
 	FProjectorHitObj DG_ProjectorHitObj;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="IC|Hitted")
 	EHittedType HittedType = EHittedType::AttachTo;
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "IC|Hitted")
-	float HitDamage = 0.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|Hitted", meta = (EditCondition = "HittedType == EHittedType::Axplode", EditConditionHides))
+	float AxplodeTime = 0.4f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC")
+	bool bApplyDamage = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC", meta = (EditCondition = "bApplyDamage", EditConditionHides))
+	float DamageATKCoefficient = 1.0f;
 
 private:
 	bool LineTraceByMeshSockets(const TArray<AActor*>& ActorsToIgnore, const TArray<TEnumAsByte<EObjectTypeQuery> >& TraceObjectTypes, bool bTraceComplex = false, bool bIgnoreSelf = true);

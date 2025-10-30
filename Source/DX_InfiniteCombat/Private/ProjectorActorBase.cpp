@@ -8,6 +8,9 @@
 #include "KismetTraceUtils.h"
 #include "Runtime/AIModule/Classes/Perception/AISense_Damage.h"
 #include "ICWorldSubsystem.h"
+#include "Utils/IC_Utils.h"
+#include "AbilitySystemComponent.h"
+
 
 // Sets default values
 AProjectorActorBase::AProjectorActorBase():TraceActor(nullptr)
@@ -117,30 +120,44 @@ bool AProjectorActorBase::LineTraceByMeshSockets(const TArray<AActor*>& ActorsTo
             DrawDebugLineTraceSingle(GetWorld(), *PreSocketLoc.Find(socket), StaticMeshComp->GetSocketLocation(socket), EDrawDebugTrace::Type::ForDuration, bHit, OutHit, FColor::Red, FColor::Green, 1.5f);
 
         PreSocketLoc.Add(socket, StaticMeshComp->GetSocketLocation(socket));
-        if (bHit)
+        if (bHit)//命中处理
         {
-            //命中处理
-            if(HittedType == EHittedType::AttachTo)
+            
+            if (HittedType == EHittedType::AttachTo)
+            {
                 AttachToActor(OutHit.GetActor(), FAttachmentTransformRules::KeepWorldTransform);
+            }
             else if (HittedType == EHittedType::Axplode)
             {
-                SetLifeSpan(0.4f);
+                SetLifeSpan(AxplodeTime);
             }
 
+            if (bApplyDamage)
+            {
+                UAbilitySystemComponent* TargetASC = OutHit.GetActor()->FindComponentByClass<UAbilitySystemComponent>();
+                UAbilitySystemComponent* OwnerASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>();
+                if (TargetASC && OwnerASC && ICSubSystem && ICSubSystem->DamageApplyGE)
+                {
+                    //应用伤害GE
+                    FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(GetOwner(), ICSubSystem->DamageApplyGE, OutHit, DamageATKCoefficient);
+                    OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
+                }
+
+                //伤害感知事件发送
+                UAISense_Damage::ReportDamageEvent(GetOwner()->GetWorld(), OutHit.GetActor(), GetOwner(), 0.f, GetOwner()->GetActorLocation(), OutHit.GetActor()->GetActorLocation());
+            }
+            
             //停止发射物
             bEnableTrace = false;
             ProjectileMovementComponent->StopMovementImmediately();
             ProjectileMovementComponent->bSimulationEnabled = false;
 
-            //伤害感知事件发送
-            UAISense_Damage::ReportDamageEvent(GetOwner()->GetWorld(), OutHit.GetActor(), GetOwner(), 0.f, GetOwner()->GetActorLocation(), OutHit.GetActor()->GetActorLocation());
-            
             //冲力
             UPrimitiveComponent* Primi = OutHit.GetActor()->FindComponentByClass<UPrimitiveComponent>();
             if(Primi->IsSimulatingPhysics())
                 Primi->AddImpulse(OutHit.ImpactNormal*-1*700, NAME_None, true);
 
-            //广播到蓝图
+            // 广播到蓝图
             DG_ProjectorHitObj.Broadcast(OutHit);
 
             return true;
@@ -149,4 +166,3 @@ bool AProjectorActorBase::LineTraceByMeshSockets(const TArray<AActor*>& ActorsTo
 
     return false;
 }
-

@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ICTypes.h"
 #include "GAS/ICGameplayEffectTypes.h"
+#include "Utils/IC_Utils.h"
 
 
 void UAN_AttackTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
@@ -146,21 +147,8 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 						//Ó¦ÓÃGE
 						if (ICSubSystem && ICSubSystem->DamageApplyGE)
 						{
-							FAttackInfo AttackInfo(DamageATKCoefficient);
-
-							FICGameplayEffectContext* ICEffectContext = new FICGameplayEffectContext(AttackInfo);
-							ICEffectContext->AddInstigator(MeshComp->GetOwner(), MeshComp->GetOwner());
-							ICEffectContext->AddSourceObject(MeshComp->GetOwner());
-							ICEffectContext->AddHitResult(res);
-
-							FGameplayEffectContextHandle ContextHandle = FGameplayEffectContextHandle(ICEffectContext);
-							FGameplayEffectSpecHandle GESpecHandle = OwnerASC->MakeOutgoingSpec(ICSubSystem->DamageApplyGE, 0, ContextHandle);
-
+							FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(MeshComp->GetOwner(), ICSubSystem->DamageApplyGE, res, DamageATKCoefficient);
 							OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
-							//SetByCaller
-
-							/*if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(GE.EffectToTargets->GetDefaultObject()))
-								OwnerASC->ApplyGameplayEffectToTarget(GECDO, TargetASC, GE.Level);*/
 						}
 
 					}
