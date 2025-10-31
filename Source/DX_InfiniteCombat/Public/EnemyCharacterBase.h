@@ -14,7 +14,6 @@ class UCombatCharacterComponent;
 class UWidgetComponent;
 struct FOnAttributeChangeData;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHelthChangeBPDG, float, NewHelth);
 
 UCLASS()
 class DX_INFINITECOMBAT_API AEnemyCharacterBase : public ACharacter, public IAttackCharacterInterface, public IAbilitySystemInterface
@@ -44,10 +43,6 @@ protected:
 	UCombatCharacterComponent* CombatComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	UWidgetComponent* StateBar;
-	UPROPERTY(BlueprintAssignable)
-	FHelthChangeBPDG HelthChangeBPDG;
-
-	void OnHelthChange(const FOnAttributeChangeData& Data);
 
 private:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;

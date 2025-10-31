@@ -19,12 +19,16 @@ bool UGC_AttakHit::OnExecute_Implementation(AActor* MyTarget, const FGameplayCue
 		return false;
 
 	//Parameters.GetSourceObject();
-	if(!EffectContext->GetInstigator())
-		return false;
+	/*if(!EffectContext->GetInstigator())
+		return false;*/
 
-	if (APawn* SourcePawn = Cast<APawn>(EffectContext->GetInstigator()))
+	APawn* playerPawn = UGameplayStatics::GetPlayerPawn(MyTarget->GetWorld(), 0);
+	/*if (!playerPawn)
+		playerPawn = Cast<APawn>(MyTarget);*/
+
+	if (playerPawn)
 	{
-		APlayerController* playerControl = Cast<APlayerController>(SourcePawn->GetController());
+		APlayerController* playerControl = Cast<APlayerController>(playerPawn->GetController());
 		if (playerControl)
 		{
 			FProperty* CombatStatesWidgetPro = playerControl->GetClass()->FindPropertyByName(TEXT("CombatStatesWidget"));

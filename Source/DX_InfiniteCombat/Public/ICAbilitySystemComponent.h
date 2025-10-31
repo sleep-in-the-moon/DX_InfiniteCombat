@@ -12,6 +12,7 @@ struct FInstancedStruct;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInputReleaseDelegate, const FGameplayTag&, AbilityInputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmunityGECallback, const FGameplayTagContainer&, ImmunityGETags);
 DECLARE_DELEGATE_OneParam(FInputComboPress, const FInstancedStruct& /**/);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHelthChangeBPDG, float, NewHelth);
 
 USTRUCT(BlueprintType)
 struct FGAGive
@@ -69,8 +70,14 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FImmunityGECallback ImmunityGECallback;
 
+	UPROPERTY(BlueprintAssignable)
+	FHelthChangeBPDG HelthChangeBPDG;
+
 public:
 	UPROPERTY()
 	FAbilityInputReleaseDelegate AbilityInputReleaseDelegate;
+
+private:
+	void OnHelthChange(const FOnAttributeChangeData& Data);
 
 };

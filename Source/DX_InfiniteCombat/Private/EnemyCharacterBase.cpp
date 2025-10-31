@@ -3,10 +3,10 @@
 
 #include "EnemyCharacterBase.h"
 #include "ICAbilitySystemComponent.h"
-#include "CombatCharacterComponent.h"
 #include "DXWidgetBase.h"
 #include "Components/WidgetComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "CombatCharacterComponent.h"
 #include "CharacterAttributeSet.h"
 #include "ICWorldSubsystem.h"
 
@@ -34,11 +34,6 @@ void AEnemyCharacterBase::BeginPlay()
 	
 	UICWorldSubsystem* ICSubSystem = UWorld::GetSubsystem<UICWorldSubsystem>(GetWorld());
 	ICSubSystem->MDG_ShowDebugChange.AddDynamic(this, &AEnemyCharacterBase::ShowDebugChange);
-
-	if (ASC)
-	{
-		ASC->GetGameplayAttributeValueChangeDelegate(UCharacterAttributeSet::GetHPAttribute()).AddUObject(this, &AEnemyCharacterBase::OnHelthChange);
-	}
 }
 
 // Called every frame
@@ -53,22 +48,6 @@ void AEnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
-
-void AEnemyCharacterBase::OnHelthChange(const FOnAttributeChangeData& Data)
-{
-	if (ASC && !ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died"))))
-	{
-		//回调蓝图处理UI
-		HelthChangeBPDG.Broadcast(Data.NewValue);
-
-		//死亡处理
-		if (Data.NewValue <= 0.0f && CombatComp)
-		{
-			CombatComp->CharacterDied();
-		}
-	}
-	
 }
 
 UAbilitySystemComponent* AEnemyCharacterBase::GetAbilitySystemComponent() const

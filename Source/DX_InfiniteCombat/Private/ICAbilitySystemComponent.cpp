@@ -5,6 +5,8 @@
 #include "ICGameplayAbilityBase.h"
 #include "GameplayTagsManager.h"
 #include "StructUtils/InstancedStruct.h"
+#include "CharacterAttributeSet.h"
+#include "CombatCharacterComponent.h"
 
 UICAbilitySystemComponent::UICAbilitySystemComponent()
 {
@@ -166,6 +168,8 @@ void UICAbilitySystemComponent::BeginPlay()
 	InitAbilityActorInfo(GetOwner(), GetOwner());
 
 	OnImmunityBlockGameplayEffectDelegate.AddUObject(this, &UICAbilitySystemComponent::ICOnImmunityBlockGameplayEffect);
+
+	GetGameplayAttributeValueChangeDelegate(UCharacterAttributeSet::GetHPAttribute()).AddUObject(this, &UICAbilitySystemComponent::OnHelthChange);
 }
 
 FGameplayTag UICAbilitySystemComponent::GetFirstChildTag(FGameplayTag ParentTag) const
@@ -203,4 +207,21 @@ void UICAbilitySystemComponent::ICOnImmunityBlockGameplayEffect(const FGameplayE
 	ImmunityGE->Spec.GetAllAssetTags(OutContainer);
 	
 	ImmunityGECallback.Broadcast(OutContainer);
+}
+
+void UICAbilitySystemComponent::OnHelthChange(const FOnAttributeChangeData& Data)
+{
+	if (!HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died"))))
+	{
+		//回调蓝图处理UI
+		HelthChangeBPDG.Broadcast(Data.NewValue);
+
+		if (Data.NewValue <= 0.0f)
+		{
+			if (UCombatCharacterComponent* CombatComponent = GetOwner()->FindComponentByClass<UCombatCharacterComponent>())
+			{
+				CombatComponent->CharacterDied();
+			}
+		}
+	}
 }
