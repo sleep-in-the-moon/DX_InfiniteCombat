@@ -3,6 +3,7 @@
 
 #include "DX_StaticFunlib.h"
 #include "CollisionQueryParams.h"
+#include "Polygon2.h"
 
 bool UDX_StaticFunlib::GetAllFilesInFolder(const FString& RootDir, TArray<FString>& OutSubDirs, TArray<FString>& OutSubFiles, const FString& ExtentName)
 {
@@ -84,4 +85,28 @@ void UDX_StaticFunlib::MakeCollisionParam(const AActor* Avatar, FCollisionQueryP
 	}
 
 	ObjectQueryParams = FCollisionObjectQueryParams(TraceObjectTypes);
+}
+
+TArray<FVector2D> UDX_StaticFunlib::SortVec2DsToCounterClockWise(const TArray<FVector2D>& Vec2Ds)
+{
+	UE::Geometry::FPolygon2d OuterPoly(Vec2Ds);
+
+	if (OuterPoly.IsClockwise())//顺时针
+	{
+		OuterPoly.Reverse();//反转
+		return OuterPoly.GetVertices();
+	}
+
+	FVector2D Centroid(0, 0);
+	for (auto& V : Vec2Ds) Centroid += V;
+	Centroid /= Vec2Ds.Num();
+
+	TArray<FVector2D> Res = Vec2Ds;
+	Res.Sort([&](auto& A, auto& B) {//逆时针排序
+		float a = FMath::Atan2(A.Y - Centroid.Y, A.X - Centroid.X);
+		float b = FMath::Atan2(B.Y - Centroid.Y, B.X - Centroid.X);
+		return a < b;
+		});
+
+	return Res;
 }
