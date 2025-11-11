@@ -28,5 +28,8 @@ public:
 
 	UFUNCTION(BlueprintPure, BlueprintCallable)
 	static TArray<FVector2D> SortVec2DsToCounterClockWise(const TArray<FVector2D>& Vec2Ds);
+	//根据多边形顶点计算其质心
+	UFUNCTION(BlueprintPure, BlueprintCallable)
+	static FVector2D GetPolygonCentroid(const TArray<FVector2D>& Vec2Ds);
 
 };

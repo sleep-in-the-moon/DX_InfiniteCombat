@@ -110,3 +110,38 @@ TArray<FVector2D> UDX_StaticFunlib::SortVec2DsToCounterClockWise(const TArray<FV
 
 	return Res;
 }
+
+FVector2D UDX_StaticFunlib::GetPolygonCentroid(const TArray<FVector2D>& Vec2Ds)
+{
+	int32 NumVertices = Vec2Ds.Num();
+	if (NumVertices < 3)
+	{
+		return FVector2D::ZeroVector;
+	}
+
+	double Area = 0.0;
+	double Cx = 0.0;
+	double Cy = 0.0;
+
+	for (int32 i = 0; i < NumVertices; ++i)
+	{
+		const FVector2D& Current = Vec2Ds[i];
+		const FVector2D& Next = Vec2Ds[(i + 1) % NumVertices];
+
+		double Cross = Current.X * Next.Y - Next.X * Current.Y;
+		Area += Cross;
+		Cx += (Current.X + Next.X) * Cross;
+		Cy += (Current.Y + Next.Y) * Cross;
+	}
+
+	Area *= 0.5;
+	if (FMath::IsNearlyZero(Area))
+	{
+		return FVector2D::ZeroVector;
+	}
+
+	Cx /= (6.0 * Area);
+	Cy /= (6.0 * Area);
+
+	return FVector2D(Cx, Cy);
+}
