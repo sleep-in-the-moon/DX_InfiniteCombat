@@ -29,10 +29,17 @@ public:
 
 private:
 	bool DoOnceTrace();
+	APlayerController* GetOwnerController();
+	FVector2D GetDeltaYawPitch();
+	FVector2D GetHalfFOV_VH();
+	FVector2D GetMargin_VH();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "WeakLock")
 	float ControllerFollowTime = 7.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WeakLock")
+	float MarginPx = 50.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "WeakLock")
 	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)) };
