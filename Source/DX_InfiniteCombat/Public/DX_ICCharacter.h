@@ -15,6 +15,7 @@ class UGameplayAbility;
 class UStaticMeshComponent;
 struct FGameplayTag;
 class UCombatCharacterComponent;
+class UICMotionWarpingComponent;
 
 //UENUM()
 //enum class EExecNodePin : uint8z
@@ -53,6 +54,8 @@ protected:
 	UCombatCharacterComponent* CombatComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* WeaponMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UICMotionWarpingComponent* ICMotionWarpingComponent;
 
 private:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;

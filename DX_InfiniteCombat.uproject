@@ -12,7 +12,8 @@
 				"BasicInputSystem",
 				"Engine",
 				"GameplayAbilities",
-				"UMG"
+				"UMG",
+				"MotionWarping"
 			]
 		}
 	],
@@ -34,6 +35,14 @@
 		},
 		{
 			"Name": "GeometryScripting",
+			"Enabled": true
+		},
+		{
+			"Name": "StructUtils",
+			"Enabled": true
+		},
+		{
+			"Name": "MotionWarping",
 			"Enabled": true
 		}
 	]

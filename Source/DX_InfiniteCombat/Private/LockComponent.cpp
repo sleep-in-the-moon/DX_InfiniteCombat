@@ -142,16 +142,13 @@ void ULockComponent::UpdateLockState()
 	if (CurLockActor)
 	{
 		UAbilitySystemComponent* LockActorASC = CurLockActor->FindComponentByClass<UAbilitySystemComponent>();
-		if (LockActorASC)
+		if (LockActorASC && LockActorASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.Died")))
 		{
-			if (LockActorASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.Died")))
-			{
-				SetIsLockingOnTarget(false);
-				CurLockActor = nullptr;
+			SetIsLockingOnTarget(false);
+			CurLockActor = nullptr;
 
-				if (CombatStatesWidget.IsValid())
-					CombatStatesWidget->UnRegisterPersistentWidget(LockedWidgetPersistentID);
-			}
+			if (CombatStatesWidget.IsValid())
+				CombatStatesWidget->UnRegisterPersistentWidget(LockedWidgetPersistentID);
 		}
 	}
 

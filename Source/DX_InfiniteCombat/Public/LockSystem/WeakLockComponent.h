@@ -7,6 +7,8 @@
 #include "WeakLockComponent.generated.h"
 
 
+class UWidgetCombatStates;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DX_INFINITECOMBAT_API UWeakLockComponent : public UActorComponent
 {
@@ -34,6 +36,9 @@ private:
 	FVector2D GetHalfFOV_VH();
 	FVector2D GetMargin_VH();
 
+	void ClearLock();
+	void CheckLockActorState();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "WeakLock")
 	float ControllerFollowTime = 7.0f;
@@ -42,11 +47,24 @@ protected:
 	float MarginPx = 50.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "WeakLock")
+	float AttackFollowDist = 250.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WeakLock")
 	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)) };
+
+	//被锁定者身上显示的UI
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> LockedWidgetClass;
 
 private:
 	bool bControllerFollow=false;
 	FTimerHandle ControllerTimer;
+	UPROPERTY()
 	AActor* LockActor=nullptr;
+
+	UPROPERTY()
+	UUserWidget* LockedWidget = nullptr;
+	FName LockedWidgetPersistentID = TEXT("LockedWidget");
+	TWeakObjectPtr<UWidgetCombatStates> CombatStatesWidget= nullptr;
 
 };

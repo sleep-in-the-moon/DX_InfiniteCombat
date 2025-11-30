@@ -7,6 +7,10 @@
 #include "DX_ReusableTool/Public/DX_StaticFunlib.h"
 #include "UMG/WidgetCombatStates.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystemComponent.h"
+#include "MotionWarpingComponent.h"
+#include "Components/CapsuleComponent.h"
+
 
 // Sets default values for this component's properties
 UWeakLockComponent::UWeakLockComponent()
@@ -25,6 +29,28 @@ void UWeakLockComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
+	if (APawn* ownerP = Cast<APawn>(GetOwner()))
+	{
+		APlayerController* playerControl = Cast<APlayerController>(ownerP->GetController());
+		if (playerControl && LockedWidgetClass)
+		{
+			LockedWidget = CreateWidget<UUserWidget>(playerControl, LockedWidgetClass);
+
+			FProperty* CombatStatesWidgetPro = playerControl->GetClass()->FindPropertyByName(TEXT("CombatStatesWidget"));
+			if (CombatStatesWidgetPro)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("CombatStatesWidgetClass::%s"), *CombatStatesWidgetPro->GetCPPType()));
+				UE_LOG(LogTemp, Warning, TEXT("CombatStatesWidgetClass::%s"), *CombatStatesWidgetPro->GetCPPType());
+
+				FClassProperty* CombatStatesWidgetClassPro = static_cast<FClassProperty*>(CombatStatesWidgetPro);
+				const void* ValuePtr = CombatStatesWidgetClassPro->ContainerPtrToValuePtr<void>(playerControl);
+				TObjectPtr<UObject> CombatStatesWidgetObj = CombatStatesWidgetClassPro->GetPropertyValue(ValuePtr);
+
+				if (Cast<UWidgetCombatStates>(CombatStatesWidgetObj))
+					CombatStatesWidget = Cast<UWidgetCombatStates>(CombatStatesWidgetObj);
+			}
+		}
+	}
 	
 }
 
@@ -36,13 +62,6 @@ void UWeakLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 	if (bControllerFollow && GetOwner() && LockActor && GetOwnerController())
 	{
-		/*if (APawn* ownerP = Cast<APawn>(GetOwner()))
-		{
-			FRotator LookRot = FRotationMatrix::MakeFromX(LockActor->GetActorLocation() - GetOwner()->GetActorLocation()).Rotator();
-			ownerP->GetController()->SetControlRotation(FMath::RInterpTo(ownerP->GetController()->GetControlRotation()
-				, FRotator(LookRot.Pitch, LookRot.Yaw, ownerP->GetController()->GetControlRotation().Roll), DeltaTime, 10.0f));
-		}*/
-
 		FVector2D ScreenPos;
 		UGameplayStatics::ProjectWorldToScreen(GetOwnerController(), LockActor->GetActorLocation(), ScreenPos);
 
@@ -74,25 +93,58 @@ void UWeakLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 			DesiredRot.Yaw += neededYaw;
 			DesiredRot.Pitch += neededPitch;
 
+			// ToDo::限制值范围
+
+			/*GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("OutOfView::Yaw:%f::Pitch:%f"), neededYaw, neededPitch));
+			UE_LOG(LogTemp, Warning, TEXT("OutOfView::Yaw:%f::Pitch:%f"), neededYaw, neededPitch);*/
+
 			GetOwnerController()->SetControlRotation(FMath::RInterpTo(GetOwnerController()->GetControlRotation()
 				, DesiredRot, DeltaTime, 10.0f));
 		}
+
+		CheckLockActorState();
 	}
 }
 
 void UWeakLockComponent::Trigger()
 {
-	if (DoOnceTrace())
+	if (DoOnceTrace() && LockActor)
 	{
 		bControllerFollow = true;
+		if (LockActor && CombatStatesWidget.IsValid() && LockedWidget)
+			CombatStatesWidget->RegisterPersistentWidget(LockedWidgetPersistentID, FPersistentWidgetInfos(LockedWidget, LockActor));
+
+		// 过时清除
 		GetWorld()->GetTimerManager().SetTimer(ControllerTimer, [this]() {
-			bControllerFollow = false;
-			LockActor = nullptr;
-			//Widget
+			ClearLock();
 		}, ControllerFollowTime, false);
 
 		FRotator LookRot = FRotationMatrix::MakeFromX(LockActor->GetActorLocation() - GetOwner()->GetActorLocation()).Rotator();
 		GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, LookRot.Yaw, GetOwner()->GetActorRotation().Roll));
+
+		// 判断距离，触发攻击吸附
+		DrawDebugCircle(GetWorld(), FVector(FVector2D(GetOwner()->GetActorLocation()), GetOwner()->GetActorLocation().Z - 89), AttackFollowDist, 12, FColor::Green, false, 3.0f, SDPG_World, 2, GetOwner()->GetActorRightVector(), GetOwner()->GetActorForwardVector(), false);
+		if (FVector::Dist(GetOwner()->GetActorLocation(), LockActor->GetActorLocation()) <= AttackFollowDist)
+		{
+			if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
+			{
+				FVector TargetLoc = LockActor->GetActorLocation();
+
+				if (UCapsuleComponent* CapsuleComponent = LockActor->FindComponentByClass<UCapsuleComponent>())
+				{
+					TargetLoc += (GetOwner()->GetActorLocation()-LockActor->GetActorLocation()).GetSafeNormal() * CapsuleComponent->GetScaledCapsuleRadius();
+				}
+
+				DrawDebugPoint(GetWorld(), TargetLoc, 10, FColor::Blue, false, 3);
+
+				MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("AttackFollow"), TargetLoc);
+			}
+		}
+		else
+		{
+			if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
+				MotionWarpingComp->RemoveWarpTarget(TEXT("AttackFollow"));
+		}
 	}
 }
 
@@ -151,8 +203,8 @@ FVector2D UWeakLockComponent::GetDeltaYawPitch()
 		FRotator DeltaRot = LookAtRot - GetOwnerController()->PlayerCameraManager->GetCameraRotation();
 		DeltaRot.Normalize();
 
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("DeltaYaw::%f, DeltaPitch::%f"), DeltaRot.Yaw, DeltaRot.Pitch));
-		UE_LOG(LogTemp, Warning, TEXT("DeltaYaw::%f, DeltaPitch::%f"), DeltaRot.Yaw, DeltaRot.Pitch);
+		/*GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("DeltaYaw::%f, DeltaPitch::%f"), DeltaRot.Yaw, DeltaRot.Pitch));
+		UE_LOG(LogTemp, Warning, TEXT("DeltaYaw::%f, DeltaPitch::%f"), DeltaRot.Yaw, DeltaRot.Pitch);*/
 
 		return FVector2D(DeltaRot.Yaw, DeltaRot.Pitch);
 	}
@@ -166,10 +218,13 @@ FVector2D UWeakLockComponent::GetHalfFOV_VH()
 	{
 		float halfHFOV = GetOwnerController()->PlayerCameraManager->GetCameraCacheView().FOV * 0.5f;
 		float aspect = GetOwnerController()->PlayerCameraManager->GetCameraCacheView().AspectRatio;
-		float halfVFOV = FMath::RadiansToDegrees(FMath::Atan(FMath::Tan(FMath::DegreesToRadians(halfHFOV)* aspect)));
+		aspect = FMath::Max(aspect, 1e-6f);
 
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("halfVFOV::%f, halfHFOV::%f"), halfVFOV, halfHFOV));
-		UE_LOG(LogTemp, Warning, TEXT("halfVFOV::%f, halfHFOV::%f"), halfVFOV, halfHFOV);
+		// 针孔相机几何关系
+		float halfVFOV = FMath::RadiansToDegrees(FMath::Atan(FMath::Tan(FMath::DegreesToRadians(halfHFOV)) / aspect));
+
+		/*GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("halfVFOV::%f, halfHFOV::%f"), halfVFOV, halfHFOV));
+		UE_LOG(LogTemp, Warning, TEXT("halfVFOV::%f, halfHFOV::%f"), halfVFOV, halfHFOV);*/
 
 		return FVector2D(halfVFOV, halfHFOV);
 	}
@@ -191,4 +246,24 @@ FVector2D UWeakLockComponent::GetMargin_VH()
 	}
 	
 	return FVector2D();
+}
+
+void UWeakLockComponent::ClearLock()
+{
+	bControllerFollow = false;
+	LockActor = nullptr;
+	if (CombatStatesWidget.IsValid())
+		CombatStatesWidget->UnRegisterPersistentWidget(LockedWidgetPersistentID);
+}
+
+void UWeakLockComponent::CheckLockActorState()
+{
+	if (LockActor)
+	{
+		UAbilitySystemComponent* LockActorASC = LockActor->FindComponentByClass<UAbilitySystemComponent>();
+		if (LockActorASC && LockActorASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.Died")))
+		{
+			ClearLock();
+		}
+	}
 }

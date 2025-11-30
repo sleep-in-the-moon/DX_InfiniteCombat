@@ -12,6 +12,7 @@
 #include "Components/CapsuleComponent.h"
 #include "ICWorldSubsystem.h"
 #include "ICTypes.h"
+#include "ICComponents/ICMotionWarpingComponent.h"
 
 
 UAbilitySystemComponent* ADX_ICCharacter::GetAbilitySystemComponent() const
@@ -32,6 +33,8 @@ ADX_ICCharacter::ADX_ICCharacter()
 	WeaponMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MainWeapon"));
 	WeaponMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	WeaponMeshComponent->ComponentTags.Add(TEXT("Weapon"));
+
+	ICMotionWarpingComponent = CreateDefaultSubobject<UICMotionWarpingComponent>(TEXT("ICMotionWarpingComponent"));
 
 }
 
