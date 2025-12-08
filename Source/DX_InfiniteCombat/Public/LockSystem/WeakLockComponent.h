@@ -67,4 +67,6 @@ private:
 	FName LockedWidgetPersistentID = TEXT("LockedWidget");
 	TWeakObjectPtr<UWidgetCombatStates> CombatStatesWidget= nullptr;
 
+	bool bIsAttackFollow = false;
+
 };

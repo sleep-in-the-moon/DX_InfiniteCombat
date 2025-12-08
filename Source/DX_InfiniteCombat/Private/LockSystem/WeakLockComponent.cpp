@@ -138,12 +138,24 @@ void UWeakLockComponent::Trigger()
 				DrawDebugPoint(GetWorld(), TargetLoc, 10, FColor::Blue, false, 3);
 
 				MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("AttackFollow"), TargetLoc);
+				bIsAttackFollow = true;
 			}
 		}
-		else
+		else if(bIsAttackFollow)
 		{
 			if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
+			{
 				MotionWarpingComp->RemoveWarpTarget(TEXT("AttackFollow"));
+				bIsAttackFollow = false;
+			}
+		}
+	}
+	else if(bIsAttackFollow)
+	{
+		if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
+		{
+			MotionWarpingComp->RemoveWarpTarget(TEXT("AttackFollow"));
+			bIsAttackFollow = false;
 		}
 	}
 }

@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Zero"))
 class DX_INFINITECOMBAT_API URootMotionModifier_Zero : public URootMotionModifier
 {
 	GENERATED_BODY()
