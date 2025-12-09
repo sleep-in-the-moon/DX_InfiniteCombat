@@ -108,8 +108,9 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 
 		case EAttackTraceShape::Box:
 			bHit = MeshComp->GetOwner()->GetWorld()->SweepMultiByObjectType(HitRes, *PreSocketLoc.Find(socket), CurWeapon->GetSocketLocation(socket), MeshComp->GetOwner()->GetActorRotation().Quaternion(), ObjectQueryParams, FCollisionShape::MakeBox(BoxHalf), Params);
-			//if (ICSubSystem->GetShowDebug())
-			DrawDebugBoxTraceMulti(MeshComp->GetOwner()->GetWorld(), *PreSocketLoc.Find(socket), CurWeapon->GetSocketLocation(socket), BoxHalf, MeshComp->GetOwner()->GetActorRotation(), EDrawDebugTrace::Type::ForDuration, bHit, HitRes, FColor::Red, FColor::Green, 1.5f);
+			
+			if (ICSubSystem->GetShowDebug())
+				DrawDebugBoxTraceMulti(MeshComp->GetOwner()->GetWorld(), *PreSocketLoc.Find(socket), CurWeapon->GetSocketLocation(socket), BoxHalf, MeshComp->GetOwner()->GetActorRotation(), EDrawDebugTrace::Type::ForDuration, bHit, HitRes, FColor::Red, FColor::Green, 1.5f);
 
 			break;
 		default:
@@ -156,7 +157,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					//伤害感知事件发送
 					UAISense_Damage::ReportDamageEvent(MeshComp->GetOwner()->GetWorld(), res.GetActor(), MeshComp->GetOwner(), 0.f, MeshComp->GetOwner()->GetActorLocation(), res.GetActor()->GetActorLocation());
 
-					//施加冲力
+					//施加冲力     TODO::改为Character的LaunchCharacter()
 					if (UCharacterMovementComponent* CharaMoveCom = res.GetActor()->FindComponentByClass<UCharacterMovementComponent>())
 					{
 						FVector Impulse = res.ImpactNormal * -1; //+(res.GetActor()->GetActorUpVector() * 300);

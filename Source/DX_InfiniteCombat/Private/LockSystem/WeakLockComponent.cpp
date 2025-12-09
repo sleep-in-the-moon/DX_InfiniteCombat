@@ -171,7 +171,7 @@ bool UWeakLockComponent::DoOnceTrace()
 		if (!playerController)
 			return false;
 
-		FVector StartLoc = playerController->PlayerCameraManager->GetCameraLocation();
+		FVector StartLoc = playerController->PlayerCameraManager->GetCameraLocation(); //TODO::¼õÈ¥Sphere°ë¾¶
 		FRotator CameraYaw = FRotator(0, playerController->PlayerCameraManager->GetCameraRotation().Yaw, 0);
 		FVector EndLoc = StartLoc + FRotationMatrix(CameraYaw).GetUnitAxis(EAxis::X) * TraceDist;
 
