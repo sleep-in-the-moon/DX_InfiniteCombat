@@ -55,8 +55,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Damage")
 	float DamageATKCoefficient = 1.0f;
 
+	//»÷ÍË¾àÀë
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Hit")
-	FVector ImpulseScale = FVector(1600, 1600, 600);
+	float KnockbackDist = 0.0f;
 
 	//¼õËÙ ¶Ù¸Ð
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack")

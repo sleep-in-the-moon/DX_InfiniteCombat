@@ -15,9 +15,5 @@ UCLASS()
 class DX_INFINITECOMBAT_API UGameplayAbilityGetHurt : public UICGameplayAbilityBase
 {
 	GENERATED_BODY()
-
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* GetHitMontage;
 	
 };

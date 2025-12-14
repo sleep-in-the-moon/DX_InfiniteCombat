@@ -14,6 +14,7 @@
 #include "ICTypes.h"
 #include "GAS/ICGameplayEffectTypes.h"
 #include "Utils/IC_Utils.h"
+#include "GameFramework/Character.h"
 
 
 void UAN_AttackTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
@@ -157,14 +158,16 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					//伤害感知事件发送
 					UAISense_Damage::ReportDamageEvent(MeshComp->GetOwner()->GetWorld(), res.GetActor(), MeshComp->GetOwner(), 0.f, MeshComp->GetOwner()->GetActorLocation(), res.GetActor()->GetActorLocation());
 
-					//施加冲力     TODO::改为Character的LaunchCharacter()
-					if (UCharacterMovementComponent* CharaMoveCom = res.GetActor()->FindComponentByClass<UCharacterMovementComponent>())
+					//击退
+					if(!FMath::IsNearlyEqual(KnockbackDist, 0.0f))
 					{
-						FVector Impulse = res.ImpactNormal * -1; //+(res.GetActor()->GetActorUpVector() * 300);
-						//Impulse = FVector(Impulse.X, Impulse.Y, 0);
-						Impulse = FVector(Impulse.X * ImpulseScale.X, Impulse.Y * ImpulseScale.Y, Impulse.Z * ImpulseScale.Z);
-						CharaMoveCom->AddImpulse(Impulse, true);
-						//DrawDebugDirectionalArrow(MeshComp->GetOwner()->GetWorld(), res.GetActor()->GetActorLocation(), Impulse, 1, FColor::Blue, false, 3, SDPG_World, 1);
+						UCharacterMovementComponent* CharaMoveCom = res.GetActor()->FindComponentByClass<UCharacterMovementComponent>();
+						ACharacter* HitCharacter = Cast<ACharacter>(res.GetActor());
+						if (CharaMoveCom && HitCharacter)
+						{
+							FVector LaunchDirect = res.GetActor()->GetActorLocation()- MeshComp->GetOwner()->GetActorLocation();
+							HitCharacter->LaunchCharacter(FMath::Sqrt(2 * CharaMoveCom->BrakingDecelerationWalking * KnockbackDist)* LaunchDirect.GetSafeNormal(), true, false);
+						}
 					}
 
 					//物理混合
