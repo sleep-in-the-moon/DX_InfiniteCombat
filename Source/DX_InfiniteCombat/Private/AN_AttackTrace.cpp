@@ -1,4 +1,4 @@
-// Copyright DX_IC
+ï»¿// Copyright DX_IC
 
 
 #include "AN_AttackTrace.h"
@@ -146,7 +146,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					ApplyedObjs.AddUnique(res.GetActor());
 					if (UAbilitySystemComponent* TargetASC = res.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
 					{
-						//Ó¦ÓÃGE
+						//åº”ç”¨GE
 						if (ICSubSystem && ICSubSystem->DamageApplyGE)
 						{
 							FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(MeshComp->GetOwner(), ICSubSystem->DamageApplyGE, res, DamageATKCoefficient);
@@ -155,10 +155,10 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 
 					}
 
-					//ÉËº¦¸ÐÖªÊÂ¼þ·¢ËÍ
+					//ä¼¤å®³æ„ŸçŸ¥äº‹ä»¶å‘é€
 					UAISense_Damage::ReportDamageEvent(MeshComp->GetOwner()->GetWorld(), res.GetActor(), MeshComp->GetOwner(), 0.f, MeshComp->GetOwner()->GetActorLocation(), res.GetActor()->GetActorLocation());
 
-					//»÷ÍË
+					//å‡»é€€
 					if(!FMath::IsNearlyEqual(KnockbackDist, 0.0f))
 					{
 						UCharacterMovementComponent* CharaMoveCom = res.GetActor()->FindComponentByClass<UCharacterMovementComponent>();
@@ -170,7 +170,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 						}
 					}
 
-					//ÎïÀí»ìºÏ
+					//ç‰©ç†æ··åˆ
 					/*if (USkeletalMeshComponent* Skele = res.GetActor()->FindComponentByClass<USkeletalMeshComponent>())
 					{
 						Skele->SetPhysicsBlendWeight(0.5);
@@ -191,25 +191,25 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					//	OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
 					//}
 
-					//..ÆäËü
+					//..å…¶å®ƒ
 
 				}
 
 			}
 		}
 
-		//Í¨ÖªÖÜÆÚÄÚÖ»Ö´ÐÐÒ»´ÎµÄÂß¼­
+		//é€šçŸ¥å‘¨æœŸå†…åªæ‰§è¡Œä¸€æ¬¡çš„é€»è¾‘
 		if (bOnce && bHit)
 		{
 			bOnce = false;
-			//¾µÍ·¶¶¶¯£¬Ê±¼äÅòÕÍ µÈGEGC
+			//é•œå¤´æŠ–åŠ¨ï¼Œæ—¶é—´è†¨èƒ€ ç­‰GEGC
 			if (ICSubSystem && ICSubSystem->AttackFeedbackGE)
 			{
 				if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(ICSubSystem->AttackFeedbackGE->GetDefaultObject()))
 					OwnerASC->ApplyGameplayEffectToSelf(GECDO, 0, FGameplayEffectContextHandle());
 			}
 
-			//»ºËÙ ¶Ù¸Ð
+			//ç¼“é€Ÿ é¡¿æ„Ÿ
 			UAnimMontage* AnimMon = Cast<UAnimMontage>(Animation);
 			if (bSlowdown && AnimMon)
 			{
@@ -221,13 +221,13 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					}, SlowdownTime, false);
 			}
 
-			//³éÖ¡
+			//æŠ½å¸§
 			if (bSkipFrames && AnimMon)
 			{
 				MeshComp->GetAnimInstance()->Montage_Pause(AnimMon);
 				float CurPlayTime = MeshComp->GetAnimInstance()->Montage_GetPosition(AnimMon);
 
-				//¼ÆËãµ±Ç°Ö¡
+				//è®¡ç®—å½“å‰å¸§
 				//const FFrameRate FrameRate = AnimMon->GetDataModel()->GetFrameRate();
 				////float CurrentFrame = CurPlayTime * FrameRate.AsDecimal();
 

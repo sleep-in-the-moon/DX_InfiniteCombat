@@ -1,4 +1,4 @@
-// Copyright DX_IC
+ï»¿// Copyright DX_IC
 
 #pragma once
 
@@ -55,18 +55,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Damage")
 	float DamageATKCoefficient = 1.0f;
 
-	//»÷ÍË¾àÀë
+	//å‡»é€€è·ç¦»
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Hit")
 	float KnockbackDist = 0.0f;
 
-	//¼õËÙ ¶Ù¸Ğ
+	//å‡é€Ÿ é¡¿æ„Ÿ
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack")
 	bool bSlowdown = false;
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack", meta = (EditCondition = "bSlowdown", EditConditionHides))
 	float SlowdownScale = 0.7;
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack", meta = (EditCondition = "bSlowdown", EditConditionHides))
 	float SlowdownTime = 0.6;
-	//ÌøÖ¡ Í£ÖÍ¸Ğ
+	//è·³å¸§ åœæ»æ„Ÿ
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack")
 	bool bSkipFrames = false;
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack", meta = (EditCondition = "bSkipFrames", EditConditionHides))
