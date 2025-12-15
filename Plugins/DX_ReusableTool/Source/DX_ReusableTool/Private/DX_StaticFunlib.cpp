@@ -4,6 +4,10 @@
 #include "DX_StaticFunlib.h"
 #include "CollisionQueryParams.h"
 #include "Polygon2.h"
+//#include "Engine/CollisionProfile.h"
+//#include "Misc/ConfigCacheIni.h"
+//#include "Engine/EngineTypes.h"
+
 
 bool UDX_StaticFunlib::GetAllFilesInFolder(const FString& RootDir, TArray<FString>& OutSubDirs, TArray<FString>& OutSubFiles, const FString& ExtentName)
 {
@@ -55,9 +59,19 @@ bool UDX_StaticFunlib::GetAllFilesInFolder(const FString& RootDir, TArray<FStrin
 
 void UDX_StaticFunlib::MakeCollisionParam(const AActor* Avatar, FCollisionQueryParams& CollisionQueryParams, FCollisionObjectQueryParams& ObjectQueryParams, TArray<AActor*> ActorsToIgnore, TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes, bool bTraceComplex, bool bIgnoreSelf)
 {
-	static const FName LineTraceTag(TEXT("LineTraceMultiForObjects"));
+	static const FName TraceTag(TEXT("TraceMultiForObjects"));
+	
+	CollisionQueryParams = MakeCollisionQueryParam(Avatar, ActorsToIgnore, TraceTag, bTraceComplex, bIgnoreSelf);
+
+	ObjectQueryParams = FCollisionObjectQueryParams(TraceObjectTypes);
+}
+
+FCollisionQueryParams UDX_StaticFunlib::MakeCollisionQueryParam(const AActor* Avatar, TArray<AActor*> ActorsToIgnore, const FName& Tag, bool bTraceComplex, bool bIgnoreSelf)
+{
+	FCollisionQueryParams CollisionQueryParams;
+
 	//ConfigureCollisionParams(LineTraceMultiName, bTraceComplex, ActorsToIgnore, bIgnoreSelf, MeshComp->GetOwner());
-	CollisionQueryParams = FCollisionQueryParams(LineTraceTag, bTraceComplex);
+	CollisionQueryParams = FCollisionQueryParams(Tag, bTraceComplex);
 	CollisionQueryParams.bReturnPhysicalMaterial = true;
 	CollisionQueryParams.AddIgnoredActors(ActorsToIgnore);
 
@@ -83,8 +97,7 @@ void UDX_StaticFunlib::MakeCollisionParam(const AActor* Avatar, FCollisionQueryP
 			}
 		}
 	}
-
-	ObjectQueryParams = FCollisionObjectQueryParams(TraceObjectTypes);
+	return CollisionQueryParams;
 }
 
 TArray<FVector2D> UDX_StaticFunlib::SortVec2DsToCounterClockWise(const TArray<FVector2D>& Vec2Ds)
@@ -144,4 +157,14 @@ FVector2D UDX_StaticFunlib::GetPolygonCentroid(const TArray<FVector2D>& Vec2Ds)
 	Cy /= (6.0 * Area);
 
 	return FVector2D(Cx, Cy);
+}
+
+ECollisionChannel UDX_StaticFunlib::GetCustomTraceChannelByName(FName ChannelName)
+{
+	UCollisionProfile* CollisionProfile = UCollisionProfile::Get();
+	if (CollisionProfile)
+	{
+		//return CollisionProfile->ConvertToCollisionChannel(true, CollisionProfile->ReturnContainerIndexFromChannelName(ChannelName));
+	}
+	return ECollisionChannel::ECC_MAX;
 }

@@ -22,6 +22,7 @@ public:
 	static bool GetAllFilesInFolder(const FString& RootDir, TArray<FString>& OutSubDirs, TArray<FString>& OutSubFiles, const FString& ExtentName="");
 
 	static void MakeCollisionParam(const AActor* Avatar, FCollisionQueryParams& CollisionQueryParams, FCollisionObjectQueryParams& ObjectQueryParams, TArray<AActor*> ActorsToIgnore, TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes, bool bTraceComplex=false, bool bIgnoreSelf=true);
+	static FCollisionQueryParams MakeCollisionQueryParam(const AActor* Avatar, TArray<AActor*> ActorsToIgnore,const FName& Tag, bool bTraceComplex = false, bool bIgnoreSelf = true);
 	
 	//UFUNCTION(BlueprintCallable)
 	//static void LineTraceFromPreToCurTickByMeshSockets(const AActor* Owner, const UStaticMeshComponent* StaticMesh, FName SockePrex);
@@ -31,5 +32,7 @@ public:
 	//根据多边形顶点计算其质心
 	UFUNCTION(BlueprintPure, BlueprintCallable)
 	static FVector2D GetPolygonCentroid(const TArray<FVector2D>& Vec2Ds);
+
+	static ECollisionChannel GetCustomTraceChannelByName(FName ChannelName);
 
 };

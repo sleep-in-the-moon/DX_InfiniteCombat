@@ -6,6 +6,22 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ICCharacterMovementComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct FTraversalCheckInput
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	FVector TraceDirection;
+	UPROPERTY(BlueprintReadWrite)
+	float TraceDistance;
+	UPROPERTY(BlueprintReadWrite)
+	float MaxLedgeHeight;
+	UPROPERTY(BlueprintReadWrite)
+	float MinLedgeHeight;
+};
+
 /**
  * 
  */
@@ -14,4 +30,7 @@ class DX_INFINITECOMBAT_API UICCharacterMovementComponent : public UCharacterMov
 {
 	GENERATED_BODY()
 	
+public:
+	bool TryTraversalAction(const FTraversalCheckInput& CheckInput);
+
 };
