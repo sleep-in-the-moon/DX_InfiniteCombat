@@ -6,6 +6,7 @@
 #include "ICAbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "StructUtils/InstancedStruct.h"
+#include "ICCharacterMovementComponent.h"
 
 
 void ADX_ICPlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
@@ -18,6 +19,12 @@ void ADX_ICPlayerController::PostProcessInput(const float DeltaTime, const bool 
 		}
 	}
 	Super::PostProcessInput(DeltaTime, bGamePaused);
+}
+
+FVector ADX_ICPlayerController::GetMoveInput() const
+{
+	return ((FRotator(0, 0, GetControlRotation().Yaw).Vector() * InputVector.X +
+	FRotationMatrix(FRotator(0, 0, GetControlRotation().Yaw)).GetScaledAxis(EAxis::Y) * InputVector.Y)).GetSafeNormal(0.0001);
 }
 
 void ADX_ICPlayerController::BeginPlay()
@@ -37,8 +44,8 @@ void ADX_ICPlayerController::MoveEvent(const FInputActionValue& InputValue)
 			character->StopAnimMontage();
 		}
 	}
-	
-	DG_MoveInputTrigger.ExecuteIfBound(FInstancedStruct::Make(InputValue.Get<FVector2D>()));
+
+	DG_MoveInputTrigger.ExecuteIfBound(FInstancedStruct::Make(InputVector));
 }
 
 void ADX_ICPlayerController::Jump()
@@ -51,8 +58,18 @@ void ADX_ICPlayerController::Jump()
 		{
 			ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir")));
 		}
+
+		UICCharacterMovementComponent* MoveComp = character->FindComponentByClass<UICCharacterMovementComponent>();
+		if (MoveComp && MoveComp->GetCurrentAcceleration().Length()/ MoveComp->GetMaxAcceleration()>0)
+		{
+			FTraversalCheckInput TraversalCheckInput;
+			TraversalCheckInput.MaxLedgeHeight = 170;
+			TraversalCheckInput.MinLedgeHeight = 50;
+			//TraversalCheckInput.TraceDirection = 50;
+			TraversalCheckInput.TraceDistance = 70;
+			MoveComp->TryTraversalAction(TraversalCheckInput);
+		}
 	}
-	
 }
 
 //void ADX_ICPlayerController::StopJump()

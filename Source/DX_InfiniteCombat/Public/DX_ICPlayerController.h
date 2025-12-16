@@ -25,6 +25,9 @@ class DX_INFINITECOMBAT_API ADX_ICPlayerController : public ABasicInputPlayerCon
 public:
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetMoveInput() const;
+
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<FAbilityInput> AbilityInputArray;
 
