@@ -62,11 +62,7 @@ void ADX_ICPlayerController::Jump()
 		UICCharacterMovementComponent* MoveComp = character->FindComponentByClass<UICCharacterMovementComponent>();
 		if (MoveComp && MoveComp->GetCurrentAcceleration().Length()/ MoveComp->GetMaxAcceleration()>0)
 		{
-			FTraversalCheckInput TraversalCheckInput;
-			TraversalCheckInput.MaxLedgeHeight = 170;
-			TraversalCheckInput.MinLedgeHeight = 50;
-			//TraversalCheckInput.TraceDirection = 50;
-			TraversalCheckInput.TraceDistance = 70;
+			FTraversalCheckInput TraversalCheckInput(GetMoveInput(), 170.0f, 50.0f, 70.0f);
 			MoveComp->TryTraversalAction(TraversalCheckInput);
 		}
 	}
