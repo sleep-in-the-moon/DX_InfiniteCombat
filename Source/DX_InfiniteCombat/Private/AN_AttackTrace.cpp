@@ -102,7 +102,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 		case EAttackTraceShape::Line:
 			bHit = MeshComp->GetOwner()->GetWorld()->LineTraceMultiByObjectType(HitRes, *PreSocketLoc.Find(socket), CurWeapon->GetSocketLocation(socket), ObjectQueryParams, Params);
 			//DrawDebugLine(MeshComp->GetOwner()->GetWorld(), *PreSocketLoc.Find(socket), CurWeapon->GetSocketLocation(socket), FColor::Red, false, 1.5f, 0, 1.0f);
-			if (ICSubSystem->GetShowDebug())
+			if (ICSubSystem && ICSubSystem->GetShowDebug())
 				DrawDebugLineTraceMulti(MeshComp->GetOwner()->GetWorld(), *PreSocketLoc.Find(socket), CurWeapon->GetSocketLocation(socket), EDrawDebugTrace::Type::ForDuration, bHit, HitRes, FColor::Red, FColor::Green, 1.5f);
 
 			break;
@@ -110,7 +110,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 		case EAttackTraceShape::Box:
 			bHit = MeshComp->GetOwner()->GetWorld()->SweepMultiByObjectType(HitRes, *PreSocketLoc.Find(socket), CurWeapon->GetSocketLocation(socket), MeshComp->GetOwner()->GetActorRotation().Quaternion(), ObjectQueryParams, FCollisionShape::MakeBox(BoxHalf), Params);
 			
-			if (ICSubSystem->GetShowDebug())
+			if (ICSubSystem && ICSubSystem->GetShowDebug())
 				DrawDebugBoxTraceMulti(MeshComp->GetOwner()->GetWorld(), *PreSocketLoc.Find(socket), CurWeapon->GetSocketLocation(socket), BoxHalf, MeshComp->GetOwner()->GetActorRotation(), EDrawDebugTrace::Type::ForDuration, bHit, HitRes, FColor::Red, FColor::Green, 1.5f);
 
 			break;
