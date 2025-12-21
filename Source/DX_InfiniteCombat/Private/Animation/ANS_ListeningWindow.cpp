@@ -62,25 +62,28 @@ void UANS_ListeningWindow::ClearBind()
 {
 	SaveMeshComp->GetAnimInstance()->OnMontageEnded.RemoveDynamic(this, &UANS_ListeningWindow::OnMontageInterruptedEvent);
 
-	switch (ListenType)
+	for (EListenType ListenType : ListenTypes)
 	{
-	case EListenType::None: default:
-		break;
-	case EListenType::MoveInput:
-		if (APawn* pawn = Cast<APawn>(SaveMeshComp->GetOwner()))
+		switch (ListenType)
 		{
-			if (ADX_ICPlayerController* ICPlayerController = Cast<ADX_ICPlayerController>(pawn->GetController()))
+		case EListenType::None: default:
+			break;
+		case EListenType::MoveInput:
+			if (APawn* pawn = Cast<APawn>(SaveMeshComp->GetOwner()))
 			{
-				ICPlayerController->DG_MoveInputTrigger.Unbind();
+				if (ADX_ICPlayerController* ICPlayerController = Cast<ADX_ICPlayerController>(pawn->GetController()))
+				{
+					ICPlayerController->DG_MoveInputTrigger.Unbind();
+				}
 			}
-		}
 
-		break;
-	case EListenType::AbilityInput:
-		if (UICAbilitySystemComponent* ICASC = SaveMeshComp->GetOwner()->FindComponentByClass<UICAbilitySystemComponent>())
-		{
-			ICASC->DG_InputComboPress.Unbind();
+			break;
+		case EListenType::AbilityInput:
+			if (UICAbilitySystemComponent* ICASC = SaveMeshComp->GetOwner()->FindComponentByClass<UICAbilitySystemComponent>())
+			{
+				ICASC->DG_InputComboPress.Unbind();
+			}
+			break;
 		}
-		break;
 	}
 }

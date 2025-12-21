@@ -29,7 +29,7 @@ class BASICINPUTSYSTEM_API ABasicInputPlayerController : public APlayerControlle
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	FVector2D InputVector;
+	FVector2D MoveInputVector;
 
 protected:
 	virtual void MoveEvent(const FInputActionValue& InputValue);

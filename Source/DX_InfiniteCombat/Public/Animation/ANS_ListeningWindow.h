@@ -21,8 +21,8 @@ UENUM(BlueprintType)
 enum class ETriggerEventType : uint8
 {
 	None,
-	Interrupt UMETA(DisplayName = "打断当前Montage"),
-	Combo UMETA(DisplayName = "可监听输入触发连招"),
+	Interrupt /*UMETA(DisplayName = "打断当前Montage")*/,
+	Combo /*UMETA(DisplayName = "可监听输入触发连招")*/,
 	Ability
 };
 
@@ -42,10 +42,12 @@ class DX_INFINITECOMBAT_API UANS_ListeningWindow : public UAnimNotifyState
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 protected:
-	UPROPERTY(EditAnywhere)
-	EListenType ListenType = EListenType::None;
+	/*UPROPERTY(EditAnywhere)
+	EListenType ListenType = EListenType::None;*/
 	UPROPERTY(EditAnywhere)
 	ETriggerEventType TriggerEventType = ETriggerEventType::None;
+	UPROPERTY(EditAnywhere)
+	TSet<EListenType> ListenTypes;
 
 private:
 	void StopMontageByInput(const FInstancedStruct& Value);
@@ -67,24 +69,27 @@ private:
 template<typename TriggerEventFuncType>
 inline void UANS_ListeningWindow::BindTriggerEventByLitenType(USkeletalMeshComponent* MeshComp, TriggerEventFuncType TriggerEventFunc)
 {
-	switch (ListenType)
+	for (EListenType ListenType : ListenTypes)
 	{
-	case EListenType::None: default:
-		break;
-	case EListenType::MoveInput:
-		if (APawn* pawn = Cast<APawn>(MeshComp->GetOwner()))
+		switch (ListenType)
 		{
-			if (ADX_ICPlayerController* ICPlayerController = Cast<ADX_ICPlayerController>(pawn->GetController()))
+		case EListenType::None: default:
+			break;
+		case EListenType::MoveInput:
+			if (APawn* pawn = Cast<APawn>(MeshComp->GetOwner()))
 			{
-				ICPlayerController->DG_MoveInputTrigger.BindUObject(this, TriggerEventFunc);
+				if (ADX_ICPlayerController* ICPlayerController = Cast<ADX_ICPlayerController>(pawn->GetController()))
+				{
+					ICPlayerController->DG_MoveInputTrigger.BindUObject(this, TriggerEventFunc);
+				}
 			}
+			break;
+		case EListenType::AbilityInput:
+			if (UICAbilitySystemComponent* ICASC = MeshComp->GetOwner()->FindComponentByClass<UICAbilitySystemComponent>())
+			{
+				ICASC->DG_InputComboPress.BindUObject(this, TriggerEventFunc);
+			}
+			break;
 		}
-		break;
-	case EListenType::AbilityInput:
-		if (UICAbilitySystemComponent* ICASC = MeshComp->GetOwner()->FindComponentByClass<UICAbilitySystemComponent>())
-		{
-			ICASC->DG_InputComboPress.BindUObject(this, TriggerEventFunc);
-		}
-		break;
 	}
 }

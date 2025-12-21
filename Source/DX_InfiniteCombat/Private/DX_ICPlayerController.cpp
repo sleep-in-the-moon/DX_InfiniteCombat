@@ -23,8 +23,35 @@ void ADX_ICPlayerController::PostProcessInput(const float DeltaTime, const bool 
 
 FVector ADX_ICPlayerController::GetMoveInput() const
 {
-	return ((FRotator(0, 0, GetControlRotation().Yaw).Vector() * InputVector.X +
-	FRotationMatrix(FRotator(0, 0, GetControlRotation().Yaw)).GetScaledAxis(EAxis::Y) * InputVector.Y)).GetSafeNormal(0.0001);
+	return GetControllerHorizontalForwardVector() * MoveInputVector.X +
+		   GetControllerHorizontalRightVector() * MoveInputVector.Y;
+}
+
+FVector ADX_ICPlayerController::GetControllerForwardVector() const
+{
+	return FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::X);
+}
+
+FVector ADX_ICPlayerController::GetControllerRightVector() const
+{
+	return FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::Y);
+}
+
+FVector ADX_ICPlayerController::GetControllerUpVector() const
+{
+	return FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::Z);
+}
+
+FVector ADX_ICPlayerController::GetControllerHorizontalForwardVector() const
+{
+	FRotator HorizontalRotation(0, GetControlRotation().Yaw, 0);
+	return FRotationMatrix(HorizontalRotation).GetUnitAxis(EAxis::X);
+}
+
+FVector ADX_ICPlayerController::GetControllerHorizontalRightVector() const
+{
+	FRotator HorizontalRotation(0, GetControlRotation().Yaw, 0);
+	return FRotationMatrix(HorizontalRotation).GetUnitAxis(EAxis::Y);
 }
 
 void ADX_ICPlayerController::BeginPlay()
@@ -45,7 +72,7 @@ void ADX_ICPlayerController::MoveEvent(const FInputActionValue& InputValue)
 		}
 	}
 
-	DG_MoveInputTrigger.ExecuteIfBound(FInstancedStruct::Make(InputVector));
+	DG_MoveInputTrigger.ExecuteIfBound(FInstancedStruct::Make(MoveInputVector));
 }
 
 void ADX_ICPlayerController::Jump()
@@ -62,7 +89,7 @@ void ADX_ICPlayerController::Jump()
 		UICCharacterMovementComponent* MoveComp = character->FindComponentByClass<UICCharacterMovementComponent>();
 		if (MoveComp && MoveComp->GetCurrentAcceleration().Length()/ MoveComp->GetMaxAcceleration()>0)
 		{
-			FTraversalCheckInput TraversalCheckInput(GetMoveInput(), 170.0f, 50.0f, 70.0f);
+			FTraversalCheckInput TraversalCheckInput(GetMoveInput(), 60.0f, 173.0f, 40.0f);
 			MoveComp->TryTraversalAction(TraversalCheckInput);
 		}
 	}

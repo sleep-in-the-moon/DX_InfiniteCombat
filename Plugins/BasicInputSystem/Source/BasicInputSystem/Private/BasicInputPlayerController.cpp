@@ -10,7 +10,7 @@
 
 void ABasicInputPlayerController::MoveEvent(const FInputActionValue& InputValue)
 {
-	InputVector = InputValue.Get<FVector2D>();
+	MoveInputVector = InputValue.Get<FVector2D>();
 	
 	FRotator ControllRot = GetControlRotation();
 	FRotator ControllRotYaw = FRotator(0, ControllRot.Yaw, 0);
@@ -20,11 +20,11 @@ void ABasicInputPlayerController::MoveEvent(const FInputActionValue& InputValue)
 
 	if (APawn* pawn = GetPawn<APawn>())
 	{
-		if (InputVector.Y != 0.0f)
-			pawn->AddMovementInput(RightVec * InputVector.Y);
+		if (MoveInputVector.Y != 0.0f)
+			pawn->AddMovementInput(RightVec * MoveInputVector.Y);
 
-		if (InputVector.X != 0.0f)
-			pawn->AddMovementInput(ForwardVec * InputVector.X);
+		if (MoveInputVector.X != 0.0f)
+			pawn->AddMovementInput(ForwardVec * MoveInputVector.X);
 
 	}
 }
