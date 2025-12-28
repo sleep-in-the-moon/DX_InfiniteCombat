@@ -7,6 +7,7 @@
 #include "KismetTraceUtils.h"
 #include "ICWorldSubsystem.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "MotionWarpingComponent.h"
 
 bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInput& CheckInput)
 {
@@ -65,7 +66,19 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
                     FTransform TargetTransform = FTransform((OutHit.ImpactNormal * FVector(-1, -1, 0)).ToOrientationRotator(),
                         FVector(OutHit2.Location.X, OutHit2.Location.Y, OutHit2.ImpactPoint.Z + Capsule->GetScaledCapsuleHalfHeight()));
 
+                    DrawDebugPoint(GetWorld(), TargetTransform.GetLocation(), 20, FColor::Green, false, 3);
+
                     float Height = TargetTransform.GetLocation().Z - GetOwner()->GetActorLocation().Z;
+
+                    //PlayMontage
+                    /*if (ACharacter* Character = Cast<ACharacter>(GetOwner()))
+                    {
+                        
+                    }*/
+                    if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
+                    {
+                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPoint"), OutHit2.ImpactPoint);
+                    }
 
                     return true;
                 }
