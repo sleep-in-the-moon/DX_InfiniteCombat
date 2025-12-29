@@ -8,6 +8,7 @@
 #include "ICWorldSubsystem.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "MotionWarpingComponent.h"
+#include "GameFramework/Character.h"
 
 bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInput& CheckInput)
 {
@@ -70,14 +71,14 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
 
                     float Height = TargetTransform.GetLocation().Z - GetOwner()->GetActorLocation().Z;
 
-                    //PlayMontage
-                    /*if (ACharacter* Character = Cast<ACharacter>(GetOwner()))
-                    {
-                        
-                    }*/
-                    if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
+                    // MotionWarping  PlayMontage
+                    ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+                    UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>();
+
+                    if (MotionWarpingComp && OwnerCharacter && ClimbMontage)
                     {
                         MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPoint"), OutHit2.ImpactPoint);
+                        OwnerCharacter->PlayAnimMontage(ClimbMontage);
                     }
 
                     return true;

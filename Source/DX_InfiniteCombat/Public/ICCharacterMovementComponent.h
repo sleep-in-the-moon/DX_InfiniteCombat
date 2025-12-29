@@ -30,6 +30,10 @@ class DX_INFINITECOMBAT_API UICCharacterMovementComponent : public UCharacterMov
 {
 	GENERATED_BODY()
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Traversal")
+	UAnimMontage* ClimbMontage=nullptr;
+
 public:
 	bool TryTraversalAction(const FTraversalCheckInput& CheckInput);
 
