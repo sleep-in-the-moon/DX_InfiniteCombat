@@ -78,7 +78,8 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
                     if (MotionWarpingComp && OwnerCharacter && ClimbMontage)
                     {
                         MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPoint"), OutHit2.ImpactPoint);
-                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"), TargetTransform.GetLocation());
+                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"), FVector(FVector2D(TargetTransform.GetLocation()), TargetTransform.GetLocation().Z+10));
+                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"), FVector(0, 0, 0));
                         OwnerCharacter->PlayAnimMontage(ClimbMontage);
                     }
 
