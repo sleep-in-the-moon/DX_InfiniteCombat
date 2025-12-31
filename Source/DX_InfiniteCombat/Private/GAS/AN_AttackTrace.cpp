@@ -1,17 +1,17 @@
 ﻿// Copyright DX_IC
 
 
-#include "AN_AttackTrace.h"
-#include "CombatCharacterComponent.h"
+#include "Animation/AN_AttackTrace.h"
+#include "ICComponents/CombatCharacterComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "KismetTraceUtils.h"
 //#include "Kismet/KismetSystemLibrary.h"
 #include "CollisionQueryParams.h"
-#include "ICAbilitySystemComponent.h"
+#include "GAS/ICAbilitySystemComponent.h"
 #include "Runtime/AIModule/Classes/Perception/AISense_Damage.h"
-#include "ICWorldSubsystem.h"
+#include "Subsystem/ICWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "ICTypes.h"
+#include "Data/ICTypes.h"
 #include "GAS/ICGameplayEffectTypes.h"
 #include "Utils/IC_Utils.h"
 #include "GameFramework/Character.h"

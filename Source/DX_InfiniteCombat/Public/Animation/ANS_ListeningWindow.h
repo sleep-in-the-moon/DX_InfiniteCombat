@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "DX_ICPlayerController.h"
-#include "ICTypes.h"
-#include "ICAbilitySystemComponent.h"
+#include "Character/DX_ICPlayerController.h"
+#include "Data/ICTypes.h"
+#include "GAS/ICAbilitySystemComponent.h"
 #include "ANS_ListeningWindow.generated.h"
 
 

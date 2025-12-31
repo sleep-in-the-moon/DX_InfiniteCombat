@@ -1,14 +1,14 @@
 // Copyright DX_IC
 
 
-#include "EnemyCharacterBase.h"
-#include "ICAbilitySystemComponent.h"
-#include "DXWidgetBase.h"
+#include "Character/EnemyCharacterBase.h"
+#include "GAS/ICAbilitySystemComponent.h"
+#include "UMG/DXWidgetBase.h"
 #include "Components/WidgetComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "CombatCharacterComponent.h"
-#include "CharacterAttributeSet.h"
-#include "ICWorldSubsystem.h"
+#include "ICComponents/CombatCharacterComponent.h"
+#include "GAS/CharacterAttributeSet.h"
+#include "Subsystem/ICWorldSubsystem.h"
 
 // Sets default values
 AEnemyCharacterBase::AEnemyCharacterBase()

@@ -1,12 +1,12 @@
 // Copyright DX_IC
 
 
-#include "ICAbilitySystemComponent.h"
-#include "ICGameplayAbilityBase.h"
+#include "GAS/ICAbilitySystemComponent.h"
+#include "GAS/GA/ICGameplayAbilityBase.h"
 #include "GameplayTagsManager.h"
 #include "StructUtils/InstancedStruct.h"
-#include "CharacterAttributeSet.h"
-#include "CombatCharacterComponent.h"
+#include "GAS/CharacterAttributeSet.h"
+#include "ICComponents/CombatCharacterComponent.h"
 
 UICAbilitySystemComponent::UICAbilitySystemComponent()
 {

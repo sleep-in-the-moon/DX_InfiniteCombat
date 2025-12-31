@@ -1,11 +1,11 @@
 // Copyright DX_IC
 
 
-#include "ICCharacterMovementComponent.h"
+#include "ICComponents/ICCharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "DX_ReusableTool/Public/DX_StaticFunlib.h"
 #include "KismetTraceUtils.h"
-#include "ICWorldSubsystem.h"
+#include "Subsystem/ICWorldSubsystem.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "MotionWarpingComponent.h"
 #include "GameFramework/Character.h"

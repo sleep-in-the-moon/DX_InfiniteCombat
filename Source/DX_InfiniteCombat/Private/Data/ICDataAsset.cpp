@@ -1,8 +1,8 @@
 // Copyright DX_IC
 
 
-#include "ICDataAsset.h"
-#include "ICAssetManager.h"
+#include "Data/ICDataAsset.h"
+#include "Data/ICAssetManager.h"
 
 const UICDataAsset& UICDataAsset::Get()
 {

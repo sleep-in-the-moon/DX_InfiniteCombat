@@ -1,7 +1,7 @@
 // Copyright DX_IC
 
 
-#include "DX_ICAnimInstance.h"
+#include "Animation/DX_ICAnimInstance.h"
 #include "AbilitySystemGlobals.h"
 
 void UDX_ICAnimInstance::NativeInitializeAnimation()

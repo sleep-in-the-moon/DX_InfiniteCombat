@@ -2,7 +2,7 @@
 
 
 #include "LockSystem/WeakLockComponent.h"
-#include "ICWorldSubsystem.h"
+#include "Subsystem/ICWorldSubsystem.h"
 #include "KismetTraceUtils.h"
 #include "DX_ReusableTool/Public/DX_StaticFunlib.h"
 #include "UMG/WidgetCombatStates.h"

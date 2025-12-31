@@ -1,5 +1,5 @@
 // Copyright DX_IC
 
 
-#include "ICGameplayAbilityBase.h"
+#include "gas/GA/ICGameplayAbilityBase.h"
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
-#include "ICTypes.h"
+#include "Data/ICTypes.h"
 #include "ICGameplayEffectTypes.generated.h"
 
 

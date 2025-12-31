@@ -1,5 +1,5 @@
 // Copyright DX_IC
 
 
-#include "GameplayAbilityGetHurt.h"
+#include "GAS/GA/GameplayAbilityGetHurt.h"
 

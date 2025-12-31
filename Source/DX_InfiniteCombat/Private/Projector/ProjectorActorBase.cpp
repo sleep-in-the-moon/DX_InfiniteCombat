@@ -1,13 +1,13 @@
 // Copyright DX_IC
 
 
-#include "ProjectorActorBase.h"
+#include "Projector/ProjectorActorBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "DX_StaticFunlib.h"
 #include "KismetTraceUtils.h"
 #include "Runtime/AIModule/Classes/Perception/AISense_Damage.h"
-#include "ICWorldSubsystem.h"
+#include "Subsystem/ICWorldSubsystem.h"
 #include "Utils/IC_Utils.h"
 #include "AbilitySystemComponent.h"
 

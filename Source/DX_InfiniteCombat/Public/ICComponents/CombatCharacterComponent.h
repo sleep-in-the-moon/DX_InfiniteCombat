@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ICTypes.h"
+#include "Data/ICTypes.h"
 #include "CombatCharacterComponent.generated.h"
 
 

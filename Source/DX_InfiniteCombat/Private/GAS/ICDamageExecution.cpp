@@ -3,7 +3,7 @@
 
 #include "GAS/ICDamageExecution.h"
 #include "GameplayEffectTypes.h"
-#include "CharacterAttributeSet.h"
+#include "GAS/CharacterAttributeSet.h"
 #include "GAS/ICGameplayEffectTypes.h"
 
 

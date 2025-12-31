@@ -1,7 +1,7 @@
 // Copyright DX_IC
 
 
-#include "CharacterAttributeSet.h"
+#include "GAS/CharacterAttributeSet.h"
 #include "GameplayEffectExtension.h"
 
 void UCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)

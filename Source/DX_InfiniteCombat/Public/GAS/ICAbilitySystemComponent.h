@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
-#include "ICTypes.h"
+#include "Data/ICTypes.h"
 #include "ICAbilitySystemComponent.generated.h"
 
 struct FInstancedStruct;

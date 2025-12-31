@@ -1,8 +1,8 @@
 // Copyright DX_IC
 
 
-#include "GAS/GA_ComboDispatcher.h"
-#include "ICAbilitySystemComponent.h"
+#include "GAS/GA/GA_ComboDispatcher.h"
+#include "GAS/ICAbilitySystemComponent.h"
 
 UGA_ComboDispatcher::UGA_ComboDispatcher()
 {

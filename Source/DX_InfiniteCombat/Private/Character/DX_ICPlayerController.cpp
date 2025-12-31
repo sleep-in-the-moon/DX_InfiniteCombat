@@ -1,12 +1,12 @@
 // Copyright DX_IC
 
 
-#include "DX_ICPlayerController.h"
-#include "DX_ICCharacter.h"
-#include "ICAbilitySystemComponent.h"
+#include "Character/DX_ICPlayerController.h"
+#include "Character/DX_ICCharacter.h"
+#include "GAS/ICAbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "StructUtils/InstancedStruct.h"
-#include "ICCharacterMovementComponent.h"
+#include "ICComponents/ICCharacterMovementComponent.h"
 
 
 void ADX_ICPlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)

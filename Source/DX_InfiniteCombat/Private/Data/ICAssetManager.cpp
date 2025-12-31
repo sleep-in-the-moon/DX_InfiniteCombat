@@ -1,7 +1,7 @@
 // Copyright DX_IC
 
 
-#include "ICAssetManager.h"
+#include "Data/ICAssetManager.h"
 
 UICAssetManager& UICAssetManager::Get()
 {

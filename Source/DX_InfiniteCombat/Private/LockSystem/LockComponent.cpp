@@ -1,9 +1,9 @@
 // Copyright DX_IC
 
 
-#include "LockComponent.h"
-#include "ICAbilitySystemComponent.h"
-#include "ICWorldSubsystem.h"
+#include "LockSystem/LockComponent.h"
+#include "GAS/ICAbilitySystemComponent.h"
+#include "Subsystem/ICWorldSubsystem.h"
 #include "KismetTraceUtils.h"
 #include "DX_ReusableTool/Public/DX_StaticFunlib.h"
 #include "UMG/WidgetCombatStates.h"

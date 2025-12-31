@@ -1,13 +1,13 @@
 // Copyright DX_IC
 
 
-#include "CombatCharacterComponent.h"
+#include "ICComponents/CombatCharacterComponent.h"
 #include "KismetTraceUtils.h"
 //#include "TimerManager.h"
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
-#include "ICWorldSubsystem.h"
+#include "Subsystem/ICWorldSubsystem.h"
 
 // Sets default values for this component's properties
 UCombatCharacterComponent::UCombatCharacterComponent()

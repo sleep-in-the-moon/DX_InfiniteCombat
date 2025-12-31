@@ -6,7 +6,7 @@
 //#include "UObject/NoExportTypes.h"
 #include "Components/ActorComponent.h"
 #include "DX_ReusableTool/Public/DataStructure/Trie.h"
-#include "ICTypes.h"
+#include "Data/ICTypes.h"
 #include "ComboTrie.generated.h"
 
 /**

@@ -1,8 +1,8 @@
 // Copyright DX_IC
 
 
-#include "AbilityTask_ICWaitInputReleased.h"
-#include "ICAbilitySystemComponent.h"
+#include "GAS/AbilityTask_ICWaitInputReleased.h"
+#include "GAS/ICAbilitySystemComponent.h"
 
 void UAbilityTask_ICWaitInputReleased::OnReleaseCallback(const FGameplayTag& Tag)
 {

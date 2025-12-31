@@ -1,17 +1,17 @@
 // Copyright DX_IC
 
 
-#include "DX_ICCharacter.h"
+#include "Character/DX_ICCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "ICAbilitySystemComponent.h"
-#include "DX_ICPlayerController.h"
+#include "GAS/ICAbilitySystemComponent.h"
+#include "Character/DX_ICPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Abilities/GameplayAbility.h"
-#include "CombatCharacterComponent.h"
+#include "ICComponents/CombatCharacterComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "ICWorldSubsystem.h"
-#include "ICTypes.h"
+#include "Subsystem/ICWorldSubsystem.h"
+#include "Data/ICTypes.h"
 #include "ICComponents/ICMotionWarpingComponent.h"
 
 
