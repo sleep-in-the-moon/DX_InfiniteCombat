@@ -72,6 +72,7 @@ private:
 	TMap<FName, FVector> PreSocketLoc;
 	TArray<FName> AttackTraceSockets;
 	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)), TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_PhysicsBody)) };
+	//TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_PhysicsBody)) };
 	bool bTrace = false;
 	AActor* TraceActor;
 };

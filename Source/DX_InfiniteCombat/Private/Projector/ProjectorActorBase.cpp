@@ -120,12 +120,18 @@ bool AProjectorActorBase::LineTraceByMeshSockets(const TArray<AActor*>& ActorsTo
             DrawDebugLineTraceSingle(GetWorld(), *PreSocketLoc.Find(socket), StaticMeshComp->GetSocketLocation(socket), EDrawDebugTrace::Type::ForDuration, bHit, OutHit, FColor::Red, FColor::Green, 1.5f);
 
         PreSocketLoc.Add(socket, StaticMeshComp->GetSocketLocation(socket));
-        if (bHit)//命中处理
+        if (bHit)//命中处理 
         {
             
             if (HittedType == EHittedType::AttachTo)
             {
-                AttachToActor(OutHit.GetActor(), FAttachmentTransformRules::KeepWorldTransform);
+                if (USkeletalMeshComponent* Skele = Cast<USkeletalMeshComponent>(OutHit.GetComponent()))
+                {
+                    AttachToComponent(Skele, FAttachmentTransformRules::KeepWorldTransform, OutHit.BoneName);
+                }
+                //TODO::盾牌
+                else
+                    AttachToActor(OutHit.GetActor(), FAttachmentTransformRules::KeepWorldTransform);
             }
             else if (HittedType == EHittedType::Axplode)
             {
