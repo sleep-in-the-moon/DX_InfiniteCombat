@@ -12,6 +12,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FArrowCountChange, int32, NewCount);
 
 class AProjectorActorBase;
+class UForesightWidgeBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DX_INFINITECOMBAT_API UBowComponent : public UActorComponent
@@ -45,6 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UnHoldingBow();
 
+private:
+	void LerpToControlRotFinish();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 ArrowCount = 20;
@@ -63,8 +67,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GameplayTag")
 	FGameplayTag AimTag = FGameplayTag::RequestGameplayTag(TEXT("State.InAiming"), false);
 
+	UPROPERTY(EditDefaultsOnly)
+	FVector AimModeCameraOffset = FVector(277.0f, 0.0f, -7.0f);
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UForesightWidgeBase> ForesightWidgeClass;
+
 private:
 	UPROPERTY()
 	AProjectorActorBase* CurHoldingArrow = nullptr;
 
+	UPROPERTY()
+	UForesightWidgeBase* ForesightWidge = nullptr;
+
+	FDelegateHandle LerpToControlRotFinishHandle;
 };

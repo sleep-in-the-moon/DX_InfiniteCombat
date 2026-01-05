@@ -6,6 +6,9 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Projector/ProjectorActorBase.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Character/DXCharacterExtensionComponent.h"
+#include "UMG/ForesightWidgeBase.h"
+
 
 // Sets default values for this component's properties
 UBowComponent::UBowComponent()
@@ -15,6 +18,7 @@ UBowComponent::UBowComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	ArrowClass = LoadClass<AProjectorActorBase>(nullptr, TEXT("/Script/Engine.Blueprint'/Game/Weapon/BP/Bullets/BP_ArrowProje.BP_ArrowProje_C'"));
+	ForesightWidgeClass = LoadClass<AProjectorActorBase>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Widgets/WBP/WBP_Foresight.WBP_Foresight_C'"));
 }
 
 
@@ -23,8 +27,6 @@ void UBowComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
 }
 
 
@@ -70,12 +72,54 @@ bool UBowComponent::TryLaunchArrow()
 
 void UBowComponent::EnterAimMode()
 {
-	if (USpringArmComponent* SpringArm = GetOwner()->FindComponentByClass<USpringArmComponent>())
+	if (UDXCharacterExtensionComponent* ExtensionComp = GetOwner()->FindComponentByClass<UDXCharacterExtensionComponent>())
 	{
-		SpringArm->SocketOffset;
+		ExtensionComp->LerpSpringArmEndOffsetToTarget(AimModeCameraOffset);
+
+		ExtensionComp->LerpActorRotToControlRot();
+		LerpToControlRotFinishHandle = ExtensionComp->DG_LerpToControlRotFinish.AddUObject(this, &UBowComponent::LerpToControlRotFinish);
+
+		//TimerHidForesight Clear
+
+		if (!ForesightWidge && ForesightWidgeClass)
+		{
+			ForesightWidge = CreateWidget<UForesightWidgeBase>(ForesightWidgeClass);
+			ForesightWidge->AddToViewport();
+		}
+		if (ForesightWidge)
+		{
+			ForesightWidge->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
 	}
 }
 
 void UBowComponent::ExitAimMode()
 {
+	if (UDXCharacterExtensionComponent* ExtensionComp = GetOwner()->FindComponentByClass<UDXCharacterExtensionComponent>())
+	{
+		ExtensionComp->SetYawByControl(false);
+		ExtensionComp->LerpSpringArmEndOffsetToTarget(FVector(0, 0, 0));
+	}
+
+	//TimerHidForesight
+}
+
+bool UBowComponent::TryHoldingBow()
+{
+	return false;
+}
+
+void UBowComponent::UnHoldingBow()
+{
+}
+
+void UBowComponent::LerpToControlRotFinish()
+{
+	if (UDXCharacterExtensionComponent* ExtensionComp = GetOwner()->FindComponentByClass<UDXCharacterExtensionComponent>())
+	{
+		ExtensionComp->SetYawByControl(true);
+
+		if(LerpToControlRotFinishHandle.IsValid())
+			ExtensionComp->DG_LerpToControlRotFinish.Remove(LerpToControlRotFinishHandle);
+	}
 }
