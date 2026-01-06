@@ -8,6 +8,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Character/DXCharacterExtensionComponent.h"
 #include "UMG/ForesightWidgeBase.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values for this component's properties
@@ -18,7 +21,8 @@ UBowComponent::UBowComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	ArrowClass = LoadClass<AProjectorActorBase>(nullptr, TEXT("/Script/Engine.Blueprint'/Game/Weapon/BP/Bullets/BP_ArrowProje.BP_ArrowProje_C'"));
-	ForesightWidgeClass = LoadClass<AProjectorActorBase>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Widgets/WBP/WBP_Foresight.WBP_Foresight_C'"));
+	ForesightWidgeClass = LoadClass<UForesightWidgeBase>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Widgets/WBP/WBP_Foresight.WBP_Foresight_C'"));
+	ArrowLaunchSound = LoadObject<USoundBase>(nullptr, TEXT("/Script/Engine.SoundWave'/Game/Sounds/Bow/ArrowClatter.ArrowClatter'"));
 }
 
 
@@ -65,8 +69,38 @@ bool UBowComponent::TrySetupArrow()
 	return false;
 }
 
-bool UBowComponent::TryLaunchArrow()
+bool UBowComponent::TryLaunchArrow(float ChargeTime)
 {
+	UCameraComponent* Camera = GetOwner()->FindComponentByClass<UCameraComponent>();
+	if (ChargeTime > 0.7f && CurHoldingArrow && Camera)
+	{
+		CurHoldingArrow->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		FVector LaunchVelocity = Camera->GetForwardVector();
+
+		FHitResult HitRes;
+		FVector End = Camera->GetComponentLocation() + Camera->GetForwardVector()* TraceDist;
+		if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Camera->GetComponentLocation(), End, TraceObjTypes, false, {},
+			EDrawDebugTrace::None, HitRes, true))
+		{
+			LaunchVelocity = (HitRes.ImpactPoint - CurHoldingArrow->GetActorLocation()).GetSafeNormal(0.0001);
+		}
+
+		CurHoldingArrow->Launch(ChargeTime, LaunchVelocity);
+		CurHoldingArrow->EnableTraceBySocketName(TraceObjTypes, true, ArrowTraceSocketPrefix);
+
+		if(ArrowLaunchSound)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ArrowLaunchSound, CurHoldingArrow->GetActorLocation(), 2.5f);
+
+		UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>();
+		if (ASC && ArrowTag.IsValid())
+		{
+			ASC->RemoveLooseGameplayTag(ArrowTag);
+		}
+
+		return true;
+	}
+
 	return false;
 }
 
@@ -79,12 +113,17 @@ void UBowComponent::EnterAimMode()
 		ExtensionComp->LerpActorRotToControlRot();
 		LerpToControlRotFinishHandle = ExtensionComp->DG_LerpToControlRotFinish.AddUObject(this, &UBowComponent::LerpToControlRotFinish);
 
-		//TimerHidForesight Clear
+		if (HidUITimer.IsValid())
+			GetWorld()->GetTimerManager().ClearTimer(HidUITimer);
 
-		if (!ForesightWidge && ForesightWidgeClass)
+		APawn* OwnerP = Cast<APawn>(GetOwner());
+		if (!ForesightWidge && ForesightWidgeClass && OwnerP)
 		{
-			ForesightWidge = CreateWidget<UForesightWidgeBase>(ForesightWidgeClass);
-			ForesightWidge->AddToViewport();
+			if (APlayerController* PlayerControl = Cast<APlayerController>(OwnerP->GetController()))
+			{
+				ForesightWidge = CreateWidget<UForesightWidgeBase>(PlayerControl, ForesightWidgeClass);
+				ForesightWidge->AddToViewport();
+			}	
 		}
 		if (ForesightWidge)
 		{
@@ -101,7 +140,13 @@ void UBowComponent::ExitAimMode()
 		ExtensionComp->LerpSpringArmEndOffsetToTarget(FVector(0, 0, 0));
 	}
 
-	//TimerHidForesight
+	GetWorld()->GetTimerManager().SetTimer(HidUITimer, [this]()
+	{
+		if (ForesightWidge)
+		{
+			ForesightWidge->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}, 0.9, false);
 }
 
 bool UBowComponent::TryHoldingBow()

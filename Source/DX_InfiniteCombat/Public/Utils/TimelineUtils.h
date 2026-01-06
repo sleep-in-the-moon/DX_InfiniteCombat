@@ -9,7 +9,7 @@
 namespace TimelineUtils
 {
 
-	static UCurveFloat* MakeFloatCurve(const TArray<FVector2D>& CurveKeys = TArray<FVector2D>({ FVector2D(0, 0), FVector2D(1, 1) }))
+	static UCurveFloat* MakeFloatCurve(const TArray<FVector2D>& CurveKeys = { FVector2D(0, 0), FVector2D(1, 1) })
 	{
 		UCurveFloat* FloatCurve = NewObject<UCurveFloat>();
 
