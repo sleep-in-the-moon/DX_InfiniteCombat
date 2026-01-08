@@ -43,9 +43,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimMontage* AM_OutCombatToSpecial;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_MainWeaponToSecond;
+	UAnimMontage* AM_HeldToSecond;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_SecondWeaponToMain;
+	UAnimMontage* AM_SecondToHeld;
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -72,7 +72,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "IC|LockTarget")
 	bool ChangeTarget();
 	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
-	UStaticMeshComponent* GetWeaponComponent() const
+	UStaticMeshComponent* GetWeaponMeshComponent() const
 	{
 		return GetOwner()->FindComponentByTag<UStaticMeshComponent>(TEXT("Weapon"));
 	}

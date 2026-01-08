@@ -24,6 +24,8 @@ void UDXCharacterExtensionComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
+	TimelineUtils::InitTimelineByFloatCurve(TL_LerpSpringArm, TimelineUtils::MakeFloatCurve(), TEXT("LerpSpringArmInter"), TEXT(""), this);
+	TimelineUtils::InitTimelineByFloatCurve(TL_LerpActorRot, TimelineUtils::MakeFloatCurve(), TEXT("LerpActorRotInter"), TEXT("LerpActorRotFinish"), this);
 	
 }
 
@@ -34,6 +36,7 @@ void UDXCharacterExtensionComponent::TickComponent(float DeltaTime, ELevelTick T
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	TL_LerpSpringArm.TickTimeline(DeltaTime);
+	TL_LerpActorRot.TickTimeline(DeltaTime);
 }
 
 void UDXCharacterExtensionComponent::LerpSpringArmEndOffsetToTarget(const FVector& TargetOffset, float Time)
@@ -44,7 +47,7 @@ void UDXCharacterExtensionComponent::LerpSpringArmEndOffsetToTarget(const FVecto
 		{
 			RawSpringOffset = SpringArm->SocketOffset;
 			TargetSpringOffset = TargetOffset;
-			TimelineUtils::InitTimelineByFloatCurve(TL_LerpSpringArm, TimelineUtils::MakeFloatCurve(), TEXT("LerpSpringArmInter"), TEXT(""), this);
+
 			TL_LerpSpringArm.SetPlayRate(1.0f / Time);
 			TL_LerpSpringArm.PlayFromStart();
 		}
@@ -73,7 +76,6 @@ void UDXCharacterExtensionComponent::LerpActorRotToControlRot(float Time, bool J
 			TargetActorRot = JustYaw ?
 				FRotator(pawn->GetActorRotation().Pitch, pawn->GetControlRotation().Yaw, pawn->GetActorRotation().Roll) : pawn->GetControlRotation();
 
-			TimelineUtils::InitTimelineByFloatCurve(TL_LerpActorRot, TimelineUtils::MakeFloatCurve(), TEXT("LerpActorRotInter"), TEXT("LerpActorRotFinish"), this);
 			TL_LerpActorRot.SetPlayRate(1.0f / Time);
 			TL_LerpActorRot.PlayFromStart();
 		}

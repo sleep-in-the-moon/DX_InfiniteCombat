@@ -41,11 +41,14 @@ private:
 	FVector RawSpringOffset;
 	FVector TargetSpringOffset;
 	FTimeline TL_LerpSpringArm;
+	UFUNCTION()
 	void LerpSpringArmInter(float Alpha);
 
 	FRotator RawActorRot;
 	FRotator TargetActorRot;
 	FTimeline TL_LerpActorRot;
+	UFUNCTION()
 	void LerpActorRotInter(float Alpha);
+	UFUNCTION()
 	void LerpActorRotFinish();
 };

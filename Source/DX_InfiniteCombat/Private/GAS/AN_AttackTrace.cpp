@@ -24,7 +24,7 @@ void UAN_AttackTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenc
 	{
 		if (UCombatCharacterComponent* combatCom = Owner->FindComponentByClass<UCombatCharacterComponent>())
 		{
-			CurWeapon = combatCom->GetWeaponComponent();
+			CurWeapon = combatCom->GetWeaponMeshComponent();
 			if(IsValid(CurWeapon))
 			{
 				//TracePointNum = TracePointNum > 2 ? TracePointNum : 2;

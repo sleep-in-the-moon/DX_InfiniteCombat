@@ -171,15 +171,15 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 			ASC->AddLooseGameplayTag(Tag);
 		}
 		CurWeapon = *WeaponList.Find(Tag);
-		if (!GetWeaponComponent())
+		if (!GetWeaponMeshComponent())
 		{
 			GetOwner()->AddComponentByClass(UStaticMeshComponent::StaticClass(), false, FTransform::Identity, false)->ComponentTags.Add(TEXT("Weapon"));
-			GetWeaponComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetWeaponMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 			
-		GetWeaponComponent()->SetStaticMesh(CurWeapon.WeaponMesh);
+		GetWeaponMeshComponent()->SetStaticMesh(CurWeapon.WeaponMesh);
 		
-		WeaponToHeld();
+		WeaponToHeld();//改为动画通知触发
 
 		//LinkAnimLayer | PlayMontage | TriggerGA
 		if (USkeletalMeshComponent* BodyMesh = GetOwner()->FindComponentByClass<USkeletalMeshComponent>())
@@ -190,6 +190,7 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 				OwnerAnimIns->LinkAnimClassLayers(CurWeapon.LinkAnimClass);
 			}
 		}
+		//if(CurWeapon.AM_SecondToHeld)
 		
 		return true;
 	}
@@ -210,10 +211,10 @@ bool UCombatCharacterComponent::WeaponToSecond()
 bool UCombatCharacterComponent::AttachWeaponToSocket(FName socketName)
 {
 	USkeletalMeshComponent* BodyMesh = GetOwner()->FindComponentByClass<USkeletalMeshComponent>();
-	if (BodyMesh && GetWeaponComponent())
+	if (!socketName.IsNone() && BodyMesh && BodyMesh->DoesSocketExist(socketName) && GetWeaponMeshComponent())
 	{
-		GetWeaponComponent()->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-		return GetWeaponComponent()->AttachToComponent(BodyMesh, FAttachmentTransformRules::KeepRelativeTransform, socketName);
+		GetWeaponMeshComponent()->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		return GetWeaponMeshComponent()->AttachToComponent(BodyMesh, FAttachmentTransformRules::KeepRelativeTransform, socketName);
 	}
 
 	return false;
