@@ -48,6 +48,7 @@ void UDXCharacterExtensionComponent::LerpSpringArmEndOffsetToTarget(const FVecto
 			RawSpringOffset = SpringArm->SocketOffset;
 			TargetSpringOffset = TargetOffset;
 
+			TL_LerpSpringArm.Stop();
 			TL_LerpSpringArm.SetPlayRate(1.0f / Time);
 			TL_LerpSpringArm.PlayFromStart();
 		}
@@ -76,6 +77,7 @@ void UDXCharacterExtensionComponent::LerpActorRotToControlRot(float Time, bool J
 			TargetActorRot = JustYaw ?
 				FRotator(pawn->GetActorRotation().Pitch, pawn->GetControlRotation().Yaw, pawn->GetActorRotation().Roll) : pawn->GetControlRotation();
 
+			TL_LerpActorRot.Stop();
 			TL_LerpActorRot.SetPlayRate(1.0f / Time);
 			TL_LerpActorRot.PlayFromStart();
 		}
