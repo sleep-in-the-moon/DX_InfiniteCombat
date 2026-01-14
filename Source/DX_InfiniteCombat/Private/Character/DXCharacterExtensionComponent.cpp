@@ -74,8 +74,7 @@ void UDXCharacterExtensionComponent::LerpActorRotToControlRot(float Time, bool J
 		if (Time > 0.0f)
 		{
 			RawActorRot = pawn->GetActorRotation();
-			TargetActorRot = JustYaw ?
-				FRotator(pawn->GetActorRotation().Pitch, pawn->GetControlRotation().Yaw, pawn->GetActorRotation().Roll) : pawn->GetControlRotation();
+			bJustYaw = JustYaw;
 
 			TL_LerpActorRot.Stop();
 			TL_LerpActorRot.SetPlayRate(1.0f / Time);
@@ -103,6 +102,10 @@ void UDXCharacterExtensionComponent::SetYawByControl(bool YawByControl)
 
 void UDXCharacterExtensionComponent::LerpActorRotInter(float Alpha)
 {
+	if (APawn* pawn = Cast<APawn>(GetOwner()))
+		TargetActorRot = bJustYaw ?
+			FRotator(pawn->GetActorRotation().Pitch, pawn->GetControlRotation().Yaw, pawn->GetActorRotation().Roll) : pawn->GetControlRotation();
+
 	GetOwner()->SetActorRotation(UKismetMathLibrary::RLerp(RawActorRot, TargetActorRot, Alpha, true));
 }
 

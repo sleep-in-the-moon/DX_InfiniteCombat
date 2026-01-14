@@ -47,6 +47,7 @@ private:
 	FRotator RawActorRot;
 	FRotator TargetActorRot;
 	FTimeline TL_LerpActorRot;
+	bool bJustYaw=true;
 	UFUNCTION()
 	void LerpActorRotInter(float Alpha);
 	UFUNCTION()
