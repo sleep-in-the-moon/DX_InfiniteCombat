@@ -31,18 +31,6 @@ struct FCombatStateSwitchMontages
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_OutToInCombat;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_InToOutCombat;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_InCombatToSpecial;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_SpecialToIncombat;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_SpecialToOutCombat;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_OutCombatToSpecial;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimMontage* AM_HeldToSecond;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimMontage* AM_SecondToHeld;
@@ -65,12 +53,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable, Category = "IC|LockTarget")
-	bool StartLockOntoTarget(ETraceShapeType TraceType= ETraceShapeType::Sphere, float CheckHalf=500, float Dist=7000);
-	UFUNCTION(BlueprintCallable, Category = "IC|LockTarget")
-	void EndLockOntoTarget();
-	UFUNCTION(BlueprintCallable, Category = "IC|LockTarget")
-	bool ChangeTarget();
 	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
 	UStaticMeshComponent* GetWeaponMeshComponent() const
 	{
@@ -90,13 +72,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
 	bool AttachWeaponToSocket(FName socketName);
 
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|StateSwitch")
 	FCombatStateSwitchMontages CombatStateSwitchMontages;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "IC|Weapon")
 	TMap<FGameplayTag, FWeaponStruct> WeaponList;
 	UPROPERTY(EditDefaultsOnly, Category = "IC|Weapon")
-	FGameplayTag InitWeaponTag = FGameplayTag::RequestGameplayTag(TEXT("Weapon.Unarmed"));
+	FGameplayTag InitWeaponTag = FGameplayTag::RequestGameplayTag(TEXT("Weapon.Unarmed"), false);
 
 	UFUNCTION()
 	void CharacterDied();
@@ -105,15 +87,6 @@ public:
 	UAnimMontage* GetHurtMontage;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "IC|LockTrace")
-	TArray<TEnumAsByte<EObjectTypeQuery> > TraceObjectTypes = { TEnumAsByte<EObjectTypeQuery>(UEngineTypes::ConvertToObjectType(ECC_Pawn)) };
-	UPROPERTY(EditAnywhere, Category = "IC|LockTrace")
-	bool bTraceComplex = false;
-	UPROPERTY(EditAnywhere, Category = "IC|LockTrace")
-	bool bIgnoreSelf = true;
-	UPROPERTY(EditAnywhere, Category = "IC|LockTrace", meta = (AllowPrivateAccess = "true"))
-	TArray<AActor*> ActorsToIgnore;
-
 	UPROPERTY(EditDefaultsOnly, Category = "IC|Combat|Montage")
 	UAnimMontage* DiedMontage;
 	
@@ -121,18 +94,6 @@ protected:
 	FCharacterDied DG_CharacterDied;
 
 private:
-	bool IsLockOnTarget=false;
-	FTimerHandle TimerLockTarget;
-	float LockFrequency=0.2f;
-	TArray<FHitResult> RawOutHits;
-	TArray<FHitResult> ChangeOutHits;
-	FCollisionQueryParams Params;
-	FCollisionObjectQueryParams ObjectQueryParams;
-
 	FWeaponStruct CurWeapon;
-	UPROPERTY()
-	AActor* LockObj;
-
-	void DoLockToTarget();
-		
+	
 };

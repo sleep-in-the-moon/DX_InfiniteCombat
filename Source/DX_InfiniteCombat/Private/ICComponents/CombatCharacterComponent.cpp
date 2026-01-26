@@ -46,118 +46,7 @@ void UCombatCharacterComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (IsLockOnTarget)
-		DoLockToTarget();
 	// ...
-}
-
-bool UCombatCharacterComponent::StartLockOntoTarget(ETraceShapeType TraceType, float CheckHalf, float Dist)
-{
-	RawOutHits.Empty();
-	FCollisionShape shape;
-	bool bDebugHit = false;
-
-	FVector Start = GetOwner()->GetActorLocation();
-	FVector End = Start + GetOwner()->GetActorForwardVector() * Dist;
-	if (UCameraComponent* camera = GetOwner()->FindComponentByClass<UCameraComponent>())
-	{
-		Start = camera->GetComponentLocation();
-		End = Start + camera->GetForwardVector() * Dist;
-	}
-	UICWorldSubsystem* ICSubSystem = UWorld::GetSubsystem<UICWorldSubsystem>(GetWorld());
-
-	switch (TraceType)
-	{
-	case ETraceShapeType::Sphere:
-		shape = FCollisionShape::MakeSphere(CheckHalf);
-		
-		if (ICSubSystem->GetShowDebug())
-			DrawDebugSphereTraceMulti(GetOwner()->GetWorld(), Start, End, CheckHalf, EDrawDebugTrace::Type::ForDuration, bDebugHit, RawOutHits, FLinearColor::Blue, FLinearColor::Green, 10.0f);
-		break;
-	case ETraceShapeType::Capsule:
-		shape = FCollisionShape::MakeCapsule(CheckHalf /2, CheckHalf /2);
-		break;
-	case ETraceShapeType::Box:
-		shape = FCollisionShape::MakeBox(FVector(CheckHalf, CheckHalf /2, CheckHalf /2));
-		break;
-	case ETraceShapeType::Line:
-		break;
-	case ETraceShapeType::Cone:
-		break;
-	default:
-		break;
-	}
-
-	static const FName LineTraceMultiName(TEXT("LineTraceMultiForObjects"));
-	//ConfigureCollisionParams(LineTraceMultiName, bTraceComplex, ActorsToIgnore, bIgnoreSelf, MeshComp->GetOwner());
-	Params = FCollisionQueryParams(LineTraceMultiName, bTraceComplex);
-	Params.bReturnPhysicalMaterial = true;
-	Params.AddIgnoredActors(ActorsToIgnore);
-	if (bIgnoreSelf)
-	{
-		const AActor* IgnoreActor = Cast<AActor>(GetOwner());
-		if (IgnoreActor)
-		{
-			Params.AddIgnoredActor(IgnoreActor);
-		}
-		else
-		{
-			// find owner
-			const UObject* CurrentObject = GetOwner();
-			while (CurrentObject)
-			{
-				CurrentObject = CurrentObject->GetOuter();
-				IgnoreActor = Cast<AActor>(CurrentObject);
-				if (IgnoreActor)
-				{
-					Params.AddIgnoredActor(IgnoreActor);
-					break;
-				}
-			}
-		}
-	}
-	ObjectQueryParams = FCollisionObjectQueryParams(TraceObjectTypes);
-	
-	bool const bHit = GetOwner()->GetWorld()->SweepMultiByObjectType(RawOutHits, Start, End, FQuat::Identity, ObjectQueryParams, shape, Params);
-	ChangeOutHits = RawOutHits;
-
-	if (bHit)
-	{
-		LockObj = RawOutHits.Last().GetActor();
-		//GetOwner()->GetWorldTimerManager().SetTimer(TimerLockTarget, this, &UCombatCharacterComponent::DoLockToTarget, LockFrequency, true, 0.f);
-		IsLockOnTarget = true;
-
-		if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
-			ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.OnLockTarget")));
-	}
-
-	return bHit;
-}
-
-void UCombatCharacterComponent::EndLockOntoTarget()
-{
-	IsLockOnTarget = false;
-	RawOutHits.Empty();
-	ChangeOutHits.Empty();
-
-	if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
-		ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.OnLockTarget")));
-
-	if (TimerLockTarget.IsValid())
-		GetOwner()->GetWorldTimerManager().ClearTimer(TimerLockTarget);
-}
-
-bool UCombatCharacterComponent::ChangeTarget()
-{
-	if (RawOutHits.Num() < 2)
-		return false;
-
-	if (ChangeOutHits.Num() == 0)
-		ChangeOutHits = RawOutHits;
-
-	LockObj = ChangeOutHits.Pop().GetActor();
-
-	return true;
 }
 
 bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
@@ -231,19 +120,8 @@ void UCombatCharacterComponent::CharacterDied()
 
 	if (UAbilitySystemComponent* asc = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
 	{
-		asc->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died")));
+		asc->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died"), false));
 	}
 
 	DG_CharacterDied.Broadcast();
 }
-
-void UCombatCharacterComponent::DoLockToTarget()
-{
-	if (LockObj)
-	{
-		FRotator TargetRot = FRotationMatrix::MakeFromX(LockObj->GetActorLocation() - GetOwner()->GetActorLocation()).Rotator();
-
-		GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, TargetRot.Yaw, GetOwner()->GetActorRotation().Roll));
-	}
-}
-

@@ -20,6 +20,15 @@ const UICDataAsset& UICAssetManager::GeICData()
     return GetOrLoadTypedGameData<UICDataAsset>(ICGameDataPath);
 }
 
+void UICAssetManager::AddLoadedAsset(const UObject* Asset)
+{
+    if (ensureAlways(Asset))
+    {
+        FScopeLock LoadedAssetsLock(&LoadedAssetsCritical);
+        LoadedAssets.Add(Asset);
+    }
+}
+
 UPrimaryDataAsset* UICAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType)
 {
     UPrimaryDataAsset* Asset = nullptr;
@@ -30,7 +39,7 @@ UPrimaryDataAsset* UICAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryData
         TSharedPtr<FStreamableHandle> Handle = LoadPrimaryAssetsWithType(PrimaryAssetType);
         if (Handle.IsValid())
         {
-            Handle->WaitUntilComplete(0.0f, false);
+            Handle->WaitUntilComplete(0.0f, false);//等待资源加载完毕，0为无限等待，即同步
 
             // This should always work
             Asset = Cast<UPrimaryDataAsset>(Handle->GetLoadedAsset());
