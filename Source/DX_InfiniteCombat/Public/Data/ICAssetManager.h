@@ -11,14 +11,14 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Config = Game)
 class DX_INFINITECOMBAT_API UICAssetManager : public UAssetManager
 {
 	GENERATED_BODY()
 	
 public:
 	static UICAssetManager& Get();
-	const UICDataAsset& GeICData();
+	const UICDataAsset& GeICDataAsset();
 
 	template<typename AssetType>
 	static AssetType* GetAsset(const TSoftObjectPtr<AssetType>& AssetPointer, bool bKeepInMemory = true);
@@ -30,6 +30,10 @@ protected:
 	void AddLoadedAsset(const UObject* Asset);
 
 	UPrimaryDataAsset* LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType);
+
+	static UObject* SynchronousLoadAsset(const FSoftObjectPath& AssetPath);
+
+	//virtual void StartInitialLoading() override;
 	
 	template <typename GameDataClass>
 	const GameDataClass& GetOrLoadTypedGameData(const TSoftObjectPtr<GameDataClass>& DataPath)
@@ -43,7 +47,7 @@ protected:
 	}
 
 protected:
-	//UPROPERTY(Config)
+	UPROPERTY(Config)
 	TSoftObjectPtr<UICDataAsset> ICGameDataPath;//弱引用
 	UPROPERTY(Transient)
 	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;//临时加载存放到内存中的数据

@@ -35,8 +35,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FMDG_DebugChange MDG_ShowDebugChange;
 
-	UPROPERTY(BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> DamageApplyGE;
+	/*UPROPERTY(BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DamageApplyGE;*/
 	UPROPERTY(BlueprintReadOnly)
 	TSubclassOf<UGameplayEffect> AttackFeedbackGE;
 	UPROPERTY(BlueprintReadOnly)

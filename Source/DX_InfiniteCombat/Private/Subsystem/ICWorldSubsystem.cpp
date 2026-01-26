@@ -6,11 +6,11 @@
 
 UICWorldSubsystem::UICWorldSubsystem()
 {
-	static ConstructorHelpers::FClassFinder<UGameplayEffect> DamageGEClass(TEXT("/Game/Character/GAS/GE/GE_DamageApply.GE_DamageApply_C"));
+	/*static ConstructorHelpers::FClassFinder<UGameplayEffect> DamageGEClass(TEXT("/Game/Character/GAS/GE/GE_DamageApply.GE_DamageApply_C"));
 	if (DamageGEClass.Succeeded())
 	{
 		DamageApplyGE = DamageGEClass.Class;
-	}
+	}*/
 
 	static ConstructorHelpers::FClassFinder<UGameplayEffect> FeedbackGEClass(TEXT("/Game/Character/GAS/GE/GE_HitFeedback.GE_HitFeedback_C"));
 	if (FeedbackGEClass.Succeeded())

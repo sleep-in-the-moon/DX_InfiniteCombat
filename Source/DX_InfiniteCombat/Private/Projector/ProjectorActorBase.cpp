@@ -10,6 +10,8 @@
 #include "Subsystem/ICWorldSubsystem.h"
 #include "Utils/IC_Utils.h"
 #include "AbilitySystemComponent.h"
+#include "Data/ICAssetManager.h"
+#include "Data/ICDataAsset.h"
 
 
 // Sets default values
@@ -142,10 +144,11 @@ bool AProjectorActorBase::LineTraceByMeshSockets(const TArray<AActor*>& ActorsTo
             {
                 UAbilitySystemComponent* TargetASC = OutHit.GetActor()->FindComponentByClass<UAbilitySystemComponent>();
                 UAbilitySystemComponent* OwnerASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>();
-                if (TargetASC && OwnerASC && ICSubSystem && ICSubSystem->DamageApplyGE)
+                const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclass(UICDataAsset::Get().DamageGEClass);
+                if (TargetASC && OwnerASC && DamageGE)
                 {
                     //Ó¦ÓÃÉËº¦GE
-                    FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(GetOwner(), ICSubSystem->DamageApplyGE, OutHit, DamageATKCoefficient);
+                    FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(GetOwner(), DamageGE, OutHit, DamageATKCoefficient);
                     OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
                 }
 

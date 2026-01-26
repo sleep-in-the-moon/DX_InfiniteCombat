@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "ICDataAsset.generated.h"
 
@@ -12,7 +11,7 @@ class UGameplayEffect;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Const)
 class DX_INFINITECOMBAT_API UICDataAsset : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

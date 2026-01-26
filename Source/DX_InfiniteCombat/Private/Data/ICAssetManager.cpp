@@ -15,7 +15,7 @@ UICAssetManager& UICAssetManager::Get()
     return *NewObject<UICAssetManager>();
 }
 
-const UICDataAsset& UICAssetManager::GeICData()
+const UICDataAsset& UICAssetManager::GeICDataAsset()
 {
     return GetOrLoadTypedGameData<UICDataAsset>(ICGameDataPath);
 }
@@ -41,19 +41,36 @@ UPrimaryDataAsset* UICAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryData
         {
             Handle->WaitUntilComplete(0.0f, false);//等待资源加载完毕，0为无限等待，即同步
 
-            // This should always work
             Asset = Cast<UPrimaryDataAsset>(Handle->GetLoadedAsset());
         }
     }
-    if (Asset)
+    if (ensureAlways(Asset))
     {
         GameDataMap.Add(DataClass, Asset);
-    }
-    else
-    {
-        // It is not acceptable to fail to load any GameData asset. It will result in soft failures that are hard to diagnose.
-        UE_LOG(LogTemp, Fatal, TEXT("Failed to load GameData asset at %s. Type %s. This is not recoverable and likely means you do not have the correct data to run %s."), *DataClassPath.ToString(), *PrimaryAssetType.ToString(), FApp::GetProjectName());
     }
 
     return Asset;
 }
+
+UObject* UICAssetManager::SynchronousLoadAsset(const FSoftObjectPath& AssetPath)
+{
+    if (AssetPath.IsValid())
+    {
+        if (UAssetManager::IsInitialized())
+        {
+            return UAssetManager::GetStreamableManager().LoadSynchronous(AssetPath, false);
+        }
+
+        // Use LoadObject if asset manager isn't ready yet.
+        return AssetPath.TryLoad();
+    }
+
+    return nullptr;
+}
+
+//void UICAssetManager::StartInitialLoading()
+//{
+//    Super::StartInitialLoading();
+//
+//    GeICDataAsset();
+//}

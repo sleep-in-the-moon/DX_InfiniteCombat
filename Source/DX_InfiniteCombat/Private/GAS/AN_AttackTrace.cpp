@@ -15,6 +15,8 @@
 #include "GAS/ICGameplayEffectTypes.h"
 #include "Utils/IC_Utils.h"
 #include "GameFramework/Character.h"
+#include "Data/ICAssetManager.h"
+#include "Data/ICDataAsset.h"
 
 
 void UAN_AttackTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
@@ -147,9 +149,9 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					if (UAbilitySystemComponent* TargetASC = res.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
 					{
 						//应用GE
-						if (ICSubSystem && ICSubSystem->DamageApplyGE)
+						if (const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclass(UICDataAsset::Get().DamageGEClass))
 						{
-							FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(MeshComp->GetOwner(), ICSubSystem->DamageApplyGE, res, DamageATKCoefficient);
+							FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(MeshComp->GetOwner(), DamageGE, res, DamageATKCoefficient);
 							OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
 						}
 
