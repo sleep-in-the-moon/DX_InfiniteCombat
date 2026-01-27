@@ -15,9 +15,14 @@ UICAssetManager& UICAssetManager::Get()
     return *NewObject<UICAssetManager>();
 }
 
-const UICDataAsset& UICAssetManager::GeICDataAsset()
+const UICDataAsset& UICAssetManager::GetICDataAsset()
 {
     return GetOrLoadTypedGameData<UICDataAsset>(ICGameDataPath);
+}
+
+const UWeaponDataAsset& UICAssetManager::GetWeaponDataAsset()
+{
+    return GetOrLoadTypedGameData<UWeaponDataAsset>(WeaponDataPath);
 }
 
 void UICAssetManager::AddLoadedAsset(const UObject* Asset)

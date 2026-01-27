@@ -26,17 +26,11 @@ void UCombatCharacterComponent::BeginPlay()
 	Super::BeginPlay();
 
 	//初始化拥有者的武器
-	if (InitWeaponTag.IsValid() && !InitWeaponTag.ToString().Equals("Weapon.Unarmed") && WeaponList.Contains(InitWeaponTag))
+	if (InitWeaponTag.IsValid())
 	{
 		SwitchWeaponByTag(InitWeaponTag);
 	}
-	else if (WeaponList.Num() > 0 && !InitWeaponTag.ToString().Equals("Weapon.Unarmed"))
-	{
-		TArray<FGameplayTag> TempKey;
-		WeaponList.GetKeys(TempKey);
-		SwitchWeaponByTag(TempKey[0]);
-	}
-	WeaponToSecond();
+	//UnequipWeapon();
 	
 }
 
@@ -56,7 +50,8 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 		//ChangeTag | ChangeStaticMesh | ChangeSocket
 		if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
 		{
-			ASC->RemoveLooseGameplayTag(CurWeapon.WeaponTag);
+			if(CurWeapon.WeaponTag.IsValid())
+				ASC->RemoveLooseGameplayTag(CurWeapon.WeaponTag);
 			ASC->AddLooseGameplayTag(Tag);
 		}
 		CurWeapon = *WeaponList.Find(Tag);
@@ -68,7 +63,7 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 			
 		GetWeaponMeshComponent()->SetStaticMesh(CurWeapon.WeaponMesh);
 		
-		WeaponToHeld();//改为动画通知触发
+		EquipWeapon();//改为动画通知触发
 
 		//LinkAnimLayer | PlayMontage | TriggerGA
 		if (USkeletalMeshComponent* BodyMesh = GetOwner()->FindComponentByClass<USkeletalMeshComponent>())
@@ -84,17 +79,25 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 		return true;
 	}
 	
+	else if (!Tag.IsValid())
+	{
+		UnequipWeapon();
+		return true;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Character 没有%s武器"), *Tag.ToString());
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Character 没有%s武器"), *Tag.ToString()));
 	return false;
 }
 
-bool UCombatCharacterComponent::WeaponToHeld()
+bool UCombatCharacterComponent::EquipWeapon()
 {
-	return AttachWeaponToSocket(CurWeapon.HeldSocket);
+	return AttachWeaponToSocket(CurWeapon.EquipSocket);
 }
 
-bool UCombatCharacterComponent::WeaponToSecond()
+bool UCombatCharacterComponent::UnequipWeapon()
 {
-	return AttachWeaponToSocket(CurWeapon.SecondSocket);
+	return AttachWeaponToSocket(CurWeapon.UnequipSocket);
 }
 
 bool UCombatCharacterComponent::AttachWeaponToSocket(FName socketName)
@@ -111,16 +114,16 @@ bool UCombatCharacterComponent::AttachWeaponToSocket(FName socketName)
 
 void UCombatCharacterComponent::CharacterDied()
 {
-	ACharacter* character = Cast<ACharacter>(GetOwner());
-	if (character && DiedMontage)
+	ACharacter* Character = Cast<ACharacter>(GetOwner());
+	if (Character && DiedMontage)
 	{
-		character->StopAnimMontage();
-		character->PlayAnimMontage(DiedMontage);
+		Character->StopAnimMontage();
+		Character->PlayAnimMontage(DiedMontage);
 	}
 
-	if (UAbilitySystemComponent* asc = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
+	if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
 	{
-		asc->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died"), false));
+		ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died"), false));
 	}
 
 	DG_CharacterDied.Broadcast();

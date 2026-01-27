@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Data/ICTypes.h"
+
 #include "CombatCharacterComponent.generated.h"
 
 
@@ -12,30 +13,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterDied);
 
 class UAnimMontage;
 class UStaticMeshComponent;
-//struct FWeaponList
 
-UENUM(BlueprintType)
-enum class ETraceShapeType : uint8
-{
-	Sphere,
-	Capsule,
-	Box,
-	Line,
-	Cone
-};
-
-USTRUCT(BlueprintType)
-struct FCombatStateSwitchMontages
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_HeldToSecond;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* AM_SecondToHeld;
-};
-
+/*
+	战斗角色组件，主要包含武器装备，死亡，受击动画等逻辑
+*/
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DX_INFINITECOMBAT_API UCombatCharacterComponent : public UActorComponent
 {
@@ -53,42 +34,46 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
-	UStaticMeshComponent* GetWeaponMeshComponent() const
-	{
-		return GetOwner()->FindComponentByTag<UStaticMeshComponent>(TEXT("Weapon"));
-	}
-	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
-	FWeaponStruct GetCurWeapon() const
-	{
-		return CurWeapon;
-	}
-	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
+public:
+
+	UFUNCTION(BlueprintCallable)
 	bool SwitchWeaponByTag(FGameplayTag Tag);
-	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
-	bool WeaponToHeld();
-	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
-	bool WeaponToSecond();
-	UFUNCTION(BlueprintCallable, Category = "IC|Weapon")
-	bool AttachWeaponToSocket(FName socketName);
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|StateSwitch")
-	FCombatStateSwitchMontages CombatStateSwitchMontages;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "IC|Weapon")
-	TMap<FGameplayTag, FWeaponStruct> WeaponList;
-	UPROPERTY(EditDefaultsOnly, Category = "IC|Weapon")
-	FGameplayTag InitWeaponTag = FGameplayTag::RequestGameplayTag(TEXT("Weapon.Unarmed"), false);
 
 	UFUNCTION()
 	void CharacterDied();
 
+	UFUNCTION(BlueprintCallable)
+	UStaticMeshComponent* GetWeaponMeshComponent() const
+	{
+		return GetOwner()->FindComponentByTag<UStaticMeshComponent>(TEXT("Weapon"));
+	}
+
+	UFUNCTION(BlueprintCallable)
+	FWeaponStruct GetCurrentWeapon() const
+	{
+		return CurWeapon;
+	}
+
+//private:
+	UFUNCTION(BlueprintCallable)
+	bool EquipWeapon();
+	UFUNCTION(BlueprintCallable)
+	bool UnequipWeapon();
+	UFUNCTION(BlueprintCallable)
+	bool AttachWeaponToSocket(FName socketName);
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "IC|Weapon")
+	TMap<FGameplayTag, FWeaponStruct> WeaponList;
+	UPROPERTY(EditDefaultsOnly, Category = "IC|Weapon")
+	FGameplayTag InitWeaponTag;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|Combat|Montage")
-	UAnimMontage* GetHurtMontage;
+	UAnimMontage* GetHurtMontage= nullptr;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "IC|Combat|Montage")
-	UAnimMontage* DiedMontage;
+	UAnimMontage* DiedMontage=nullptr;
 	
 	UPROPERTY(BlueprintAssignable)
 	FCharacterDied DG_CharacterDied;

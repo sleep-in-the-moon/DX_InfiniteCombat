@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Engine/AssetManager.h"
 #include "ICDataAsset.h"
+#include "WeaponDataAsset.h"
+
 #include "ICAssetManager.generated.h"
 
 
@@ -18,7 +20,8 @@ class DX_INFINITECOMBAT_API UICAssetManager : public UAssetManager
 	
 public:
 	static UICAssetManager& Get();
-	const UICDataAsset& GeICDataAsset();
+	const UICDataAsset& GetICDataAsset();
+	const UWeaponDataAsset& GetWeaponDataAsset();
 
 	template<typename AssetType>
 	static AssetType* GetAsset(const TSoftObjectPtr<AssetType>& AssetPointer, bool bKeepInMemory = true);
@@ -49,6 +52,8 @@ protected:
 protected:
 	UPROPERTY(Config)
 	TSoftObjectPtr<UICDataAsset> ICGameDataPath;//弱引用
+	UPROPERTY(Config)
+	TSoftObjectPtr<UICDataAsset> WeaponDataPath;
 	UPROPERTY(Transient)
 	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;//临时加载存放到内存中的数据
 

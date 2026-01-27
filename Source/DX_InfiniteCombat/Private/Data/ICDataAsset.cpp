@@ -6,5 +6,5 @@
 
 const UICDataAsset& UICDataAsset::Get()
 {
-	return UICAssetManager::Get().GeICDataAsset();
+	return UICAssetManager::Get().GetICDataAsset();
 }
