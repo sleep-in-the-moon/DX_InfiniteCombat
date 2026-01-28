@@ -20,28 +20,34 @@ class DX_INFINITECOMBAT_API UICAssetManager : public UAssetManager
 	
 public:
 	static UICAssetManager& Get();
+
 	const UICDataAsset& GetICDataAsset();
 	const UWeaponDataAsset& GetWeaponDataAsset();
 
+	// 获取 SoftObjectPtr 所软引用的资源，不在内存中将触发同步加载，可选择加载后保持对其硬引用
 	template<typename AssetType>
-	static AssetType* GetAsset(const TSoftObjectPtr<AssetType>& AssetPointer, bool bKeepInMemory = true);
+	static AssetType* GetAssetBySoftPtr(const TSoftObjectPtr<AssetType>& AssetSoftPtr, bool bKeepInMemory = true);
+	// 获取 SoftClassPtr 所软引用的类，不在内存中将触发同步加载，可选择加载后保持对其硬引用
 	template<typename AssetType>
-	static TSubclassOf<AssetType> GetSubclass(const TSoftClassPtr<AssetType>& AssetPointer, bool bKeepInMemory = true);
+	static TSubclassOf<AssetType> GetSubclassBySoftPtr(const TSoftClassPtr<AssetType>& AssetPointer, bool bKeepInMemory = true);
 
 protected:
 
 	void AddLoadedAsset(const UObject* Asset);
 
-	UPrimaryDataAsset* LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType);
+	//根据 PrimaryAssetType 从 AssetManager 的 AssetTypeMap 中加载 UPrimaryDataAsset 并存放到 GameDataMap (遍历所有相同 PrimaryAssetType 的 FPrimaryAssetId ，从 FPrimaryAssetId 获取软引用 加载)
+	UPrimaryDataAsset* LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataPath, FPrimaryAssetType PrimaryAssetType);
 
+	// 以同步的方式加载 FSoftObjectPath 所软引用的资源
 	static UObject* SynchronousLoadAsset(const FSoftObjectPath& AssetPath);
 
 	//virtual void StartInitialLoading() override;
 	
+	// 将一个 UPrimaryDataAsset 子类的软引用加载/缓存 到对象实例中 
 	template <typename GameDataClass>
 	const GameDataClass& GetOrLoadTypedGameData(const TSoftObjectPtr<GameDataClass>& DataPath)
 	{
-		if (TObjectPtr<UPrimaryDataAsset> const* pResult = GameDataMap.Find(GameDataClass::StaticClass()))//内存中有则直接取
+		if (TObjectPtr<UPrimaryDataAsset> const* pResult = GameDataMap.Find(GameDataClass::StaticClass()))  // 内存中有则直接取
 		{
 			return *CastChecked<GameDataClass>(*pResult);
 		}
@@ -51,11 +57,13 @@ protected:
 
 protected:
 	UPROPERTY(Config)
-	TSoftObjectPtr<UICDataAsset> ICGameDataPath;//弱引用
+	TSoftObjectPtr<UICDataAsset> ICGameDataPath;  // 主资产对象弱引用
 	UPROPERTY(Config)
 	TSoftObjectPtr<UICDataAsset> WeaponDataPath;
+
+	// 临时加载存放到内存中的数据缓存
 	UPROPERTY(Transient)
-	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;//临时加载存放到内存中的数据
+	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;
 
 private:
 	UPROPERTY()
@@ -66,18 +74,18 @@ private:
 };
 
 template<typename AssetType>
-inline AssetType* UICAssetManager::GetAsset(const TSoftObjectPtr<AssetType>& AssetPointer, bool bKeepInMemory)
+inline AssetType* UICAssetManager::GetAssetBySoftPtr(const TSoftObjectPtr<AssetType>& AssetSoftPtr, bool bKeepInMemory)
 {
 	AssetType* LoadedAsset = nullptr;
 
-	const FSoftObjectPath& AssetPath = AssetPointer.ToSoftObjectPath();
+	const FSoftObjectPath& AssetPath = AssetSoftPtr.ToSoftObjectPath();
 
 	if (AssetPath.IsValid())
 	{
-		LoadedAsset = AssetPointer.Get();
+		LoadedAsset = AssetSoftPtr.Get(); // 先尝试在内存中 find
 		if (!LoadedAsset)
 		{
-			LoadedAsset = Cast<AssetType>(SynchronousLoadAsset(AssetPath));
+			LoadedAsset = Cast<AssetType>(SynchronousLoadAsset(AssetPath));  // AssetSoftPtr.LoadSynchronous() ?
 		}
 
 		if (LoadedAsset && bKeepInMemory)
@@ -90,7 +98,7 @@ inline AssetType* UICAssetManager::GetAsset(const TSoftObjectPtr<AssetType>& Ass
 }
 
 template<typename AssetType>
-inline TSubclassOf<AssetType> UICAssetManager::GetSubclass(const TSoftClassPtr<AssetType>& AssetPointer, bool bKeepInMemory)
+inline TSubclassOf<AssetType> UICAssetManager::GetSubclassBySoftPtr(const TSoftClassPtr<AssetType>& AssetPointer, bool bKeepInMemory)
 {
 	TSubclassOf<AssetType> LoadedSubclass;
 

@@ -144,7 +144,7 @@ bool AProjectorActorBase::LineTraceByMeshSockets(const TArray<AActor*>& ActorsTo
             {
                 UAbilitySystemComponent* TargetASC = OutHit.GetActor()->FindComponentByClass<UAbilitySystemComponent>();
                 UAbilitySystemComponent* OwnerASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>();
-                const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclass(UICDataAsset::Get().DamageGEClass);
+                const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclassBySoftPtr(UICDataAsset::Get().DamageGEClass);
                 if (TargetASC && OwnerASC && DamageGE)
                 {
                     //”¶”√…À∫¶GE

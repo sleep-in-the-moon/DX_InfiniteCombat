@@ -34,13 +34,13 @@ void UICAssetManager::AddLoadedAsset(const UObject* Asset)
     }
 }
 
-UPrimaryDataAsset* UICAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType)
+UPrimaryDataAsset* UICAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataPath, FPrimaryAssetType PrimaryAssetType)
 {
     UPrimaryDataAsset* Asset = nullptr;
 
-    if (!DataClassPath.IsNull())
+    if (!DataPath.IsNull())
     {
-        UE_LOG(LogTemp, Log, TEXT("Loading GameData: %s ..."), *DataClassPath.ToString());
+        UE_LOG(LogTemp, Log, TEXT("Loading GameData: %s ..."), *DataPath.ToString());
         TSharedPtr<FStreamableHandle> Handle = LoadPrimaryAssetsWithType(PrimaryAssetType);
         if (Handle.IsValid())
         {

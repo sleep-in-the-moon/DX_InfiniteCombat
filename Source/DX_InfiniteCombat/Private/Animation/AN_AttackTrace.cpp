@@ -149,7 +149,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 					if (UAbilitySystemComponent* TargetASC = res.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
 					{
 						//应用GE
-						if (const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclass(UICDataAsset::Get().DamageGEClass))
+						if (const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclassBySoftPtr(UICDataAsset::Get().DamageGEClass))
 						{
 							FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(MeshComp->GetOwner(), DamageGE, res, DamageATKCoefficient);
 							OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
