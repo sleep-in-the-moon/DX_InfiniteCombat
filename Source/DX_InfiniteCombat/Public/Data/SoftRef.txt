@@ -1,0 +1,52 @@
+FSoftObjectPath/FSoftClassPath
+{
+	资源/类路径字符串，无类型限制;
+}
+TSoftObjectPtr<>/TSoftClassPtr<>
+{
+	对 FSoftObjectPath/FSoftClassPath 包装的 TWeakObjectPtr智能指针，模板参数限制特定类型，TSoftClassPtr相当于TSubClassOf的软引用版本；
+	
+	TSoftObjectPtr<>::Get()，内部调用 FSoftObjectPath::ResolveObject(), 最终调用 FindObject 在内存中查找对象，不会触发加载；
+	
+	同步加载
+	{
+		c++
+		{
+			TSoftObjectPtr<>::LoadSynchronous()，内部调用的 ToSoftObjectPath().TryLoad()，但做了缓存处理，不会重复加载;
+			或 FSoftObjectPath::TryLoad()，最终调用 StaticLoadObject，底层接口，不做缓存，在没有 TSoftObjectPtr和 FStreamableManager时使用;
+			
+			或 FStreamableManager::LoadSynchronous()，内部调用的 RequestSyncLoad(), 后返回 Handle->GetLoadedAsset();
+			或 FStreamableManager::RequestSyncLoad()，可传TArray批量加载，内部调用异步的 RequestAsyncLoad，后调用 Handle->WaitUntilComplete()阻塞主线程，
+			实现伪同步，由于 WaitUntilComplete 会将请求的资源推到优先级列表的顶部，通常比 StaticLoadObject 调用完成得更快;
+			
+			特殊:当软引用的对象类型为 UPrimaryAsset 时，使用 UAssetManager::LoadPrimaryAssetsWithType(PrimaryAssetType), 内部还是调用的 RequestAsyncLoad，
+			获取返回的handle，执行 WaitUntilComplete(0，false), GetLoadedAsset/GetLoadedAssets, 最后 Cast成 UPrimaryAsset，
+			因为这样可以获取到全部相同 PrimaryAssetType 的 UPrimaryAsset，一个 FPrimaryAssetId 由 PrimaryAssetType 和 PrimaryAssetName 共同组成唯一值;
+		}
+		BP
+		{
+			LoadAssetBlocking,也是调用的 TSoftObjectPtr<>::LoadSynchronous()；
+		}
+		
+	}
+	异步加载
+	{
+		c++
+		{
+			UAssetManager::GetStreamableManager().RequestAsyncLoad(FSoftObjectPath/ TArray<FSoftObjectPath>, 回调函数)，
+			在回调中使用 TSoftObjectPtr<>::Get()或 FSoftObjectPath::ResolveObject()或 FStreamableHandle::GetLoadedAsset()，
+			最终调用 StaticLoadObject 或 LoadPackageAsync;
+		}
+		BP
+		{
+			Async Load Asset，内部也是调用的 RequestAsyncLoad;
+		}
+	}
+	
+	资源回收
+	{
+		与弱指针一样，软引用不会阻止垃圾回收器回收资源，因为软引用并不增加对象的引用计数。因此在加载完成后，使用硬引用接收对象实例，避免被回收内存；
+		自动回收：当对象没有被硬引用后会自动回收；
+		手动回收：FStreamableManager::Unload(FSoftObjectPath)释放掉相关的FStreamableHandle,(StreamableManager在调用委托之前保持对其加载的任何资源的硬引用);
+	}
+}
