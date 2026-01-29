@@ -9,7 +9,7 @@
 
 
 /**
- * Weapon config list
+ * Weapon config data
  */
 UCLASS(BlueprintType, Const)
 class DX_INFINITECOMBAT_API UWeaponDataAsset : public UPrimaryDataAsset
@@ -17,10 +17,26 @@ class DX_INFINITECOMBAT_API UWeaponDataAsset : public UPrimaryDataAsset
 	GENERATED_BODY()
 	
 public:
-	static const UWeaponDataAsset& Get();
+	static const UWeaponDataAsset* GetInsByTag(const FGameplayTag& WeaponTag);
+
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
 
 public:
-	UPROPERTY(EditDefaultsOnly)
-	TArray<FWeaponStruct> WeaponList;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag WeaponTag; // Œ®“ª±Í ∂
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UStaticMesh> WeaponMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName EquipSocket = "R_Hand_Socket";
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName UnequipSocket = "Belt_Socket";
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UAnimMontage> AM_EquipWeapon;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UAnimMontage> AM_UnequipWeapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftClassPtr<UAnimInstance> LinkAnimClass;
 };

@@ -13,6 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterDied);
 
 class UAnimMontage;
 class UStaticMeshComponent;
+class UWeaponDataAsset;
 
 /*
 	战斗角色组件，主要包含武器装备，死亡，受击动画等逻辑
@@ -49,22 +50,19 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable)
-	FWeaponStruct GetCurrentWeapon() const
-	{
-		return CurWeapon;
-	}
+	const UWeaponDataAsset* GetCurrentWeapon() const;
 
 //private:
 	UFUNCTION(BlueprintCallable)
-	bool EquipWeapon();
+	void EquipWeapon();
 	UFUNCTION(BlueprintCallable)
-	bool UnequipWeapon();
+	void UnequipWeapon();
 	UFUNCTION(BlueprintCallable)
 	bool AttachWeaponToSocket(FName socketName);
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "IC|Weapon")
-	TMap<FGameplayTag, FWeaponStruct> WeaponList;
+	TSet<FGameplayTag> WeaponList;
 	UPROPERTY(EditDefaultsOnly, Category = "IC|Weapon")
 	FGameplayTag InitWeaponTag;
 
@@ -79,6 +77,6 @@ protected:
 	FCharacterDied DG_CharacterDied;
 
 private:
-	FWeaponStruct CurWeapon;
+	FGameplayTag CurWeaponTag;
 	
 };

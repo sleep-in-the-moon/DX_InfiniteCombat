@@ -118,32 +118,32 @@ struct TStructOpsTypeTraits<FAttackInfo> : public TStructOpsTypeTraitsBase2<FAtt
 
 
 /*---------------------------------------------------------------------------------------------------------------------------------*/
-class UStaticMesh;
-
-USTRUCT(BlueprintType)
-struct FWeaponStruct
-{
-	GENERATED_BODY()
-
-public:
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FGameplayTag WeaponTag; // 唯一标识
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UStaticMesh* WeaponMesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FName EquipSocket = "R_Hand_Socket";
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FName UnequipSocket = "Belt_Socket";
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UAnimMontage* AM_EquipWeapon;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UAnimMontage* AM_UnequipWeapon;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<UAnimInstance> LinkAnimClass;
-};
+//class UStaticMesh;
+//
+//USTRUCT(BlueprintType)
+//struct FWeaponStruct
+//{
+//	GENERATED_BODY()
+//
+//public:
+//	
+//	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+//	FGameplayTag WeaponTag; // 唯一标识
+//	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+//	UStaticMesh* WeaponMesh;
+//
+//	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+//	FName EquipSocket = "R_Hand_Socket";
+//	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+//	FName UnequipSocket = "Belt_Socket";
+//	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+//	UAnimMontage* AM_EquipWeapon;
+//	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+//	UAnimMontage* AM_UnequipWeapon;
+//
+//	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+//	TSubclassOf<UAnimInstance> LinkAnimClass;
+//};
 
 //using FWeaponList = TMap<FGameplayTag, FWeaponStruct>;
 //USTRUCT(BlueprintType)

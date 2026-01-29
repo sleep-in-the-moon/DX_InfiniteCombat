@@ -20,9 +20,19 @@ const UICDataAsset& UICAssetManager::GetICDataAsset()
     return GetOrLoadTypedGameData<UICDataAsset>(ICGameDataPath);
 }
 
-const UWeaponDataAsset& UICAssetManager::GetWeaponDataAsset()
+const UWeaponDataAsset* UICAssetManager::GetWeaponDataAssetByTag(const FGameplayTag& WeaponTag)
 {
-    return GetOrLoadTypedGameData<UWeaponDataAsset>(WeaponDataPath);
+    if (WeaponTag.IsValid())
+    {
+        if (TObjectPtr<UPrimaryDataAsset> const* pResult = GameDataMap.Find(UWeaponDataAsset::StaticClass()))
+        {
+            return CastChecked<UWeaponDataAsset>(*pResult);
+        }
+
+        return CastChecked<const UWeaponDataAsset>(LoadGameDataByAssetId(UWeaponDataAsset::StaticClass()
+                , FPrimaryAssetId(UWeaponDataAsset::StaticClass()->GetFName(), WeaponTag.GetTagName())));
+    }
+    return nullptr;
 }
 
 void UICAssetManager::AddLoadedAsset(const UObject* Asset)
@@ -49,6 +59,26 @@ UPrimaryDataAsset* UICAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryData
             Asset = Cast<UPrimaryDataAsset>(Handle->GetLoadedAsset());
         }
     }
+    if (ensureAlways(Asset))
+    {
+        GameDataMap.Add(DataClass, Asset);
+    }
+
+    return Asset;
+}
+
+UPrimaryDataAsset* UICAssetManager::LoadGameDataByAssetId(TSubclassOf<UPrimaryDataAsset> DataClass, const FPrimaryAssetId& PrimaryAssetId)
+{
+    UPrimaryDataAsset* Asset = nullptr;
+
+    TSharedPtr<FStreamableHandle> Handle = LoadPrimaryAsset(PrimaryAssetId);
+    if (Handle.IsValid())
+    {
+        Handle->WaitUntilComplete(0.0f, false);
+
+        Asset = Cast<UPrimaryDataAsset>(Handle->GetLoadedAsset());
+    }
+
     if (ensureAlways(Asset))
     {
         GameDataMap.Add(DataClass, Asset);

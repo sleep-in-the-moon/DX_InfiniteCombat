@@ -20,7 +20,7 @@ public:
 	static const UICDataAsset& Get();
 
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftClassPtr<UGameplayEffect> DamageGEClass;
 
 };

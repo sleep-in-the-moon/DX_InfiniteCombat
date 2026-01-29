@@ -22,7 +22,7 @@ public:
 	static UICAssetManager& Get();
 
 	const UICDataAsset& GetICDataAsset();
-	const UWeaponDataAsset& GetWeaponDataAsset();
+	const UWeaponDataAsset* GetWeaponDataAssetByTag(const FGameplayTag& WeaponTag);
 
 	// 获取 SoftObjectPtr 所软引用的资源，不在内存中将触发同步加载，可选择加载后保持对其硬引用
 	template<typename AssetType>
@@ -37,6 +37,8 @@ protected:
 
 	//根据 PrimaryAssetType 从 AssetManager 的 AssetTypeMap 中加载 UPrimaryDataAsset 并存放到 GameDataMap (遍历所有相同 PrimaryAssetType 的 FPrimaryAssetId ，从 FPrimaryAssetId 获取软引用 加载)
 	UPrimaryDataAsset* LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataPath, FPrimaryAssetType PrimaryAssetType);
+	
+	UPrimaryDataAsset* LoadGameDataByAssetId(TSubclassOf<UPrimaryDataAsset> DataClass, const FPrimaryAssetId& PrimaryAssetId);
 
 	// 以同步的方式加载 FSoftObjectPath 所软引用的资源
 	static UObject* SynchronousLoadAsset(const FSoftObjectPath& AssetPath);
@@ -58,10 +60,10 @@ protected:
 protected:
 	UPROPERTY(Config)
 	TSoftObjectPtr<UICDataAsset> ICGameDataPath;  // 主资产对象弱引用
-	UPROPERTY(Config)
-	TSoftObjectPtr<UICDataAsset> WeaponDataPath;
+	/*UPROPERTY(Config)
+	TSoftObjectPtr<UICDataAsset> WeaponDataPath;*/
 
-	// 临时加载存放到内存中的数据缓存
+	// 临时加载存放到内存中的游戏数据，每种UClass只缓存一个
 	UPROPERTY(Transient)
 	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;
 

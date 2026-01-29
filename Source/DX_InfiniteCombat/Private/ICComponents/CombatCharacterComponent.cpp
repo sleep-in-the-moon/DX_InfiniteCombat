@@ -8,6 +8,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "Subsystem/ICWorldSubsystem.h"
+#include "Data/WeaponDataAsset.h"
+#include "Data/ICAssetManager.h"
+
 
 // Sets default values for this component's properties
 UCombatCharacterComponent::UCombatCharacterComponent()
@@ -50,18 +53,19 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 		//ChangeTag | ChangeStaticMesh | ChangeSocket
 		if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
 		{
-			if(CurWeapon.WeaponTag.IsValid())
-				ASC->RemoveLooseGameplayTag(CurWeapon.WeaponTag);
+			if(CurWeaponTag.IsValid())
+				ASC->RemoveLooseGameplayTag(CurWeaponTag);
 			ASC->AddLooseGameplayTag(Tag);
 		}
-		CurWeapon = *WeaponList.Find(Tag);
+		CurWeaponTag = *WeaponList.Find(Tag);
 		if (!GetWeaponMeshComponent())
 		{
 			GetOwner()->AddComponentByClass(UStaticMeshComponent::StaticClass(), false, FTransform::Identity, false)->ComponentTags.Add(TEXT("Weapon"));
 			GetWeaponMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
-			
-		GetWeaponMeshComponent()->SetStaticMesh(CurWeapon.WeaponMesh);
+		
+		if(GetCurrentWeapon())
+			GetWeaponMeshComponent()->SetStaticMesh(UICAssetManager::GetAssetBySoftPtr(GetCurrentWeapon()->WeaponMesh));
 		
 		EquipWeapon();//改为动画通知触发
 
@@ -69,9 +73,9 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 		if (USkeletalMeshComponent* BodyMesh = GetOwner()->FindComponentByClass<USkeletalMeshComponent>())
 		{
 			UAnimInstance* OwnerAnimIns = BodyMesh->GetAnimInstance();
-			if (OwnerAnimIns && CurWeapon.LinkAnimClass)
+			if (OwnerAnimIns && GetCurrentWeapon() && UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass))
 			{
-				OwnerAnimIns->LinkAnimClassLayers(CurWeapon.LinkAnimClass);
+				OwnerAnimIns->LinkAnimClassLayers(UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass));
 			}
 		}
 		//if(CurWeapon.AM_SecondToHeld)
@@ -90,14 +94,26 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 	return false;
 }
 
-bool UCombatCharacterComponent::EquipWeapon()
+const UWeaponDataAsset* UCombatCharacterComponent::GetCurrentWeapon() const
 {
-	return AttachWeaponToSocket(CurWeapon.EquipSocket);
+	if (CurWeaponTag.IsValid())
+	{
+		return UWeaponDataAsset::GetInsByTag(CurWeaponTag);
+	}
+
+	return nullptr;
 }
 
-bool UCombatCharacterComponent::UnequipWeapon()
+void UCombatCharacterComponent::EquipWeapon()
 {
-	return AttachWeaponToSocket(CurWeapon.UnequipSocket);
+	if(GetCurrentWeapon())
+		AttachWeaponToSocket(GetCurrentWeapon()->EquipSocket);
+}
+
+void UCombatCharacterComponent::UnequipWeapon()
+{
+	if(GetCurrentWeapon())
+		AttachWeaponToSocket(GetCurrentWeapon()->UnequipSocket);
 }
 
 bool UCombatCharacterComponent::AttachWeaponToSocket(FName socketName)
