@@ -29,6 +29,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Trigger();
 
+	UFUNCTION(BlueprintCallable)
+	void ClearLock();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsLockOn() const;
+
 private:
 	bool DoOnceTrace();
 	APlayerController* GetOwnerController();
@@ -36,12 +42,11 @@ private:
 	FVector2D GetHalfFOV_VH();
 	FVector2D GetMargin_VH();
 
-	void ClearLock();
 	void CheckLockActorState();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "WeakLock")
-	float ControllerFollowTime = 7.0f;
+	float ControllerFollowTime = 4.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "WeakLock")
 	float MarginPx = 50.0f;

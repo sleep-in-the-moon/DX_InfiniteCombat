@@ -16,7 +16,10 @@ void UGA_SwitchWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 		//return;
 	}
 
-	GetOwningActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>();
+	if (UCombatCharacterComponent* CombatComp = GetOwningActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>())
+	{
+		//CombatComp->WeaponList.Find;
+	}
 }
 
 void UGA_SwitchWeapon::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

@@ -52,13 +52,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const UWeaponDataAsset* GetCurrentWeapon() const;
 
-//private:
+private:
 	UFUNCTION(BlueprintCallable)
 	void EquipWeapon();
 	UFUNCTION(BlueprintCallable)
 	void UnequipWeapon();
 	UFUNCTION(BlueprintCallable)
 	bool AttachWeaponToSocket(FName socketName);
+
+	UFUNCTION(BlueprintCallable)
+	void PlayMontageBySoftPtr(TSoftObjectPtr<UAnimMontage> Montage);
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "IC|Weapon")
@@ -67,11 +70,11 @@ public:
 	FGameplayTag InitWeaponTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|Combat|Montage")
-	UAnimMontage* GetHurtMontage= nullptr;
+	UAnimMontage* GetHurtMontage=nullptr;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "IC|Combat|Montage")
-	UAnimMontage* DiedMontage=nullptr;
+	TSoftObjectPtr<UAnimMontage> Montage_Died;
 	
 	UPROPERTY(BlueprintAssignable)
 	FCharacterDied DG_CharacterDied;

@@ -39,9 +39,6 @@ void UWeakLockComponent::BeginPlay()
 			FProperty* CombatStatesWidgetPro = playerControl->GetClass()->FindPropertyByName(TEXT("CombatStatesWidget"));
 			if (CombatStatesWidgetPro)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("CombatStatesWidgetClass::%s"), *CombatStatesWidgetPro->GetCPPType()));
-				UE_LOG(LogTemp, Warning, TEXT("CombatStatesWidgetClass::%s"), *CombatStatesWidgetPro->GetCPPType());
-
 				FClassProperty* CombatStatesWidgetClassPro = static_cast<FClassProperty*>(CombatStatesWidgetPro);
 				const void* ValuePtr = CombatStatesWidgetClassPro->ContainerPtrToValuePtr<void>(playerControl);
 				TObjectPtr<UObject> CombatStatesWidgetObj = CombatStatesWidgetClassPro->GetPropertyValue(ValuePtr);
@@ -266,6 +263,11 @@ void UWeakLockComponent::ClearLock()
 	LockActor = nullptr;
 	if (CombatStatesWidget.IsValid())
 		CombatStatesWidget->UnRegisterPersistentWidget(LockedWidgetPersistentID);
+}
+
+bool UWeakLockComponent::IsLockOn() const
+{
+	return !(LockActor == nullptr);
 }
 
 void UWeakLockComponent::CheckLockActorState()

@@ -40,7 +40,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FVector GetControllerHorizontalRightVector() const;
 
-	UPROPERTY(EditAnywhere, Category = "GAS")
+	UPROPERTY(EditAnywhere, Category = "Input|GAS")
 	TArray<FAbilityInput> AbilityInputArray;
 
 	FMoveInputTrigger DG_MoveInputTrigger;

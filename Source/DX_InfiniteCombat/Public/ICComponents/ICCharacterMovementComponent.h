@@ -13,13 +13,13 @@ struct FTraversalCheckInput
 
 public:
 	UPROPERTY(BlueprintReadWrite)
-	FVector TraceDirection;
+	FVector TraceDirection=FVector::Zero();
 	UPROPERTY(BlueprintReadWrite)
-	float TraceDistance;
+	float TraceDistance=0.0f;
 	UPROPERTY(BlueprintReadWrite)
-	float MaxLedgeHeight;
+	float MaxLedgeHeight=0.0f;
 	UPROPERTY(BlueprintReadWrite)
-	float MinLedgeHeight;
+	float MinLedgeHeight=0.0f;
 };
 
 /**
