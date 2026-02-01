@@ -49,17 +49,21 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 {
 	if (Tag.IsValid() && WeaponList.Contains(Tag))
 	{
-		// ChangeSocket、PlayMontage
-		EquipWeapon();
-
+		if (CurWeaponTag.IsValid())
+		{
+			UnequipWeapon();
+		}
 		// ChangeTag
 		if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
 		{
-			if(CurWeaponTag.IsValid())
+			if (CurWeaponTag.IsValid())
 				ASC->RemoveLooseGameplayTag(CurWeaponTag);
 			ASC->AddLooseGameplayTag(Tag);
 		}
 		CurWeaponTag = *WeaponList.Find(Tag);
+
+		// ChangeSocket、PlayMontage
+		EquipWeapon();
 
 		// ChangeStaticMesh
 		if (!GetWeaponMeshComponent())
@@ -122,9 +126,9 @@ const UWeaponDataAsset* UCombatCharacterComponent::GetCurrentWeapon() const
 
 void UCombatCharacterComponent::EquipWeapon()
 {
-	if (GetCurrentWeapon())
+	if (const UWeaponDataAsset* Asset =  GetCurrentWeapon())
 	{
-		PlayMontageBySoftPtr(GetCurrentWeapon()->AM_EquipWeapon);
+		PlayMontageBySoftPtr(Asset->AM_EquipWeapon);
 	}
 	if(GetCurrentWeapon())
 		AttachWeaponToSocket(GetCurrentWeapon()->EquipSocket);// 改为动画通知触发

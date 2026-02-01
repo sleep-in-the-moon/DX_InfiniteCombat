@@ -24,9 +24,13 @@ const UWeaponDataAsset* UICAssetManager::GetWeaponDataAssetByTag(const FGameplay
 {
     if (WeaponTag.IsValid())
     {
-        if (TObjectPtr<UPrimaryDataAsset> const* pResult = GameDataMap.Find(UWeaponDataAsset::StaticClass()))
+        TObjectPtr<UPrimaryDataAsset> const* pResult = GameDataMap.Find(UWeaponDataAsset::StaticClass());
+        if (pResult)
         {
-            return CastChecked<UWeaponDataAsset>(*pResult);
+            if((*pResult)->GetPrimaryAssetId().PrimaryAssetName.IsEqual(WeaponTag.GetTagName()))
+                return CastChecked<UWeaponDataAsset>(*pResult);
+
+            UnloadPrimaryAsset((*pResult)->GetPrimaryAssetId()); // 卸载掉已经加载了的相同type资源
         }
 
         return CastChecked<const UWeaponDataAsset>(LoadGameDataByAssetId(UWeaponDataAsset::StaticClass()

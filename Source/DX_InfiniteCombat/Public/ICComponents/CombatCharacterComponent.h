@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Data/ICTypes.h"
+#include "StructUtils/InstancedStruct.h"
 
 #include "CombatCharacterComponent.generated.h"
 
@@ -75,6 +76,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "IC|Combat|Montage")
 	TSoftObjectPtr<UAnimMontage> Montage_Died;
+
+	UPROPERTY(EditDefaultsOnly, Category = "IC|Combat|Montage")
+	FInstancedStruct Test;
 	
 	UPROPERTY(BlueprintAssignable)
 	FCharacterDied DG_CharacterDied;
