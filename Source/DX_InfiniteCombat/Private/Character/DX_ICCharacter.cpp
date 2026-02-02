@@ -81,7 +81,7 @@ void ADX_ICCharacter::BeginPlay()
 	}*/
 
 	UICWorldSubsystem* ICSubSystem = UWorld::GetSubsystem<UICWorldSubsystem>(GetWorld());
-	ICSubSystem->MDG_ShowDebugChange.AddDynamic(this, &ADX_ICCharacter::ShowDebugChange);
+	ICSubSystem->MDG_ShowDebugChange.AddUniqueDynamic(this, &ADX_ICCharacter::ShowDebugChange);
 
 }
 

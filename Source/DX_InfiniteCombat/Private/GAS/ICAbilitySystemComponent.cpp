@@ -163,7 +163,9 @@ void UICAbilitySystemComponent::BeginPlay()
 	for (const FGAGive& FGA : GAArray)
 	{
 		if (FGA.GA)
+		{
 			GiveAbility(FGameplayAbilitySpec(FGA.GA.GetDefaultObject(), FGA.Level));
+		}
 	}
 	InitAbilityActorInfo(GetOwner(), GetOwner());
 
@@ -199,6 +201,47 @@ void UICAbilitySystemComponent::ApplySetByCallerGEToTarget(UAbilitySystemCompone
 		ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 	}
 
+}
+
+bool UICAbilitySystemComponent::TryActivateAbilityArg(FGameplayAbilitySpecHandle AbilityToActivate, const FInstancedStruct& Arg, bool bAllowRemoteActivation)
+{
+	FGameplayAbilitySpec* Spec = FindAbilitySpecFromHandle(AbilityToActivate);
+	if (!Spec)
+	{
+		return false;
+	}
+
+	if (Spec->PendingRemove || Spec->RemoveAfterActivation)
+	{
+		return false;
+	}
+
+	UGameplayAbility* Ability = Spec->Ability;
+
+	if (UICGameplayAbilityBase* GA = Cast<UICGameplayAbilityBase>(Ability))
+	{
+		GA->ReceiveArg(Arg);
+	}
+
+	return TryActivateAbility(AbilityToActivate, bAllowRemoteActivation);
+}
+
+bool UICAbilitySystemComponent::TryActivateAbilityByClassArg(TSubclassOf<UGameplayAbility> InAbilityToActivate, const FInstancedStruct& Arg, bool bAllowRemoteActivation)
+{
+	const UGameplayAbility* const InAbilityCDO = InAbilityToActivate.GetDefaultObject();
+
+	for (const FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	{
+		if (Spec.Ability == InAbilityCDO)
+		{
+			if (UICGameplayAbilityBase* GA = Cast<UICGameplayAbilityBase>(Spec.Ability))
+			{
+				GA->ReceiveArg(Arg);
+			}
+		}
+	}
+	
+	return TryActivateAbilityByClass(InAbilityToActivate, bAllowRemoteActivation);
 }
 
 void UICAbilitySystemComponent::ICOnImmunityBlockGameplayEffect(const FGameplayEffectSpec& Spec, const FActiveGameplayEffect* ImmunityGE)

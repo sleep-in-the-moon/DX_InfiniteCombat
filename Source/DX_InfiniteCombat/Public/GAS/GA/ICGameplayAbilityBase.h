@@ -13,6 +13,7 @@ enum class EAbilityInputTriggerMode : uint8
 	OnHeldActive
 };
 
+struct FInstancedStruct;
 /**
  * 
  */
@@ -21,11 +22,19 @@ class DX_INFINITECOMBAT_API UICGameplayAbilityBase : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
+	friend class UICAbilitySystemComponent;
+
 public:
+
+	UICGameplayAbilityBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
 	EAbilityInputTriggerMode GetAbilityInputTriggerMode() const
 	{
 		return InputTriggerMode;
 	}
+
+protected:
+	virtual void ReceiveArg(const FInstancedStruct& Arg);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="IC")

@@ -50,6 +50,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplySetByCallerGEToTarget(UAbilitySystemComponent* TargetASC, TSubclassOf<UGameplayEffect> ApplyGE, FGameplayTag DataTag, float Magnitude, float Level=0.0f);
 
+	UFUNCTION(BlueprintCallable)
+	bool TryActivateAbilityArg(FGameplayAbilitySpecHandle AbilityToActivate, const FInstancedStruct& Arg, bool bAllowRemoteActivation = true);
+
+	UFUNCTION(BlueprintCallable)
+	bool TryActivateAbilityByClassArg(TSubclassOf<UGameplayAbility> InAbilityToActivate, const FInstancedStruct& Arg, bool bAllowRemoteActivation = true);
+
+private:
+	void OnHelthChange(const FOnAttributeChangeData& Data);
+
+public:
+	UPROPERTY()
+	FAbilityInputReleaseDelegate AbilityInputReleaseDelegate;
+
 	FInputComboPress DG_InputComboPress;
 
 protected:
@@ -72,12 +85,5 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FHelthChangeBPDG HelthChangeBPDG;
-
-public:
-	UPROPERTY()
-	FAbilityInputReleaseDelegate AbilityInputReleaseDelegate;
-
-private:
-	void OnHelthChange(const FOnAttributeChangeData& Data);
 
 };
