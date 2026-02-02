@@ -23,6 +23,8 @@ class DX_INFINITECOMBAT_API UCombatCharacterComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+	friend class UGA_SwitchWeapon;
+
 public:	
 	// Sets default values for this component's properties
 	UCombatCharacterComponent();
