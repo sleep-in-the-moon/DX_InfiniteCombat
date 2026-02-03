@@ -3,6 +3,7 @@
 
 #include "gas/GA/ICGameplayAbilityBase.h"
 
+
 //void UICGameplayAbilityBase::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 //{
 //
@@ -24,10 +25,19 @@
 UICGameplayAbilityBase::UICGameplayAbilityBase(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	bRetriggerInstancedAbility = true;
+	bRetriggerInstancedAbility = false;
 }
 
 void UICGameplayAbilityBase::ReceiveArg(const FInstancedStruct& Arg)
 {
 	//(Arg.IsValid() && Arg.GetPtr<XX>() )
+}
+
+FInstancedStruct UICGameplayAbilityBase::ConsumArg() const
+{
+	UICAbilitySystemComponent* ASC = Cast<UICAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	if(ASC)
+		return ASC->ConsumAbilityArg();
+
+	return FInstancedStruct();
 }

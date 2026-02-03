@@ -6,6 +6,8 @@
 #include "GAS/GA/ICGameplayAbilityBase.h"
 #include "GA_SwitchWeapon.generated.h"
 
+
+class UCombatCharacterComponent;
 /**
  * 
  */
@@ -13,7 +15,7 @@ UCLASS()
 class DX_INFINITECOMBAT_API UGA_SwitchWeapon : public UICGameplayAbilityBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void ReceiveArg(const FInstancedStruct& Arg) override;
 
@@ -25,7 +27,7 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnMontageCompleted();
+	void EquipNewWeapon();
 	UFUNCTION()
 	void OnMontageBlendOut();
 	UFUNCTION()
@@ -37,5 +39,7 @@ private:
 
 private:
 	FGameplayTag SwitchWeaponTag;
+	UPROPERTY()
+	UCombatCharacterComponent* CombatComp=nullptr;
 
 };

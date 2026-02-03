@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool SwitchWeaponByTag(FGameplayTag Tag);
 
+	UFUNCTION(BlueprintCallable)
+	void AddNewWeapon(const FGameplayTag& NewWeaponTag);
+
 	UFUNCTION()
 	void CharacterDied();
 
@@ -64,6 +67,15 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void PlayMontageBySoftPtr(TSoftObjectPtr<UAnimMontage> Montage);
+
+	void SetToNewWeaponTag(const FGameplayTag& NewTag);
+
+	void CurWeaponToUnequipSocket();
+	void CurWeaponToEquipSocket();
+
+	void AddOrUpdateStaticMesh();
+
+	void UpdateAnimLayer();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "IC|Weapon")

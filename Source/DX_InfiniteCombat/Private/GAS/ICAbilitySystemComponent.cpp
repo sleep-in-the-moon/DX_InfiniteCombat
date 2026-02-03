@@ -4,7 +4,6 @@
 #include "GAS/ICAbilitySystemComponent.h"
 #include "GAS/GA/ICGameplayAbilityBase.h"
 #include "GameplayTagsManager.h"
-#include "StructUtils/InstancedStruct.h"
 #include "GAS/CharacterAttributeSet.h"
 #include "ICComponents/CombatCharacterComponent.h"
 
@@ -205,7 +204,7 @@ void UICAbilitySystemComponent::ApplySetByCallerGEToTarget(UAbilitySystemCompone
 
 bool UICAbilitySystemComponent::TryActivateAbilityArg(FGameplayAbilitySpecHandle AbilityToActivate, const FInstancedStruct& Arg, bool bAllowRemoteActivation)
 {
-	FGameplayAbilitySpec* Spec = FindAbilitySpecFromHandle(AbilityToActivate);
+	/*FGameplayAbilitySpec* Spec = FindAbilitySpecFromHandle(AbilityToActivate);
 	if (!Spec)
 	{
 		return false;
@@ -221,14 +220,16 @@ bool UICAbilitySystemComponent::TryActivateAbilityArg(FGameplayAbilitySpecHandle
 	if (UICGameplayAbilityBase* GA = Cast<UICGameplayAbilityBase>(Ability))
 	{
 		GA->ReceiveArg(Arg);
-	}
+	}*/
+
+	AbilityArg = Arg;
 
 	return TryActivateAbility(AbilityToActivate, bAllowRemoteActivation);
 }
 
 bool UICAbilitySystemComponent::TryActivateAbilityByClassArg(TSubclassOf<UGameplayAbility> InAbilityToActivate, const FInstancedStruct& Arg, bool bAllowRemoteActivation)
 {
-	const UGameplayAbility* const InAbilityCDO = InAbilityToActivate.GetDefaultObject();
+	/*const UGameplayAbility* const InAbilityCDO = InAbilityToActivate.GetDefaultObject();
 
 	for (const FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
 	{
@@ -239,7 +240,9 @@ bool UICAbilitySystemComponent::TryActivateAbilityByClassArg(TSubclassOf<UGamepl
 				GA->ReceiveArg(Arg);
 			}
 		}
-	}
+	}*/
+
+	AbilityArg = Arg;
 	
 	return TryActivateAbilityByClass(InAbilityToActivate, bAllowRemoteActivation);
 }
@@ -267,4 +270,11 @@ void UICAbilitySystemComponent::OnHelthChange(const FOnAttributeChangeData& Data
 			}
 		}
 	}
+}
+
+FInstancedStruct UICAbilitySystemComponent::ConsumAbilityArg()
+{
+	FInstancedStruct TempArg = AbilityArg;
+	AbilityArg = FInstancedStruct();
+	return TempArg;
 }

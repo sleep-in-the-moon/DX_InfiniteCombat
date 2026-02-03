@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "GAS/ICAbilitySystemComponent.h"
+
 #include "ICGameplayAbilityBase.generated.h"
 
 UENUM(BlueprintType)
@@ -35,6 +37,21 @@ public:
 
 protected:
 	virtual void ReceiveArg(const FInstancedStruct& Arg);
+
+	FInstancedStruct ConsumArg() const;
+	
+	template<typename T>
+	T* TConsumArg() const
+	{
+		UICAbilitySystemComponent* ASC = Cast<UICAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+		if (ASC)
+		{
+			FInstancedStruct temp = ASC->ConsumAbilityArg().IsValid();
+			return temp.GetPtr<T>();
+		}
+			
+		return nullptr;
+	}
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="IC")

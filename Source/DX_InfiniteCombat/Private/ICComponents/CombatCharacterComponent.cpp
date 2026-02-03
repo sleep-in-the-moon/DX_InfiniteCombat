@@ -47,55 +47,37 @@ void UCombatCharacterComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 {
-	if (Tag.IsValid() && WeaponList.Contains(Tag))
+	if (!WeaponList.Contains(Tag))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Character 没有%s武器"), *Tag.ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Character 没有%s武器"), *Tag.ToString()));
+		return false;
+	}
+		
+	if (Tag.IsValid())
 	{
 		if (CurWeaponTag.IsValid())
 		{
 			UnequipWeapon();
 		}
 		// ChangeTag
-		if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
-		{
-			if (CurWeaponTag.IsValid())
-				ASC->RemoveLooseGameplayTag(CurWeaponTag);
-			ASC->AddLooseGameplayTag(Tag);
-		}
-		CurWeaponTag = *WeaponList.Find(Tag);
+		SetToNewWeaponTag(Tag);
 
 		// ChangeSocket、PlayMontage
 		EquipWeapon();
 
 		// ChangeStaticMesh
-		if (!GetWeaponMeshComponent())
-		{
-			GetOwner()->AddComponentByClass(UStaticMeshComponent::StaticClass(), false, FTransform::Identity, false)->ComponentTags.Add(TEXT("Weapon"));
-			GetWeaponMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-		if(GetCurrentWeapon())
-			GetWeaponMeshComponent()->SetStaticMesh(UICAssetManager::GetAssetBySoftPtr(GetCurrentWeapon()->WeaponMesh));
+		AddOrUpdateStaticMesh();
 		
 		// LinkAnimLayer
-		if (USkeletalMeshComponent* BodyMesh = GetOwner()->FindComponentByClass<USkeletalMeshComponent>())
-		{
-			UAnimInstance* OwnerAnimIns = BodyMesh->GetAnimInstance();
-			if (OwnerAnimIns && GetCurrentWeapon() && UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass))
-			{
-				OwnerAnimIns->LinkAnimClassLayers(UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass));
-			}
-		}
-		
-		return true;
+		UpdateAnimLayer();
 	}
-	else if (!Tag.IsValid())
+	else
 	{
 		if (CurWeaponTag.IsValid())
 		{
 			UnequipWeapon();
-			if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
-			{
-				ASC->RemoveLooseGameplayTag(CurWeaponTag);
-			}
-			CurWeaponTag = FGameplayTag::EmptyTag;
+			SetToNewWeaponTag(FGameplayTag::EmptyTag);
 		}
 
 		if (GetWeaponMeshComponent())
@@ -104,14 +86,15 @@ bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
 		}
 		
 		// LinkUnarmAnimLayer
-
-
-		return true;
+		
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Character 没有%s武器"), *Tag.ToString());
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Character 没有%s武器"), *Tag.ToString()));
-	return false;
+	return true;
+}
+
+void UCombatCharacterComponent::AddNewWeapon(const FGameplayTag& NewWeaponTag)
+{
+	WeaponList.Add(NewWeaponTag);
 }
 
 const UWeaponDataAsset* UCombatCharacterComponent::GetCurrentWeapon() const
@@ -163,6 +146,57 @@ void UCombatCharacterComponent::PlayMontageBySoftPtr(TSoftObjectPtr<UAnimMontage
 	{
 		Character->StopAnimMontage();
 		Character->PlayAnimMontage(UICAssetManager::GetAssetBySoftPtr(Montage, false));
+	}
+}
+
+void UCombatCharacterComponent::SetToNewWeaponTag(const FGameplayTag& NewTag)
+{
+	if (!WeaponList.Find(NewTag))
+		return;
+
+	if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
+	{
+		if (CurWeaponTag.IsValid() && ASC->HasMatchingGameplayTag(CurWeaponTag))
+			ASC->RemoveLooseGameplayTag(CurWeaponTag);
+
+		if(NewTag.IsValid())
+			ASC->AddLooseGameplayTag(NewTag);
+	}
+	CurWeaponTag = *WeaponList.Find(NewTag);
+}
+
+void UCombatCharacterComponent::CurWeaponToUnequipSocket()
+{
+	if (GetCurrentWeapon())
+		AttachWeaponToSocket(GetCurrentWeapon()->UnequipSocket);
+}
+
+void UCombatCharacterComponent::CurWeaponToEquipSocket()
+{
+	if (GetCurrentWeapon())
+		AttachWeaponToSocket(GetCurrentWeapon()->EquipSocket);
+}
+
+void UCombatCharacterComponent::AddOrUpdateStaticMesh()
+{
+	if (!GetWeaponMeshComponent())
+	{
+		GetOwner()->AddComponentByClass(UStaticMeshComponent::StaticClass(), false, FTransform::Identity, false)->ComponentTags.Add(TEXT("Weapon"));
+		GetWeaponMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	if (GetCurrentWeapon())
+		GetWeaponMeshComponent()->SetStaticMesh(UICAssetManager::GetAssetBySoftPtr(GetCurrentWeapon()->WeaponMesh));
+}
+
+void UCombatCharacterComponent::UpdateAnimLayer()
+{
+	if (USkeletalMeshComponent* BodyMesh = GetOwner()->FindComponentByClass<USkeletalMeshComponent>())
+	{
+		UAnimInstance* OwnerAnimIns = BodyMesh->GetAnimInstance();
+		if (OwnerAnimIns && GetCurrentWeapon() && UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass))
+		{
+			OwnerAnimIns->LinkAnimClassLayers(UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass));
+		}
 	}
 }
 

@@ -5,9 +5,10 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "Data/ICTypes.h"
+#include "StructUtils/InstancedStruct.h"
+
 #include "ICAbilitySystemComponent.generated.h"
 
-struct FInstancedStruct;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInputReleaseDelegate, const FGameplayTag&, AbilityInputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmunityGECallback, const FGameplayTagContainer&, ImmunityGETags);
@@ -33,6 +34,7 @@ class DX_INFINITECOMBAT_API UICAbilitySystemComponent : public UAbilitySystemCom
 {
 	GENERATED_BODY()
 	
+	friend class UICGameplayAbilityBase;
 public:
 	UICAbilitySystemComponent();
 	void AbilityInputTagPressed(const FGameplayTag& InputTag, EComboSource InputComboSource);
@@ -58,6 +60,8 @@ public:
 
 private:
 	void OnHelthChange(const FOnAttributeChangeData& Data);
+
+	FInstancedStruct ConsumAbilityArg();
 
 public:
 	UPROPERTY()
@@ -85,5 +89,8 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FHelthChangeBPDG HelthChangeBPDG;
+
+private:
+	FInstancedStruct AbilityArg;
 
 };

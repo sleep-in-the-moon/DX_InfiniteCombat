@@ -23,33 +23,38 @@ void UGA_SwitchWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 		constexpr bool bReplicateEndAbility = true;
 		constexpr bool bWasCancelled = true;
 		EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-		//return;
+		return;
+	}
+	
+	FInstancedStruct Arg = ConsumArg();
+	if (!Arg.IsValid() || !Arg.GetPtr<FGameplayTag>())
+		return;
+
+	SwitchWeaponTag = Arg.Get<FGameplayTag>();
+
+	CombatComp = GetOwningActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>();
+	if (!CombatComp || !CombatComp->WeaponList.Contains(SwitchWeaponTag))
+		return;
+
+	if (SwitchWeaponTag.IsValid())
+	{
+		if (CombatComp->CurWeaponTag.IsValid() && CombatComp->GetCurrentWeapon())
+		{
+			//Unequip old
+			UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("MontageTask"), UICAssetManager::GetAssetBySoftPtr(CombatComp->GetCurrentWeapon()->AM_UnequipWeapon, false));
+			MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_SwitchWeapon::EquipNewWeapon);
+			MontageTask->Activate();
+
+		}
+		else
+			EquipNewWeapon();
 	}
 	else
 	{
-		if (UCombatCharacterComponent* CombatComp = GetOwningActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>())
-		{
-			CombatComp->SwitchWeaponByTag(SwitchWeaponTag);
 
-			if (SwitchWeaponTag.IsValid() && CombatComp->WeaponList.Contains(SwitchWeaponTag))
-			{
-				if (CombatComp->CurWeaponTag.IsValid() && CombatComp->GetCurrentWeapon())
-				{
-					UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("MontageTask"), UICAssetManager::GetAssetBySoftPtr(CombatComp->GetCurrentWeapon()->AM_UnequipWeapon, false));
-
-					MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_SwitchWeapon::OnMontageCompleted);
-					
-				}
-			}
-			else if (!SwitchWeaponTag.IsValid())
-			{
-
-			}
-			
-		}
-
-		Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	}
+
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 }
 
@@ -58,46 +63,24 @@ void UGA_SwitchWeapon::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UGA_SwitchWeapon::OnMontageCompleted()
+void UGA_SwitchWeapon::EquipNewWeapon()
 {
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-	UCombatCharacterComponent* CombatComp = GetOwningActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>();
-	if (ASC && CombatComp)
-	{
-		if (CombatComp->GetCurrentWeapon())
-			CombatComp->AttachWeaponToSocket(CombatComp->GetCurrentWeapon()->UnequipSocket);
+	CombatComp->CurWeaponToUnequipSocket();
 
-		if (CombatComp->CurWeaponTag.IsValid())
-			ASC->RemoveLooseGameplayTag(CombatComp->CurWeaponTag);
-		ASC->AddLooseGameplayTag(SwitchWeaponTag);
-	}
-	CombatComp->CurWeaponTag = *CombatComp->WeaponList.Find(SwitchWeaponTag);
+	CombatComp->SetToNewWeaponTag(SwitchWeaponTag);
 
 	if (const UWeaponDataAsset* Asset = CombatComp->GetCurrentWeapon())
 	{
 		CombatComp->PlayMontageBySoftPtr(Asset->AM_EquipWeapon);
 	}
-	if (CombatComp->GetCurrentWeapon())
-		CombatComp->AttachWeaponToSocket(CombatComp->GetCurrentWeapon()->EquipSocket);
+
+	CombatComp->CurWeaponToEquipSocket();
 
 	// ChangeStaticMesh
-	if (!CombatComp->GetWeaponMeshComponent())
-	{
-		GetOwningActorFromActorInfo()->AddComponentByClass(UStaticMeshComponent::StaticClass(), false, FTransform::Identity, false)->ComponentTags.Add(TEXT("Weapon"));
-		CombatComp->GetWeaponMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-	if (CombatComp->GetCurrentWeapon())
-		CombatComp->GetWeaponMeshComponent()->SetStaticMesh(UICAssetManager::GetAssetBySoftPtr(CombatComp->GetCurrentWeapon()->WeaponMesh));
+	CombatComp->AddOrUpdateStaticMesh();
 
 	// LinkAnimLayer
-	if (USkeletalMeshComponent* BodyMesh = GetOwningActorFromActorInfo()->FindComponentByClass<USkeletalMeshComponent>())
-	{
-		UAnimInstance* OwnerAnimIns = BodyMesh->GetAnimInstance();
-		if (OwnerAnimIns && CombatComp->GetCurrentWeapon() && UICAssetManager::GetSubclassBySoftPtr(CombatComp->GetCurrentWeapon()->LinkAnimClass))
-		{
-			OwnerAnimIns->LinkAnimClassLayers(UICAssetManager::GetSubclassBySoftPtr(CombatComp->GetCurrentWeapon()->LinkAnimClass));
-		}
-	}
+	CombatComp->UpdateAnimLayer();
 
 }
 
@@ -107,6 +90,11 @@ void UGA_SwitchWeapon::OnMontageBlendOut()
 
 void UGA_SwitchWeapon::OnMontageInterrupted()
 {
+	ensure(CurrentActorInfo);
+
+	bool bReplicateEndAbility = true;
+	bool bWasCancelled = false;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UGA_SwitchWeapon::OnMontageCancelled()
