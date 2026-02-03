@@ -31,7 +31,7 @@ void UCombatCharacterComponent::BeginPlay()
 	//初始化拥有者的武器
 	if (InitWeaponTag.IsValid())
 	{
-		SwitchWeaponByTag(InitWeaponTag);
+		//SwitchWeaponByTag(InitWeaponTag);
 	}
 	
 }

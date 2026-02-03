@@ -82,6 +82,12 @@ void UGA_SwitchWeapon::EquipNewWeapon()
 	// LinkAnimLayer
 	CombatComp->UpdateAnimLayer();
 
+	ensure(CurrentActorInfo);
+
+	bool bReplicateEndAbility = true;
+	bool bWasCancelled = false;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
+
 }
 
 void UGA_SwitchWeapon::OnMontageBlendOut()
