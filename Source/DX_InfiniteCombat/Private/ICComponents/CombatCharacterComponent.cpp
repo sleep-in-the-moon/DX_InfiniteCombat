@@ -10,6 +10,7 @@
 #include "Subsystem/ICWorldSubsystem.h"
 #include "Data/WeaponDataAsset.h"
 #include "Data/ICAssetManager.h"
+#include "UMG/WidgetCombatStates.h"
 
 
 // Sets default values for this component's properties
@@ -45,52 +46,6 @@ void UCombatCharacterComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
-bool UCombatCharacterComponent::SwitchWeaponByTag(FGameplayTag Tag)
-{
-	if (!WeaponList.Contains(Tag))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Character 没有%s武器"), *Tag.ToString());
-		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Character 没有%s武器"), *Tag.ToString()));
-		return false;
-	}
-		
-	if (Tag.IsValid())
-	{
-		if (CurWeaponTag.IsValid())
-		{
-			UnequipWeapon();
-		}
-		// ChangeTag
-		SetToNewWeaponTag(Tag);
-
-		// ChangeSocket、PlayMontage
-		EquipWeapon();
-
-		// ChangeStaticMesh
-		AddOrUpdateStaticMesh();
-		
-		// LinkAnimLayer
-		UpdateAnimLayer();
-	}
-	else
-	{
-		if (CurWeaponTag.IsValid())
-		{
-			UnequipWeapon();
-			SetToNewWeaponTag(FGameplayTag::EmptyTag);
-		}
-
-		if (GetWeaponMeshComponent())
-		{
-			GetWeaponMeshComponent()->SetStaticMesh(nullptr);
-		}
-		
-		// LinkUnarmAnimLayer
-		
-	}
-
-	return true;
-}
 
 void UCombatCharacterComponent::AddNewWeapon(const FGameplayTag& NewWeaponTag)
 {
@@ -107,25 +62,6 @@ const UWeaponDataAsset* UCombatCharacterComponent::GetCurrentWeapon() const
 	return nullptr;
 }
 
-void UCombatCharacterComponent::EquipWeapon()
-{
-	if (const UWeaponDataAsset* Asset =  GetCurrentWeapon())
-	{
-		PlayMontageBySoftPtr(Asset->AM_EquipWeapon);
-	}
-	if(GetCurrentWeapon())
-		AttachWeaponToSocket(GetCurrentWeapon()->EquipSocket);// 改为动画通知触发
-}
-
-void UCombatCharacterComponent::UnequipWeapon()
-{
-	if (GetCurrentWeapon())
-	{
-		PlayMontageBySoftPtr(GetCurrentWeapon()->AM_UnequipWeapon);
-	}
-	if(GetCurrentWeapon())
-		AttachWeaponToSocket(GetCurrentWeapon()->UnequipSocket);
-}
 
 bool UCombatCharacterComponent::AttachWeaponToSocket(FName socketName)
 {
@@ -151,9 +87,6 @@ void UCombatCharacterComponent::PlayMontageBySoftPtr(TSoftObjectPtr<UAnimMontage
 
 void UCombatCharacterComponent::SetToNewWeaponTag(const FGameplayTag& NewTag)
 {
-	if (!WeaponList.Find(NewTag))
-		return;
-
 	if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
 	{
 		if (CurWeaponTag.IsValid() && ASC->HasMatchingGameplayTag(CurWeaponTag))
@@ -162,29 +95,60 @@ void UCombatCharacterComponent::SetToNewWeaponTag(const FGameplayTag& NewTag)
 		if(NewTag.IsValid())
 			ASC->AddLooseGameplayTag(NewTag);
 	}
-	CurWeaponTag = *WeaponList.Find(NewTag);
+	if (WeaponList.Find(NewTag) || !NewTag.IsValid())
+		CurWeaponTag = NewTag;
+
+	if (APawn* playerPawn = Cast<APawn>(GetOwner()))
+	{
+		APlayerController* playerControl = Cast<APlayerController>(playerPawn->GetController());
+		if (playerControl)
+		{
+			FProperty* CombatStatesWidgetPro = playerControl->GetClass()->FindPropertyByName(TEXT("CombatStatesWidget"));
+			if (CombatStatesWidgetPro)
+			{
+
+				FClassProperty* CombatStatesWidgetClassPro = static_cast<FClassProperty*>(CombatStatesWidgetPro);
+				const void* ValuePtr = CombatStatesWidgetClassPro->ContainerPtrToValuePtr<void>(playerControl);
+				TObjectPtr<UObject> CombatStatesWidgetObj = CombatStatesWidgetClassPro->GetPropertyValue(ValuePtr);
+
+				if (UWidgetCombatStates* CombatStatesWidget = Cast<UWidgetCombatStates>(CombatStatesWidgetObj))
+					CombatStatesWidget->UpdateWeaponColumn(CurWeaponTag);
+			}
+		}
+	}
 }
 
 void UCombatCharacterComponent::CurWeaponToUnequipSocket()
 {
 	if (GetCurrentWeapon())
-		AttachWeaponToSocket(GetCurrentWeapon()->UnequipSocket);
+	{
+		if (GetCurrentWeapon()->UnequipSocket.IsValid())
+			AttachWeaponToSocket(GetCurrentWeapon()->UnequipSocket);
+		else
+			GetWeaponMeshComponent()->SetStaticMesh(nullptr);//DestroyComponent(); 
+	}
 }
 
 void UCombatCharacterComponent::CurWeaponToEquipSocket()
 {
 	if (GetCurrentWeapon())
 		AttachWeaponToSocket(GetCurrentWeapon()->EquipSocket);
+
+	AddOrUpdateStaticMesh();
 }
 
 void UCombatCharacterComponent::AddOrUpdateStaticMesh()
 {
+	if (!GetCurrentWeapon())
+		return;
+
 	if (!GetWeaponMeshComponent())
 	{
-		GetOwner()->AddComponentByClass(UStaticMeshComponent::StaticClass(), false, FTransform::Identity, false)->ComponentTags.Add(TEXT("Weapon"));
+		GetOwner()->AddComponentByClass(UStaticMeshComponent::StaticClass(), false, FTransform::Identity, false)->ComponentTags.Add(CurWeaponTag.GetTagName());
 		GetWeaponMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
-	if (GetCurrentWeapon())
+
+	if (!GetWeaponMeshComponent()->GetStaticMesh() && GetCurrentWeapon()->WeaponMesh)
 		GetWeaponMeshComponent()->SetStaticMesh(UICAssetManager::GetAssetBySoftPtr(GetCurrentWeapon()->WeaponMesh));
 }
 
@@ -193,9 +157,16 @@ void UCombatCharacterComponent::UpdateAnimLayer()
 	if (USkeletalMeshComponent* BodyMesh = GetOwner()->FindComponentByClass<USkeletalMeshComponent>())
 	{
 		UAnimInstance* OwnerAnimIns = BodyMesh->GetAnimInstance();
-		if (OwnerAnimIns && GetCurrentWeapon() && UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass))
+		if (!OwnerAnimIns)
+			return;
+
+		if (GetCurrentWeapon() && UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass))
 		{
 			OwnerAnimIns->LinkAnimClassLayers(UICAssetManager::GetSubclassBySoftPtr(GetCurrentWeapon()->LinkAnimClass));
+		}
+		else if(UnarmLinkAnimLayer)
+		{
+			OwnerAnimIns->LinkAnimClassLayers(UICAssetManager::GetSubclassBySoftPtr(UnarmLinkAnimLayer));
 		}
 	}
 }

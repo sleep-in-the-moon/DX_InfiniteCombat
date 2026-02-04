@@ -40,28 +40,26 @@ public:
 public:
 
 	UFUNCTION(BlueprintCallable)
-	bool SwitchWeaponByTag(FGameplayTag Tag);
-
-	UFUNCTION(BlueprintCallable)
 	void AddNewWeapon(const FGameplayTag& NewWeaponTag);
 
-	UFUNCTION()
-	void CharacterDied();
+	UFUNCTION(BlueprintCallable)
+	void CurWeaponToUnequipSocket();
+	UFUNCTION(BlueprintCallable)
+	void CurWeaponToEquipSocket();
 
 	UFUNCTION(BlueprintCallable)
 	UStaticMeshComponent* GetWeaponMeshComponent() const
 	{
-		return GetOwner()->FindComponentByTag<UStaticMeshComponent>(TEXT("Weapon"));
+		return CurWeaponTag.IsValid() ? GetOwner()->FindComponentByTag<UStaticMeshComponent>(CurWeaponTag.GetTagName()) : nullptr;
 	}
 
 	UFUNCTION(BlueprintCallable)
 	const UWeaponDataAsset* GetCurrentWeapon() const;
 
+	UFUNCTION()
+	void CharacterDied();
+
 private:
-	UFUNCTION(BlueprintCallable)
-	void EquipWeapon();
-	UFUNCTION(BlueprintCallable)
-	void UnequipWeapon();
 	UFUNCTION(BlueprintCallable)
 	bool AttachWeaponToSocket(FName socketName);
 
@@ -69,9 +67,6 @@ private:
 	void PlayMontageBySoftPtr(TSoftObjectPtr<UAnimMontage> Montage);
 
 	void SetToNewWeaponTag(const FGameplayTag& NewTag);
-
-	void CurWeaponToUnequipSocket();
-	void CurWeaponToEquipSocket();
 
 	void AddOrUpdateStaticMesh();
 
@@ -92,6 +87,9 @@ protected:
 	
 	UPROPERTY(BlueprintAssignable)
 	FCharacterDied DG_CharacterDied;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftClassPtr<UAnimInstance> UnarmLinkAnimLayer;
 
 private:
 	FGameplayTag CurWeaponTag;

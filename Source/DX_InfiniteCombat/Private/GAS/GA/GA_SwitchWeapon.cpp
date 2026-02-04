@@ -36,23 +36,16 @@ void UGA_SwitchWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 	if (!CombatComp || !CombatComp->WeaponList.Contains(SwitchWeaponTag))
 		return;
 
-	if (SwitchWeaponTag.IsValid())
+	// CurWeaponValid ? UnequipCur : None  Comleted->  NewWeaponValid ? EquipNew : unarm
+	if (CombatComp->CurWeaponTag.IsValid() && CombatComp->GetCurrentWeapon())
 	{
-		if (CombatComp->CurWeaponTag.IsValid() && CombatComp->GetCurrentWeapon())
-		{
-			//Unequip old
-			UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("MontageTask"), UICAssetManager::GetAssetBySoftPtr(CombatComp->GetCurrentWeapon()->AM_UnequipWeapon, false));
-			MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_SwitchWeapon::EquipNewWeapon);
-			MontageTask->Activate();
-
-		}
-		else
-			EquipNewWeapon();
+		//Unequip
+		UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("MontageTask"), UICAssetManager::GetAssetBySoftPtr(CombatComp->GetCurrentWeapon()->AM_UnequipWeapon, false));
+		MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_SwitchWeapon::EquipNewWeapon);
+		MontageTask->Activate();
 	}
 	else
-	{
-
-	}
+		EquipNewWeapon();
 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -65,7 +58,7 @@ void UGA_SwitchWeapon::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 
 void UGA_SwitchWeapon::EquipNewWeapon()
 {
-	CombatComp->CurWeaponToUnequipSocket();
+	CombatComp->CurWeaponToUnequipSocket();//animNotify
 
 	CombatComp->SetToNewWeaponTag(SwitchWeaponTag);
 
@@ -74,19 +67,12 @@ void UGA_SwitchWeapon::EquipNewWeapon()
 		CombatComp->PlayMontageBySoftPtr(Asset->AM_EquipWeapon);
 	}
 
-	CombatComp->CurWeaponToEquipSocket();
-
-	// ChangeStaticMesh
-	CombatComp->AddOrUpdateStaticMesh();
+	CombatComp->CurWeaponToEquipSocket();//animNotify
 
 	// LinkAnimLayer
 	CombatComp->UpdateAnimLayer();
 
-	ensure(CurrentActorInfo);
-
-	bool bReplicateEndAbility = true;
-	bool bWasCancelled = false;
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
+	K2_EndAbility();
 
 }
 
@@ -96,11 +82,7 @@ void UGA_SwitchWeapon::OnMontageBlendOut()
 
 void UGA_SwitchWeapon::OnMontageInterrupted()
 {
-	ensure(CurrentActorInfo);
-
-	bool bReplicateEndAbility = true;
-	bool bWasCancelled = false;
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
+	K2_EndAbility();
 }
 
 void UGA_SwitchWeapon::OnMontageCancelled()

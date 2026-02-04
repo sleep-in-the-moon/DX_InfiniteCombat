@@ -42,6 +42,7 @@ struct FPersistentWidgetInfos
 
 class UCanvasPanel;
 class UCapsuleComponent;
+struct FGameplayTag;
 /**
  * 
  */
@@ -60,6 +61,9 @@ public:
 
 	/*UFUNCTION(BlueprintCallable)
 	void UpdatePersistentWidget(FName UniqueID, );*/
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateWeaponColumn(const FGameplayTag& NewWeapon);
 
 protected:
 	//virtual void NativePreConstruct() override;
