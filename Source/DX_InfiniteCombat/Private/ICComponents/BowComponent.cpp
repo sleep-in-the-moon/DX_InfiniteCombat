@@ -101,6 +101,12 @@ bool UBowComponent::TryLaunchArrow(float ChargeTime)
 		return true;
 	}
 
+	if (CurHoldingArrow)
+	{
+		CurHoldingArrow->Destroy();
+		CurHoldingArrow = nullptr;
+	}
+
 	return false;
 }
 
@@ -136,6 +142,7 @@ void UBowComponent::ExitAimMode()
 {
 	if (UDXCharacterExtensionComponent* ExtensionComp = GetOwner()->FindComponentByClass<UDXCharacterExtensionComponent>())
 	{
+		ExtensionComp->StopTimeline();
 		ExtensionComp->SetYawByControl(false);
 		ExtensionComp->LerpSpringArmEndOffsetToTarget(FVector(0, 0, 0));
 	}

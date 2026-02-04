@@ -35,6 +35,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetYawByControl(bool YawByControl);
 
+	void StopTimeline();
+
 	FLerpToControlRotFinish DG_LerpToControlRotFinish;
 
 private:

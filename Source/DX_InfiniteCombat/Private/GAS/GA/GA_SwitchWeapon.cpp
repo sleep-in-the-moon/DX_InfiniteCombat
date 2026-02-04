@@ -28,19 +28,25 @@ void UGA_SwitchWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 	
 	FInstancedStruct Arg = ConsumArg();
 	if (!Arg.IsValid() || !Arg.GetPtr<FGameplayTag>())
+	{
+		K2_EndAbility();
 		return;
+	}
 
 	SwitchWeaponTag = Arg.Get<FGameplayTag>();
 
 	CombatComp = GetOwningActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>();
-	if (!CombatComp || !CombatComp->WeaponList.Contains(SwitchWeaponTag))
+	if (!CombatComp || !CombatComp->WeaponList.Contains(SwitchWeaponTag) || CombatComp->CurWeaponTag == SwitchWeaponTag)
+	{
+		K2_EndAbility();
 		return;
+	}
 
 	// CurWeaponValid ? UnequipCur : None  Comleted->  NewWeaponValid ? EquipNew : unarm
 	if (CombatComp->CurWeaponTag.IsValid() && CombatComp->GetCurrentWeapon())
 	{
 		//Unequip
-		UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("MontageTask"), UICAssetManager::GetAssetBySoftPtr(CombatComp->GetCurrentWeapon()->AM_UnequipWeapon, false));
+		UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("UnequipMontage"), UICAssetManager::GetAssetBySoftPtr(CombatComp->GetCurrentWeapon()->AM_UnequipWeapon, false));
 		MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_SwitchWeapon::EquipNewWeapon);
 		MontageTask->Activate();
 	}
@@ -58,22 +64,24 @@ void UGA_SwitchWeapon::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 
 void UGA_SwitchWeapon::EquipNewWeapon()
 {
-	CombatComp->CurWeaponToUnequipSocket();//animNotify
+	//CombatComp->CurWeaponToUnequipSocket();//animNotify
 
 	CombatComp->SetToNewWeaponTag(SwitchWeaponTag);
-
-	if (const UWeaponDataAsset* Asset = CombatComp->GetCurrentWeapon())
-	{
-		CombatComp->PlayMontageBySoftPtr(Asset->AM_EquipWeapon);
-	}
-
-	CombatComp->CurWeaponToEquipSocket();//animNotify
 
 	// LinkAnimLayer
 	CombatComp->UpdateAnimLayer();
 
-	K2_EndAbility();
+	if (CombatComp->GetCurrentWeapon())
+	{
+		UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("EquipMontage"), UICAssetManager::GetAssetBySoftPtr(CombatComp->GetCurrentWeapon()->AM_EquipWeapon, false));
+		MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_SwitchWeapon::K2_EndAbility);
+		MontageTask->Activate();
 
+		//CombatComp->CurWeaponToEquipSocket();//animNotify
+	}
+	else
+		K2_EndAbility();
+	
 }
 
 void UGA_SwitchWeapon::OnMontageBlendOut()

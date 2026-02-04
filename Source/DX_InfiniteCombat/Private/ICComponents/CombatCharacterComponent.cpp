@@ -29,6 +29,10 @@ void UCombatCharacterComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*for (const FGameplayTag& WeaponTag : WeaponList)
+	{
+
+	}*/
 	//初始化拥有者的武器
 	if (InitWeaponTag.IsValid())
 	{
@@ -131,10 +135,10 @@ void UCombatCharacterComponent::CurWeaponToUnequipSocket()
 
 void UCombatCharacterComponent::CurWeaponToEquipSocket()
 {
+	AddOrUpdateStaticMesh();
+
 	if (GetCurrentWeapon())
 		AttachWeaponToSocket(GetCurrentWeapon()->EquipSocket);
-
-	AddOrUpdateStaticMesh();
 }
 
 void UCombatCharacterComponent::AddOrUpdateStaticMesh()

@@ -100,6 +100,12 @@ void UDXCharacterExtensionComponent::SetYawByControl(bool YawByControl)
 	}
 }
 
+void UDXCharacterExtensionComponent::StopTimeline()
+{
+	TL_LerpSpringArm.Stop();
+	TL_LerpActorRot.Stop();
+}
+
 void UDXCharacterExtensionComponent::LerpActorRotInter(float Alpha)
 {
 	if (APawn* pawn = Cast<APawn>(GetOwner()))
