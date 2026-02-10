@@ -31,12 +31,11 @@ void UCombatCharacterComponent::BeginPlay()
 
 	/*for (const FGameplayTag& WeaponTag : WeaponList)
 	{
-
+		
 	}*/
-	//初始化拥有者的武器
 	if (InitWeaponTag.IsValid())
 	{
-		//SwitchWeaponByTag(InitWeaponTag);
+		CurWeaponTag = InitWeaponTag;
 	}
 	
 }

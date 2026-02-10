@@ -30,12 +30,12 @@ ADX_ICCharacter::ADX_ICCharacter()
 	ASC = CreateDefaultSubobject<UICAbilitySystemComponent>(TEXT("ICAbilitySystemComponent"));
 	CombatComponent = CreateDefaultSubobject<UCombatCharacterComponent>(TEXT("CombatCharacterComponent"));
 
-	WeaponMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MainWeapon"));
+	WeaponMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MainWeapon"), true);
 	WeaponMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-	WeaponMeshComponent->ComponentTags.Add(TEXT("Weapon"));
+	WeaponMeshComponent->ComponentTags.Add(TEXT("Weapon.Katana"));
+	WeaponMeshComponent->SetupAttachment(GetMesh(), TEXT("Belt_Socket"));
 
 	ICMotionWarpingComponent = CreateDefaultSubobject<UICMotionWarpingComponent>(TEXT("ICMotionWarpingComponent"));
-
 }
 
 void ADX_ICCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
