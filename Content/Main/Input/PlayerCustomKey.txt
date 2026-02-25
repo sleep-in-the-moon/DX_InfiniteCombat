@@ -1,0 +1,46 @@
+设置
+{
+	增强输入-> UserSettings, 勾选 EnableUserSettings, 修改自定义类;
+}
+UserSettings
+{
+	用于处理与输入设置相关的操作，比如重新映射玩家的按键;
+	获取：UEnhancedInputLocalPlayerSubsystem->GetUserSettings();
+	
+	需要将所有可配置的 IMC 注册到 UserSettings 中;
+	
+	MapPlayerKey() 通过 MappingName 和 NewKey 即可重新映射按键;
+}
+PlayerMappableKeyProfile(玩家可映射按键描述/配置 文件)
+{
+	用于存储玩家在 UserSettings 中设置的按键映射，可动态生成的预设配置;
+	
+	每个配置文件可通过 GameplayTag 标识;
+	
+	由 UserSettings 对象 GetCurrentKeyProfile()获取;
+	
+	GetPlayerMappingRows() 获取此配置文件的所有已知按键映射，返回 映射名称: FKeyMappingRow;
+}
+PlayerMappableKeySettings(玩家可映射按键设置)
+{
+	用于保存每个可重新映射的 InputAction 的信息;
+	可视为每个可重新映射按键的定义;
+	
+	在 InputAction 中设置或者在 IMC 中将 SettingBehavior 修改为 OverrideSettings 可对同一 IA 的不同键设置;
+}
+
+FPlayerKeyMapping
+{
+	FKeyMappingRow 中的Set;
+	
+	成员
+	{
+		PlayerMappableKeySettings中配置的 Name、DisplayName、DisplayCategory;
+		Slot：IMC 中配置的按键槽位;
+		IsDirty: 如果此按键映射已修改（即已被玩家更改）则为真;
+		DefaultKey: 默认按键;
+		CurrentKey: 当前按键;
+		HardwareDeviceId: 硬件设备id;
+		InputAction;
+	}
+}

@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "UserSettings/EnhancedInputUserSettings.h"
 
 void ABasicInputPlayerController::MoveEvent(const FInputActionValue& InputValue)
 {
@@ -70,6 +71,7 @@ void ABasicInputPlayerController::BeginPlay()
 	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		InputSystem->AddMappingContext(DefaultInputMapping, 0);
+		InputSystem->GetUserSettings()->RegisterInputMappingContext(DefaultInputMapping);
 	}
 
 	if (APawn* pawn = GetPawn<APawn>())
