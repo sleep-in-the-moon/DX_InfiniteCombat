@@ -37,4 +37,12 @@ protected:
 public:
 	bool TryTraversalAction(const FTraversalCheckInput& CheckInput);
 
+private:
+	FOnMontageEnded MontageEndedDelegate;
+
+	EMovementMode TempMode;
+
+	UFUNCTION()
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 };

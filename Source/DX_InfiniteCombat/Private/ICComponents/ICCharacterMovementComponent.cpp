@@ -80,7 +80,19 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
                         MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPoint"), OutHit2.ImpactPoint);
                         MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"), FVector(FVector2D(TargetTransform.GetLocation()), TargetTransform.GetLocation().Z+10));
                         MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"), FVector(0, 0, 0));
-                        OwnerCharacter->PlayAnimMontage(ClimbMontage);
+
+                        UAnimInstance* AnimInstance = (OwnerCharacter->GetMesh()) ? OwnerCharacter->GetMesh()->GetAnimInstance() : nullptr;
+                        if (AnimInstance)
+                        {
+                            TempMode = MovementMode;
+                            SetMovementMode(EMovementMode::MOVE_Flying);
+
+                            OwnerCharacter->PlayAnimMontage(ClimbMontage);
+
+                            MontageEndedDelegate.BindUObject(this, &UICCharacterMovementComponent::OnMontageEnded);
+                            AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, ClimbMontage);
+                        }
+                        
                     }
 
                     return true;
@@ -90,4 +102,10 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
     }
 
     return false;
+}
+
+void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+    SetMovementMode(TempMode);
+    MontageEndedDelegate.Unbind();
 }

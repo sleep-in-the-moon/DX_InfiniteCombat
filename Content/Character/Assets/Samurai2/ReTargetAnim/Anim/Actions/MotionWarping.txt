@@ -1,0 +1,5 @@
+1.原 AnimationSequence 的 RootMotion 不能为0，否则会出 Bug;
+2.不忽略Z轴时，若移动组件 Mode 处于 Walking 状态下Z轴不会生效，需改为 Flying Mode, 完成后再改回Walking;
+3.会被碰撞阻挡，除非可以通过碰撞后的 Slide 脱离阻挡;
+4.若 Montage 混出时机在 WarpingAS 结束点之前，将导致 Warping 在混出触发时直接停止，无法到达 Target 点;
+5.Debug: 命令行 a.MotionWarping.Debug 3;
