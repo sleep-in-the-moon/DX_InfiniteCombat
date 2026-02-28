@@ -38,6 +38,7 @@ public class DX_TechnicalArt : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"RenderCore",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

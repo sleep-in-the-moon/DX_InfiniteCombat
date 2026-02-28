@@ -1,0 +1,10 @@
+#pragma once
+
+
+float3 HukeLaw(float3 pos0, float3 pos1, MaterialFloat k, MaterialFloat l)
+{
+	float3 v = pos0 - pos1;
+	float3 dis = length(v);
+    float3 dir = v / dis;
+    return (dis - l) * k * dir;
+}
