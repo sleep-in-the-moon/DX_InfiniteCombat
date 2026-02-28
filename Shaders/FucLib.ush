@@ -8,3 +8,17 @@ float3 HukeLaw(float3 pos0, float3 pos1, MaterialFloat k, MaterialFloat l)
     float3 dir = v / dis;
     return (dis - l) * k * dir;
 }
+
+bool IsInside(float2 xy, bool isXY0)
+{
+    if (isXY0)
+        return xy.x < 0.49 && xy.x > 0.01 && xy.y < 0.99 && xy.y > 0.01;
+    else
+        return xy.x < 0.99 && xy.x > 0.51 && xy.y < 0.99 && xy.y > 0.01;
+}
+
+float3 OffsetSample(Texture2D Tex, SamplerState TexSampler, float2 xy, float2 xyof, float h)
+{
+    float3 initValue = xy.x < 0.5 ? float3(0, 0, h) : float3(0, 0, 0);
+    return IsInside(xyof, xy.x < 0.5) ? Texture2DSample(Tex, TexSampler, xyof).rgb : initValue;
+}
