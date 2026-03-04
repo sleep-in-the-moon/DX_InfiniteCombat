@@ -35,7 +35,7 @@ void UGA_SwitchWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 
 	SwitchWeaponTag = Arg.Get<FGameplayTag>();
 
-	CombatComp = GetOwningActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>();
+	CombatComp = GetAvatarActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>();
 	if (!CombatComp || !CombatComp->WeaponList.Contains(SwitchWeaponTag) || CombatComp->CurWeaponTag == SwitchWeaponTag)
 	{
 		K2_EndAbility();
