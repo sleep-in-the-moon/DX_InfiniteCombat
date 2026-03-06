@@ -62,15 +62,15 @@ void ADX_ICPlayerController::BeginPlay()
 void ADX_ICPlayerController::MoveEvent(const FInputActionValue& InputValue)
 { 
 	Super::MoveEvent(InputValue);
-	ACharacter* character = GetCharacter();
-	if (!IgnoreMoveInput && character)
-	{
-		UAbilitySystemComponent* ASC = character->FindComponentByClass<UAbilitySystemComponent>();
-		if (ASC && (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InCombo"))) ))//|| ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InDodge")))))
-		{
-			character->StopAnimMontage();
-		}
-	}
+	//ACharacter* character = GetCharacter();
+	//if (!IgnoreMoveInput && character)
+	//{
+	//	UAbilitySystemComponent* ASC = character->FindComponentByClass<UAbilitySystemComponent>();
+	//	if (ASC && (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InCombo"))) ))//|| ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InDodge")))))
+	//	{
+	//		character->StopAnimMontage();
+	//	}
+	//}
 
 	DG_MoveInputTrigger.ExecuteIfBound(FInstancedStruct::Make(MoveInputVector));
 }
