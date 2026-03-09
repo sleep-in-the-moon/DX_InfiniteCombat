@@ -4,25 +4,20 @@
 #include "GAS/GA/GA_Jump.h"
 #include "Character/DX_ICCharacter.h"
 
-void UGA_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+
+void UGA_Jump::JumpStart()
 {
-	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
-	{
-		constexpr bool bReplicateEndAbility = true;
-		constexpr bool bWasCancelled = true;
-		EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-		return;
-	}
-	
 	if (ADX_ICCharacter* Character = Cast<ADX_ICCharacter>(GetAvatarActorFromActorInfo()))
 	{
-
+		Character->Jump();
 	}
-
-    Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void UGA_Jump::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	if (ADX_ICCharacter* Character = Cast<ADX_ICCharacter>(GetAvatarActorFromActorInfo()))
+	{
+		Character->StopJumping();
+	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

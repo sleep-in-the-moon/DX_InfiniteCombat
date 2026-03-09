@@ -58,6 +58,8 @@ public:
 
 	UFUNCTION()
 	void CharacterDied();
+	UFUNCTION()
+	void DiedEnded();
 
 private:
 	UFUNCTION(BlueprintCallable)
@@ -80,6 +82,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|Combat|Montage")
 	UAnimMontage* GetHurtMontage=nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RespawnTime = -1;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "IC|Combat|Montage")

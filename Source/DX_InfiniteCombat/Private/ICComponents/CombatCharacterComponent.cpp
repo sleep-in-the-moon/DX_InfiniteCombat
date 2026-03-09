@@ -185,3 +185,11 @@ void UCombatCharacterComponent::CharacterDied()
 
 	DG_CharacterDied.Broadcast();
 }
+
+void UCombatCharacterComponent::DiedEnded()
+{
+	if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
+	{
+		ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died"), false));
+	}
+}
