@@ -7,6 +7,7 @@
 
 
 class UGameplayEffect;
+class UGameplayAbility;
 
 /**
  * 
@@ -22,5 +23,7 @@ public:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftClassPtr<UGameplayEffect> DamageGEClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftClassPtr<UGameplayAbility> DeathGAClass;
 
 };

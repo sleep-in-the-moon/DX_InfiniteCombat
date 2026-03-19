@@ -180,7 +180,8 @@ void UCombatCharacterComponent::CharacterDied()
 
 	if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
 	{
-		ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died"), false));
+		if(const TSubclassOf<UGameplayAbility> DeathGA = UICAssetManager::GetSubclassBySoftPtr(UICDataAsset::Get().DeathGAClass))
+			ASC->TryActivateAbilityByClass(DeathGA);
 	}
 
 	DG_CharacterDied.Broadcast();
@@ -188,8 +189,5 @@ void UCombatCharacterComponent::CharacterDied()
 
 void UCombatCharacterComponent::DiedEnded()
 {
-	if (UAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UAbilitySystemComponent>())
-	{
-		ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Died"), false));
-	}
+	
 }
