@@ -7,8 +7,7 @@
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AISense_Sight.h"
 
-AICAIController::AICAIController(const FObjectInitializer& ObjectInitializer)
-	:Super(ObjectInitializer)
+AICAIController::AICAIController()
 {
 	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComp"));
 }

@@ -17,7 +17,7 @@ class DX_INFINITECOMBAT_API AICAIController : public AAIController
 	GENERATED_BODY()
 
 public:
-	AICAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AICAIController();
 
 	virtual void OnPossess(APawn* InPawn) override;
 
@@ -27,6 +27,8 @@ public:
 	void UpdateTargetKey(AActor* TargetActor);
 	UFUNCTION(BlueprintCallable, meta = (Category = "BlackboardKey"))
 	void UpdateSightKey(bool HasLineSight);
+
+	virtual FGenericTeamId GetGenericTeamId() const override { return FGenericTeamId::FGenericTeamId(TeamId); }
 
 private:
 	UFUNCTION()
@@ -39,6 +41,9 @@ protected:
 	UAIPerceptionComponent* AIPerceptionComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float LooseSightTime=7.0f;
+
+	UPROPERTY(EditAnywhere)
+	uint8 TeamId = 1;
 
 private:
 	FTimerHandle LoseSightTimer;
