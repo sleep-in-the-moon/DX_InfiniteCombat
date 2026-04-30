@@ -61,33 +61,30 @@ void ABasicInputPlayerController::StopJump()
 
 void ABasicInputPlayerController::SetupInputComponent()
 {
-	
-}
+	Super::SetupInputComponent();
 
-void ABasicInputPlayerController::BeginPlay()
-{
-	Super::BeginPlay();
-	//TODO:输入绑定时机
 	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		InputSystem->AddMappingContext(DefaultInputMapping, 0);
 		InputSystem->GetUserSettings()->RegisterInputMappingContext(DefaultInputMapping);
 	}
 
-	if (APawn* pawn = GetPawn<APawn>())
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(pawn->InputComponent))
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		if (JumpAction)
 		{
-			if (JumpAction)
-			{
-				EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABasicInputPlayerController::Jump);
-				EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ABasicInputPlayerController::StopJump);
-			}
-			if (MoveAction && LookAction)
-			{
-				EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABasicInputPlayerController::MoveEvent);
-				EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABasicInputPlayerController::LookEvent);
-			}
-			
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABasicInputPlayerController::Jump);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ABasicInputPlayerController::StopJump);
 		}
+		if (MoveAction && LookAction)
+		{
+			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABasicInputPlayerController::MoveEvent);
+			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABasicInputPlayerController::LookEvent);
+		}
+	}
+}
 
+void ABasicInputPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
 }
