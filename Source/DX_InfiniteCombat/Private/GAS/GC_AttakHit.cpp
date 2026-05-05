@@ -48,7 +48,7 @@ bool UGC_AttakHit::OnExecute_Implementation(AActor* MyTarget, const FGameplayCue
 	//EffectContext->GetAttackInfo().GetFinalDamage();
 
 	if(HitSound)
-		UGameplayStatics::PlaySoundAtLocation(MyTarget->GetWorld(), HitSound, MyTarget->GetActorLocation(), MyTarget->GetActorRotation(), 3.0f);
+		UGameplayStatics::PlaySoundAtLocation(MyTarget->GetWorld(), HitSound, MyTarget->GetActorLocation(), MyTarget->GetActorRotation(), 1.0f);
 
 	float ForwardDot = FVector::DotProduct(MyTarget->GetActorForwardVector(), Parameters.EffectContext.GetHitResult()->Normal);
 	float RightDot = FVector::DotProduct(MyTarget->GetActorRightVector(), Parameters.EffectContext.GetHitResult()->Normal);

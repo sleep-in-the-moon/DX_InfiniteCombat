@@ -54,4 +54,8 @@ private:
 	void LerpActorRotInter(float Alpha);
 	UFUNCTION()
 	void LerpActorRotFinish();
+
+private:
+	UPROPERTY()
+	UCurveFloat* LerpCurve;
 };

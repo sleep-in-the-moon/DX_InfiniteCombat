@@ -49,7 +49,5 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void MoveEvent(const FInputActionValue& InputValue) override;
-	virtual void Jump() override;
-	//virtual void StopJump() override;
 
 };

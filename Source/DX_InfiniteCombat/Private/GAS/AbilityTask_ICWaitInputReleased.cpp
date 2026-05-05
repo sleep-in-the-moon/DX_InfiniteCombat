@@ -62,7 +62,7 @@ void UAbilityTask_ICWaitInputReleased::OnDestroy(bool bInOwnerFinished)
 UAbilityTask_ICWaitInputReleased* UAbilityTask_ICWaitInputReleased::ICWaitInputReleased(UGameplayAbility* OwningAbility, float FixTime)
 {
 	UAbilityTask_ICWaitInputReleased* Task = NewAbilityTask<UAbilityTask_ICWaitInputReleased>(OwningAbility);
-	Task->AbilityTags = OwningAbility->AbilityTags;
+	Task->AbilityTags = OwningAbility->GetAssetTags();
 	Task->FixTime = FixTime;
 	return Task;
 }

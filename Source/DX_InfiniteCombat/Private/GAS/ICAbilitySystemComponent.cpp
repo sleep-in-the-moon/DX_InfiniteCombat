@@ -18,7 +18,7 @@ void UICAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Input
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTag(InputTag))	//AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag)??
+			if (AbilitySpec.Ability && AbilitySpec.Ability->GetAssetTags().HasTag(InputTag))	//AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag)??
 			{
 				//TryActivateAbility(AbilitySpec.Handle);
 				InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
@@ -38,7 +38,7 @@ void UICAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inpu
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTag(InputTag))
+			if (AbilitySpec.Ability && AbilitySpec.Ability->GetAssetTags().HasTag(InputTag))
 			{
 				ReleasedTag = InputTag;
 				InputReleasedSpecHandles.AddUnique(AbilitySpec.Handle);
@@ -57,7 +57,7 @@ void UICAbilitySystemComponent::AbilityInputTagClick(const FGameplayTag& InputTa
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 		{
-			if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTag(InputTag))	//AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag)??
+			if (AbilitySpec.Ability && AbilitySpec.Ability->GetAssetTags().HasTag(InputTag))	//AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag)??
 			{
 				TryActivateAbility(AbilitySpec.Handle);
 			}

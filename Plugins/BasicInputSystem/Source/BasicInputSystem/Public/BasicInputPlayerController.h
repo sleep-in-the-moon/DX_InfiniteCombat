@@ -35,8 +35,8 @@ protected:
 	virtual void MoveEvent(const FInputActionValue& InputValue);
 	void LookEvent(const FInputActionValue& InputValue);
 
-	virtual void Jump();
-	virtual void StopJump();
+	void CharacterStartJump();
+	void CharacterStopJump();
 
 	virtual void SetupInputComponent() override;
 

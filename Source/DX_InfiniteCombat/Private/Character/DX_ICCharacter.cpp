@@ -13,6 +13,7 @@
 #include "Subsystem/ICWorldSubsystem.h"
 #include "Data/ICTypes.h"
 #include "ICComponents/ICMotionWarpingComponent.h"
+#include "ICComponents/ICCharacterMovementComponent.h"
 
 
 UAbilitySystemComponent* ADX_ICCharacter::GetAbilitySystemComponent() const
@@ -59,6 +60,41 @@ void ADX_ICCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		}
 	}
 }
+
+void ADX_ICCharacter::Jump()
+{
+	Super::Jump();
+	if (ASC && !ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir"))))
+	{
+		ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir")));
+	}
+
+	UICCharacterMovementComponent* MoveComp = FindComponentByClass<UICCharacterMovementComponent>();
+	if (MoveComp && MoveComp->GetCurrentAcceleration().Length() / MoveComp->GetMaxAcceleration() > 0)
+	{
+		FTraversalCheckInput TraversalCheckInput(GetControlMoveInput(), 60.0f, 173.0f, 40.0f);
+		MoveComp->TryTraversalAction(TraversalCheckInput);
+	}
+}
+
+FVector ADX_ICCharacter::GetControlMoveInput() const
+{
+	if (ADX_ICPlayerController* ICController = Cast<ADX_ICPlayerController>(GetController()))
+	{
+		return ICController->GetMoveInput();
+	}
+
+	return FVector();
+}
+
+//void ADX_ICCharacter::StopJumping()
+//{
+//	Super::StopJumping();
+//	if (UAbilitySystemComponent* ASC = FindComponentByClass<UAbilitySystemComponent>())
+//	{
+//		ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir")));
+//	}
+//}
 
 void ADX_ICCharacter::BeginPlay()
 {

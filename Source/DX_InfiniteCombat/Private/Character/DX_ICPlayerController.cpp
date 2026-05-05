@@ -6,7 +6,6 @@
 #include "GAS/ICAbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "StructUtils/InstancedStruct.h"
-#include "ICComponents/ICCharacterMovementComponent.h"
 
 
 void ADX_ICPlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
@@ -75,34 +74,3 @@ void ADX_ICPlayerController::MoveEvent(const FInputActionValue& InputValue)
 	DG_MoveInputTrigger.ExecuteIfBound(FInstancedStruct::Make(MoveInputVector));
 }
 
-void ADX_ICPlayerController::Jump()
-{
-	Super::Jump();
-	if (ACharacter* character = GetCharacter())
-	{
-		UAbilitySystemComponent* ASC = character->FindComponentByClass<UAbilitySystemComponent>();
-		if (ASC && !ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir"))))
-		{
-			ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir")));
-		}
-
-		UICCharacterMovementComponent* MoveComp = character->FindComponentByClass<UICCharacterMovementComponent>();
-		if (MoveComp && MoveComp->GetCurrentAcceleration().Length()/ MoveComp->GetMaxAcceleration()>0)
-		{
-			FTraversalCheckInput TraversalCheckInput(GetMoveInput(), 60.0f, 173.0f, 40.0f);
-			MoveComp->TryTraversalAction(TraversalCheckInput);
-		}
-	}
-}
-
-//void ADX_ICPlayerController::StopJump()
-//{
-//	Super::StopJump();
-//	if (ACharacter* character = GetCharacter())
-//	{
-//		if (UAbilitySystemComponent* ASC = character->FindComponentByClass<UAbilitySystemComponent>())
-//		{
-//			ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.InAir")));
-//		}
-//	}
-//}

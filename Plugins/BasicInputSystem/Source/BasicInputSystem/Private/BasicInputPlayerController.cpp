@@ -41,7 +41,7 @@ void ABasicInputPlayerController::LookEvent(const FInputActionValue& InputValue)
 	}
 }
 
-void ABasicInputPlayerController::Jump()
+void ABasicInputPlayerController::CharacterStartJump()
 {
 	//TODO:优化
 	if (ACharacter* pawn = GetPawn<ACharacter>())
@@ -50,7 +50,7 @@ void ABasicInputPlayerController::Jump()
 	}
 }
 
-void ABasicInputPlayerController::StopJump()
+void ABasicInputPlayerController::CharacterStopJump()
 {
 	//TODO:优化
 	if (ACharacter* pawn = GetPawn<ACharacter>())
@@ -73,8 +73,8 @@ void ABasicInputPlayerController::SetupInputComponent()
 	{
 		if (JumpAction)
 		{
-			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABasicInputPlayerController::Jump);
-			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ABasicInputPlayerController::StopJump);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABasicInputPlayerController::CharacterStartJump);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ABasicInputPlayerController::CharacterStopJump);
 		}
 		if (MoveAction && LookAction)
 		{

@@ -24,8 +24,9 @@ void UDXCharacterExtensionComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	TimelineUtils::InitTimelineByFloatCurve(TL_LerpSpringArm, TimelineUtils::MakeFloatCurve(), TEXT("LerpSpringArmInter"), TEXT(""), this);
-	TimelineUtils::InitTimelineByFloatCurve(TL_LerpActorRot, TimelineUtils::MakeFloatCurve(), TEXT("LerpActorRotInter"), TEXT("LerpActorRotFinish"), this);
+	LerpCurve = TimelineUtils::MakeFloatCurve();
+	TimelineUtils::InitTimelineByFloatCurve(TL_LerpSpringArm, LerpCurve, TEXT("LerpSpringArmInter"), TEXT(""), this);
+	TimelineUtils::InitTimelineByFloatCurve(TL_LerpActorRot, LerpCurve, TEXT("LerpActorRotInter"), TEXT("LerpActorRotFinish"), this);
 	
 }
 

@@ -39,6 +39,12 @@ public:
 	//UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta = (ExpandEnumAsExecs = "Result"))
 	//void LerpActorToTargetRot(EExecNodePin& Result, const FRotator& TargetRot);
 
+	virtual void Jump() override;
+	//virtual void StopJumping() override;
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetControlMoveInput() const;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Landed(const FHitResult& Hit) override;
