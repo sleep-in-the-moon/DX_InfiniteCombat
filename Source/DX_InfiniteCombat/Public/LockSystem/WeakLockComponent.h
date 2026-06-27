@@ -35,6 +35,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsLockOn() const;
 
+	UFUNCTION(BlueprintCallable)
+	AActor* GetLockActor() const
+	{
+		return LockActor;
+	}
+
 private:
 	bool DoOnceTrace();
 	APlayerController* GetOwnerController();

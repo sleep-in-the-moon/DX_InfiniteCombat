@@ -15,6 +15,7 @@ class DX_INFINITECOMBAT_API USaveGameLib : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
+	//UFUNCTION(BlueprintCallable)
 	//Object override Serialize(Ar) to save the specified field
 	static TArray<uint8> SaveObject(UObject* Object, const FString& Src=FPaths::ProjectSavedDir()+TEXT("SaveGames/"));
 	UFUNCTION(BlueprintCallable)
@@ -28,7 +29,7 @@ inline TArray<uint8> USaveGameLib::SaveObject(UObject* Object, const FString& Sr
 	FObjectAndNameAsStringProxyArchive Ar(Writer, true);
 
 	Ar.ArIsSaveGame = true;
-	Ar.ArNoDelta = true;
+	Ar.ArNoDelta = true;	//非增量更新
 	Object->Serialize(Ar);
 
 	if (FFileHelper::SaveArrayToFile(Data, *Src))

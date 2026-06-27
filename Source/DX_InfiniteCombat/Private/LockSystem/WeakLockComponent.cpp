@@ -10,6 +10,7 @@
 #include "AbilitySystemComponent.h"
 #include "MotionWarpingComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "ICComponents/ExecuteComponent.h"
 
 
 // Sets default values for this component's properties
@@ -108,8 +109,17 @@ void UWeakLockComponent::Trigger()
 	if (DoOnceTrace() && LockActor)
 	{
 		bControllerFollow = true;
+
+		//锁定 UI 显示
 		if (LockActor && CombatStatesWidget.IsValid() && LockedWidget)
 			CombatStatesWidget->RegisterPersistentWidget(LockedWidgetPersistentID, FPersistentWidgetInfos(LockedWidget, LockActor));
+
+		//处决系统检测
+		UExecuteComponent* ExecuteComponent = LockActor->FindComponentByClass<UExecuteComponent>();
+		if (ExecuteComponent && ExecuteComponent->bCanBeExecuted)
+		{
+			
+		}
 
 		// 过时清除
 		GetWorld()->GetTimerManager().SetTimer(ControllerTimer, [this]() {

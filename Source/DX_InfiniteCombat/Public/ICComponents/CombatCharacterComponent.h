@@ -16,7 +16,7 @@ class UStaticMeshComponent;
 class UWeaponDataAsset;
 
 /*
-	战斗角色组件，主要包含武器装备，死亡，受击动画等逻辑
+	战斗角色组件，主要包含武器装备，死亡，受击动画配置等逻辑
 */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DX_INFINITECOMBAT_API UCombatCharacterComponent : public UActorComponent
@@ -36,8 +36,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddNewWeapon(const FGameplayTag& NewWeaponTag);
@@ -80,8 +78,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "IC|Weapon")
 	FGameplayTag InitWeaponTag;
 
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FGameplayTag, float> BodyPartDamageATKCoefficient;
+
+	//TODO::改成软引用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|Combat|Montage")
 	UAnimMontage* GetHurtMontage=nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|Combat|Montage")
+	UAnimMontage* BlockMontage = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RespawnTime = -1;

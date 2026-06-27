@@ -31,6 +31,13 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D MoveInputVector;
 
+	//可能会被 SaveGame 覆盖
+	UPROPERTY(BlueprintReadWrite)
+	float VerticalSensitivity = 1.0f;
+	//可能会被 SaveGame 覆盖
+	UPROPERTY(BlueprintReadWrite)
+	float HorizontalSensitivity = 1.0f;
+
 protected:
 	virtual void MoveEvent(const FInputActionValue& InputValue);
 	void LookEvent(const FInputActionValue& InputValue);

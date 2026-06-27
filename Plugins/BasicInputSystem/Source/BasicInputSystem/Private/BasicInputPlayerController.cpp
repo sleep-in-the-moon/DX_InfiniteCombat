@@ -36,8 +36,8 @@ void ABasicInputPlayerController::LookEvent(const FInputActionValue& InputValue)
 
 	if (APawn* pawn = GetPawn<APawn>())
 	{
-		pawn->AddControllerPitchInput(value.Y);
-		pawn->AddControllerYawInput(value.X);
+		pawn->AddControllerPitchInput(value.Y * VerticalSensitivity);
+		pawn->AddControllerYawInput(value.X * HorizontalSensitivity);
 	}
 }
 

@@ -69,6 +69,9 @@ public:
 
 	FInputComboPress DG_InputComboPress;
 
+	UPROPERTY(BlueprintAssignable)
+	FHelthChangeBPDG HelthChangeBPDG;
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS")
@@ -86,9 +89,6 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FImmunityGECallback ImmunityGECallback;
-
-	UPROPERTY(BlueprintAssignable)
-	FHelthChangeBPDG HelthChangeBPDG;
 
 private:
 	FInstancedStruct AbilityArg;

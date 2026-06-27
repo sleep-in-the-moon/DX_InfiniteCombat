@@ -17,6 +17,7 @@
 #include "GameFramework/Character.h"
 #include "Data/ICAssetManager.h"
 #include "Data/ICDataAsset.h"
+#include "Physics/PhysicalMaterialWithTags.h"
 
 
 void UAN_AttackTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
@@ -142,8 +143,23 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 			{
 				for (auto& res : HitRes)
 				{
-					if (ApplyedObjs.Contains(res.GetActor()))
+					if (ApplyedObjs.Contains(res.GetActor()))//一次通知对同一 Actor 只执行一次 TODO::多段攻击
 						continue;
+
+					//根据物理材质分部位叠加计算
+					float BodyPartDamageATKCoefficient = 1.0f;
+					UPhysicalMaterialWithTags* PhysicalMaterialWithTags = Cast<UPhysicalMaterialWithTags>(res.PhysMaterial);
+					UCombatCharacterComponent * combatCom = MeshComp->GetOwner()->FindComponentByClass<UCombatCharacterComponent>();
+					if (PhysicalMaterialWithTags && combatCom)
+					{
+						for (FGameplayTag MatTag : PhysicalMaterialWithTags->Tags.GetGameplayTagArray())
+						{
+							if (combatCom->BodyPartDamageATKCoefficient.Contains(MatTag))
+							{
+								BodyPartDamageATKCoefficient *= combatCom->BodyPartDamageATKCoefficient.FindRef(MatTag);
+							}
+						}
+					}
 
 					ApplyedObjs.AddUnique(res.GetActor());
 					if (UAbilitySystemComponent* TargetASC = res.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
@@ -151,7 +167,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 						//应用GE
 						if (const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclassBySoftPtr(UICDataAsset::Get().DamageGEClass))
 						{
-							FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(MeshComp->GetOwner(), DamageGE, res, DamageATKCoefficient);
+							FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(MeshComp->GetOwner(), DamageGE, res, DamageATKCoefficient* BodyPartDamageATKCoefficient);
 							OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
 						}
 
@@ -245,7 +261,6 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 
 		}
 	}
-
 	
 }
 
