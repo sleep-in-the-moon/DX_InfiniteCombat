@@ -67,6 +67,7 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
                     FTransform TargetTransform = FTransform((OutHit.ImpactNormal * FVector(-1, -1, 0)).ToOrientationRotator(),
                         FVector(OutHit2.Location.X, OutHit2.Location.Y, OutHit2.ImpactPoint.Z + Capsule->GetScaledCapsuleHalfHeight()));
 
+                    DrawDebugPoint(GetWorld(), OutHit2.ImpactPoint, 20, FColor::Black, false, 3);
                     DrawDebugPoint(GetWorld(), TargetTransform.GetLocation(), 20, FColor::Green, false, 3);
 
                     float Height = TargetTransform.GetLocation().Z - GetOwner()->GetActorLocation().Z;
@@ -78,7 +79,7 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
                     if (MotionWarpingComp && OwnerCharacter && ClimbMontage)
                     {
                         MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPointZ"), FVector(Capsule->GetComponentLocation().X, Capsule->GetComponentLocation().Y, OutHit2.ImpactPoint.Z));
-                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPoint"), OutHit2.ImpactPoint);
+                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPoint"), OutHit2.ImpactPoint+10);
                         //MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"),TargetTransform.GetLocation());
                         MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"), FVector(FVector2D(TargetTransform.GetLocation()), TargetTransform.GetLocation().Z+20));
 
