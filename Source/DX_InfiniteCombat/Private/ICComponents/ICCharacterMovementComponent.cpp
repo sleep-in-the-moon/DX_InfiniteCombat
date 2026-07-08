@@ -46,7 +46,7 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
             FHitResult OutHit2;
 
             if (UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, Capsule->GetScaledCapsuleRadius(), UEngineTypes::ConvertToTraceType(CollisionChannel), false
-                , TArray<AActor*>(), DebugType, OutHit2, true, FLinearColor::Blue, FLinearColor::Green, 4.0f) && IsWalkable(OutHit2))
+                , TArray<AActor*>(), DebugType, OutHit2, true, FLinearColor::Blue, FLinearColor::Green, 4.0f) && IsWalkable(OutHit2))//OutHit2::ÊÖ×¥µã
             {
                 GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("TraversalAction2 Success")));
                 UE_LOG(LogTemp, Warning, TEXT("TraversalAction2 Success"));
@@ -78,10 +78,12 @@ bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInpu
 
                     if (MotionWarpingComp && OwnerCharacter && ClimbMontage)
                     {
-                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPointZ"), FVector(Capsule->GetComponentLocation().X, Capsule->GetComponentLocation().Y, OutHit2.ImpactPoint.Z));
-                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPoint"), OutHit2.ImpactPoint+10);
-                        //MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"),TargetTransform.GetLocation());
-                        MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"), FVector(FVector2D(TargetTransform.GetLocation()), TargetTransform.GetLocation().Z+20));
+                        MotionWarpingComp->AddOrUpdateWarpTargetFromTransform(TEXT("ClimbHandPointZ"), FTransform(FRotator(0, -172, 0), FVector(Capsule->GetComponentLocation().X, Capsule->GetComponentLocation().Y, OutHit2.ImpactPoint.Z)));
+                        //MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbHandPoint"), OutHit2.ImpactPoint);
+                        //MotionWarpingComp->AddOrUpdateWarpTargetFromTransform(TEXT("ClimbHandPoint"), FTransform(GetOwner()->GetActorRotation(), OutHit2.ImpactPoint));
+                       
+                        //MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("ClimbStandPoint"), FVector(FVector2D(TargetTransform.GetLocation()), TargetTransform.GetLocation().Z+2));
+                        MotionWarpingComp->AddOrUpdateWarpTargetFromTransform(TEXT("ClimbStandPoint"), FTransform(FRotator(0, -172, 0), TargetTransform.GetLocation()));
 
                         UAnimInstance* AnimInstance = (OwnerCharacter->GetMesh()) ? OwnerCharacter->GetMesh()->GetAnimInstance() : nullptr;
                         if (AnimInstance)
