@@ -15,6 +15,7 @@ class DX_INFINITECOMBAT_API URootMotionModifier_ICSkewWarp : public URootMotionM
 	GENERATED_BODY()
 
 public:
-	virtual FTransform ProcessRootMotion(const FTransform& InRootMotion, float DeltaSeconds) override;
+	/*virtual FTransform ProcessRootMotion(const FTransform& InRootMotion, float DeltaSeconds) override;*/
+	virtual void Update(const FMotionWarpingUpdateContext& Context) override;
 	
 };

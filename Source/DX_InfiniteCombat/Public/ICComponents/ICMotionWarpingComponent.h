@@ -14,4 +14,6 @@ class DX_INFINITECOMBAT_API UICMotionWarpingComponent : public UMotionWarpingCom
 {
 	GENERATED_BODY()
 	
+public:
+	static FTransform CalculateRootTransformRelativeToWarpPointAtTime(const UMotionWarpingBaseAdapter& WarpingAdapter, const UAnimSequenceBase* Animation, float Time, const FName& WarpPointBoneName);
 };
