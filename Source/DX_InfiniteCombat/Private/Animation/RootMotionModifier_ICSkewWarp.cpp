@@ -167,7 +167,11 @@ void URootMotionModifier_ICSkewWarp::Update(const FMotionWarpingUpdateContext& C
 			}
 
 			// Update Target Transform based on the offset between the root and the warp point in the animation
-			TargetTransform = CachedOffsetFromWarpPoint.GetValue() * WarpPointTransformGame;
+			FTransform WarpPointTrans = CachedOffsetFromWarpPoint.GetValue();
+			FVector WarpPointLocRootSpace = WarpPointTrans.GetRotation().Rotator().UnrotateVector(WarpPointTrans.GetTranslation());
+			WarpPointTrans.SetTranslation(WarpPointLocRootSpace);
+
+			TargetTransform = WarpPointTrans * WarpPointTransformGame;
 		}
 
 		if (!CachedTargetTransform.Equals(TargetTransform))
