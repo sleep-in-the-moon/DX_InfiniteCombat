@@ -19,6 +19,7 @@ bool UGA_Traversal::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 
 void UGA_Traversal::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+    bool bSuccess = false;
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		constexpr bool bReplicateEndAbility = true;
@@ -108,13 +109,16 @@ void UGA_Traversal::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
                         MotionWarpingComp->AddOrUpdateWarpTargetFromTransform(TEXT("TraversalStandPoint"), FTransform(FRotator(0, -172, 0), TargetTransform.GetLocation()));
 
                         UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("TraversalMontage"), MoveComp->TraversalMontage, false);
+                       
+                        MontageTask->Activate();
                         MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_Traversal::TraversalEnd);
                         MontageTask->OnInterrupted.AddUniqueDynamic(this, &UGA_Traversal::TraversalEnd);
-                        MontageTask->Activate();
 
                         RawMovementMode = MoveComp->MovementMode;
                         RawCustomMovementMode = MoveComp->CustomMovementMode;
                         MoveComp->SetMovementMode(EMovementMode::MOVE_Custom, static_cast<uint8>(ECusMovementMode::MOVE_Traversal));
+
+                        bSuccess = true;
                     }
 
                 }
@@ -122,8 +126,14 @@ void UGA_Traversal::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
         }
     }
 
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	//Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+    if (!bSuccess)
+    {
+        EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+        return;
+    }
 }
+        
 
 void UGA_Traversal::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
