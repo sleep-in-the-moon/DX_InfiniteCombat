@@ -70,10 +70,13 @@ void ADX_ICCharacter::Jump()
 	}
 
 	UICCharacterMovementComponent* MoveComp = FindComponentByClass<UICCharacterMovementComponent>();
-	if (MoveComp && MoveComp->GetCurrentAcceleration().Length() / MoveComp->GetMaxAcceleration() > 0)
+	if (MoveComp && ASC/* && MoveComp->GetCurrentAcceleration().Length() / MoveComp->GetMaxAcceleration() > 0*/)
 	{
 		FTraversalCheckInput TraversalCheckInput(GetControlMoveInput(), 60.0f, 173.0f, 40.0f);
-		MoveComp->TryTraversalAction(TraversalCheckInput);
+		//MoveComp->TryTraversalAction(TraversalCheckInput);
+		MoveComp->TraversalCheckInput = TraversalCheckInput;
+
+		ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(TEXT("Ability.Action.Traversal"), false)));
 	}
 }
 

@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "IC Skew Warp"))
 class DX_INFINITECOMBAT_API URootMotionModifier_ICSkewWarp : public URootMotionModifier_SkewWarp
 {
 	GENERATED_BODY()

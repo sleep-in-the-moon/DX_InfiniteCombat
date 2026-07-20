@@ -22,6 +22,13 @@ public:
 	float MinLedgeHeight=0.0f;
 };
 
+UENUM(BlueprintType)
+enum class ECusMovementMode : uint8
+{
+	MOVE_Traversal UMETA(DisplayName = "Traversal"),
+	MOVE_Climb UMETA(DisplayName = "Climb")
+};
+
 /**
  * 
  */
@@ -30,19 +37,26 @@ class DX_INFINITECOMBAT_API UICCharacterMovementComponent : public UCharacterMov
 {
 	GENERATED_BODY()
 	
-protected:
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "Traversal")
-	UAnimMontage* ClimbMontage=nullptr;
+	UAnimMontage* TraversalMontage = nullptr;
 
 public:
-	bool TryTraversalAction(const FTraversalCheckInput& CheckInput);
+	//bool TryTraversalAction(const FTraversalCheckInput& CheckInput);
+
+protected:
+	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
 
 private:
-	FOnMontageEnded MontageEndedDelegate;
+	/*UFUNCTION()
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);*/
 
-	EMovementMode TempMode;
+public:
+	FTraversalCheckInput TraversalCheckInput;
 
-	UFUNCTION()
-	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+private:
+	/*FOnMontageEnded MontageEndedDelegate;
+
+	EMovementMode TempMode;*/
 
 };
