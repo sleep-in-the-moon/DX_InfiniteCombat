@@ -24,7 +24,7 @@ void UGA_Block::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		return;
 	}
 
-	UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockMontage"), CombatComp->BlockMontage, false);
+	UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockMontage"), CombatComp->BlockMontage);
 	MontageTask->Activate();
 
 	UAbilityTask_ICWaitInputReleased* InputReleasedTask = UAbilityTask_ICWaitInputReleased::ICWaitInputReleased(this);
