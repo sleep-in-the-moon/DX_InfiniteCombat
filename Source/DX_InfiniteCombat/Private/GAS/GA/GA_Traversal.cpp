@@ -108,11 +108,11 @@ void UGA_Traversal::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
                         //MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("TraversalStandPoint"), FVector(FVector2D(TargetTransform.GetLocation()), TargetTransform.GetLocation().Z+2));
                         MotionWarpingComp->AddOrUpdateWarpTargetFromTransform(TEXT("TraversalStandPoint"), FTransform(FRotator(0, -172, 0), TargetTransform.GetLocation()));
 
-                        UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("TraversalMontage"), MoveComp->TraversalMontage, false);
+                        UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("TraversalMontage"), MoveComp->TraversalMontage);
                        
-                        MontageTask->Activate();
                         MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_Traversal::TraversalEnd);
-                        MontageTask->OnInterrupted.AddUniqueDynamic(this, &UGA_Traversal::TraversalEnd);
+                        //MontageTask->OnInterrupted.AddUniqueDynamic(this, &UGA_Traversal::TraversalEnd);
+                        MontageTask->Activate();
 
                         RawMovementMode = MoveComp->MovementMode;
                         RawCustomMovementMode = MoveComp->CustomMovementMode;

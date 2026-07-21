@@ -7,7 +7,7 @@
 #include "RootMotionModifier_ICSkewWarp.generated.h"
 
 /**
- * 
+ * 修复了原 SkewWarp 骨骼 Provider 位置异常的 bug
  */
 UCLASS(meta = (DisplayName = "IC Skew Warp"))
 class DX_INFINITECOMBAT_API URootMotionModifier_ICSkewWarp : public URootMotionModifier_SkewWarp
