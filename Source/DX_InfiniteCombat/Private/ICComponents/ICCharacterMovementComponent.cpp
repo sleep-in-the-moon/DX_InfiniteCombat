@@ -122,6 +122,15 @@ void UICCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
     Super::PhysCustom(deltaTime, Iterations);
 }
 
+void UICCharacterMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
+{
+    if (deltaTime < MIN_TICK_TIME)
+    {
+        return;
+    }
+
+}
+
 //void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 //{
 //    SetMovementMode(TempMode);

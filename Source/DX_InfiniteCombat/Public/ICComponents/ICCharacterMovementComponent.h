@@ -46,6 +46,7 @@ public:
 
 protected:
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
+	void PhysClimb(float deltaTime, int32 Iterations);
 
 private:
 	/*UFUNCTION()
