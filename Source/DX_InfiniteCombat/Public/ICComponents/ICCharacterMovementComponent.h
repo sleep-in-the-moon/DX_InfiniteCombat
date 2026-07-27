@@ -29,6 +29,20 @@ enum class ECusMovementMode : uint8
 	MOVE_Climb UMETA(DisplayName = "Climb")
 };
 
+USTRUCT(BlueprintType)
+struct FClimbSurfaceInfo 
+{
+	GENERATED_BODY()
+
+	//多个 Probe 结果的平均法线
+	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
+	FVector SurfaceNormal;
+	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
+	FVector SurfacePoint;
+	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
+	FHitResult HitResult;
+};
+
 /**
  * 
  */
@@ -46,7 +60,7 @@ public:
 
 protected:
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
-	void PhysClimb(float deltaTime, int32 Iterations);
+	void PhysClimbing(float deltaTime, int32 Iterations);
 
 private:
 	/*UFUNCTION()

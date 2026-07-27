@@ -116,19 +116,38 @@ void UICCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
         PhysFlying(deltaTime, Iterations);
         break;
     case static_cast<uint8>(ECusMovementMode::MOVE_Climb):
+        PhysClimbing(deltaTime, Iterations);
         break;
     }
 
     Super::PhysCustom(deltaTime, Iterations);
 }
 
-void UICCharacterMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
+void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iterations)
 {
     if (deltaTime < MIN_TICK_TIME)
     {
         return;
     }
 
+    if (!UpdatedComponent->IsQueryCollisionEnabled())
+    {
+        SetMovementMode(MOVE_Custom, static_cast<uint8>(ECusMovementMode::MOVE_Climb));
+        return;
+    }
+
+    //bJustTeleported = false;
+    float remainingTime = deltaTime;
+    while ((remainingTime >= MIN_TICK_TIME) && (Iterations < MaxSimulationIterations) && CharacterOwner && (CharacterOwner->Controller || bRunPhysicsWithNoController 
+        || HasAnimRootMotion() || CurrentRootMotion.HasOverrideVelocity() || (CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy)))
+    {
+        ++Iterations;
+        //bJustTeleported = false;
+        float TimeStep = GetSimulationTimeStep(remainingTime, Iterations);
+        remainingTime -= TimeStep;
+
+
+    }
 }
 
 //void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
