@@ -40,7 +40,10 @@ struct FClimbSurfaceInfo
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
 	FVector SurfacePoint;
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
-	FHitResult HitResult;
+	FHitResult PrimaryHitResult;
+	//沿法线方向到表面距离
+	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
+	float NormalDistance=0.0f;
 };
 
 /**
@@ -61,6 +64,8 @@ public:
 protected:
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
 	void PhysClimbing(float deltaTime, int32 Iterations);
+
+	virtual bool FindClimbSurface(FClimbSurfaceInfo& OutSurface);
 
 private:
 	/*UFUNCTION()

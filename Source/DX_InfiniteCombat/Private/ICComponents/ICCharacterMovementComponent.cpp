@@ -146,8 +146,22 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         float TimeStep = GetSimulationTimeStep(remainingTime, Iterations);
         remainingTime -= TimeStep;
 
+        FClimbSurfaceInfo ClimbSurface;
+        if (!FindClimbSurface(ClimbSurface))
+        {
+            SetMovementMode(MOVE_Falling);
+            StartNewPhysics(remainingTime + TimeStep, Iterations-1);
+            return;
+        }
+        //UpdateClimbSurface(ClimbSurface);
+
 
     }
+}
+
+bool UICCharacterMovementComponent::FindClimbSurface(FClimbSurfaceInfo& OutSurface)
+{
+    return false;
 }
 
 //void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
