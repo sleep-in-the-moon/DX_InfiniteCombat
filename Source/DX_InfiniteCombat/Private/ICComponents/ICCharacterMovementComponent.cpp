@@ -108,6 +108,11 @@
 //    return false;
 //}
 
+UICCharacterMovementComponent::UICCharacterMovementComponent()
+{
+    ClimbBrakingDeceleration = MaxAcceleration;
+}
+
 void UICCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
 {
     switch (CustomMovementMode)
@@ -146,7 +151,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         float TimeStep = GetSimulationTimeStep(remainingTime, Iterations);
         remainingTime -= TimeStep;
 
-        FClimbSurfaceInfo ClimbSurface;
+        //FClimbSurfaceInfo ClimbSurface;
         if (!FindClimbSurface(ClimbSurface))
         {
             SetMovementMode(MOVE_Falling);
@@ -155,13 +160,59 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         }
         //UpdateClimbSurface(ClimbSurface);
 
+        const FVector OldLocation = UpdatedComponent->GetComponentLocation();
 
+        //将上一次模拟时叠加的叠加型 RootMotion 清除，避免重复叠加
+        RestorePreAdditiveRootMotionVelocity();
+
+        UpdateClimbingAcceleration();
+
+        if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
+        {
+            CalcVelocity(TimeStep, ClimbFriction, false, ClimbBrakingDeceleration);
+        }
+
+        //应用 RootMotion，动画 RootMotion 或 非动画 RootMotion: 覆盖型和叠加型
+        ApplyRootMotionToVelocity(TimeStep);
+
+        if (CustomMovementMode != static_cast<uint8>(ECusMovementMode::MOVE_Climb))
+        {
+            StartNewPhysics(remainingTime + TimeStep, Iterations - 1);
+            return;
+        }
+
+        const FVector ClimbVelocity = Velocity;
+        ClimbAlongSurface(ClimbVelocity, TimeStep);
+        
     }
 }
 
 bool UICCharacterMovementComponent::FindClimbSurface(FClimbSurfaceInfo& OutSurface)
 {
     return false;
+}
+
+void UICCharacterMovementComponent::UpdateClimbingAcceleration()
+{
+}
+
+FVector UICCharacterMovementComponent::ComputeAttachVelocity(const FClimbSurfaceInfo& InSurface)
+{
+    return FVector();
+}
+
+void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds)
+{
+    if (!ClimbSurface.IsClimbableSurface)
+        return;
+
+    // 速度位于墙面切平面
+    FVector MoveDelta = FVector::VectorPlaneProject(InVelocity, ClimbSurface.SurfaceNormal);
+    const FVector AttachVelocity = ComputeAttachVelocity(ClimbSurface);
+
+    MoveDelta = (InVelocity + AttachVelocity) * DeltaSeconds;
+
+
 }
 
 //void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

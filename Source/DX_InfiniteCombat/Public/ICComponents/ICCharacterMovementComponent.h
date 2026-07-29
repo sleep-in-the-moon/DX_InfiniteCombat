@@ -34,6 +34,8 @@ struct FClimbSurfaceInfo
 {
 	GENERATED_BODY()
 
+	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
+	bool IsClimbableSurface = false;
 	//多个 Probe 结果的平均法线
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
 	FVector SurfaceNormal;
@@ -55,8 +57,7 @@ class DX_INFINITECOMBAT_API UICCharacterMovementComponent : public UCharacterMov
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "Traversal")
-	UAnimMontage* TraversalMontage = nullptr;
+	UICCharacterMovementComponent();
 
 public:
 	//bool TryTraversalAction(const FTraversalCheckInput& CheckInput);
@@ -67,12 +68,31 @@ protected:
 
 	virtual bool FindClimbSurface(FClimbSurfaceInfo& OutSurface);
 
+	void UpdateClimbingAcceleration();
+
+	FVector ComputeAttachVelocity(const FClimbSurfaceInfo& InSurface);
+
+	void ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds);
+
 private:
 	/*UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);*/
 
 public:
+	UPROPERTY(EditDefaultsOnly, Category = "Traversal")
+	UAnimMontage* TraversalMontage = nullptr;
+
 	FTraversalCheckInput TraversalCheckInput;
+
+protected:
+	FClimbSurfaceInfo ClimbSurface;
+
+	//摩擦力
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
+	float ClimbFriction = 8.0f;
+	//制动减速
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
+	float ClimbBrakingDeceleration;
 
 private:
 	/*FOnMontageEnded MontageEndedDelegate;
