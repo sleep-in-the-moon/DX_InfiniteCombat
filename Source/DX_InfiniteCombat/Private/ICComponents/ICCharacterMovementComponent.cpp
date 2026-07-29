@@ -208,11 +208,28 @@ void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity,
 
     // 速度位于墙面切平面
     FVector MoveDelta = FVector::VectorPlaneProject(InVelocity, ClimbSurface.SurfaceNormal);
-    const FVector AttachVelocity = ComputeAttachVelocity(ClimbSurface);
 
+    const FVector AttachVelocity = ComputeAttachVelocity(ClimbSurface);
     MoveDelta = (InVelocity + AttachVelocity) * DeltaSeconds;
 
+    FHitResult Hit(1.f);
+    SafeMoveUpdatedComponent(MoveDelta, UpdatedComponent->GetComponentQuat(), true, Hit);
+    float LastMoveTimeSlice = DeltaSeconds;
 
+    if (Hit.bStartPenetrating)
+    {
+        HandleImpact(Hit);
+        SlideAlongSurface(MoveDelta, 1.f, Hit.Normal, Hit, true);
+
+        if (Hit.bStartPenetrating)
+        {
+            OnCharacterStuckInGeometry(&Hit);
+        }
+    }
+    else if (Hit.IsValidBlockingHit())
+    {
+
+    }
 }
 
 //void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
