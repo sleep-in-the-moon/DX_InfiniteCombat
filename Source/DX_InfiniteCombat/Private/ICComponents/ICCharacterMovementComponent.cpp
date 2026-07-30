@@ -10,6 +10,7 @@
 #include "MotionWarpingComponent.h"
 #include "GameFramework/Character.h"
 
+
 //bool UICCharacterMovementComponent::TryTraversalAction(const FTraversalCheckInput& CheckInput)
 //{
 //    if (UCapsuleComponent* Capsule = GetOwner()->FindComponentByClass<UCapsuleComponent>())
@@ -234,7 +235,9 @@ FVector UICCharacterMovementComponent::ComputeAttachVelocity(const FClimbSurface
 
     ClimbSurface.NormalDistance = FVector::DotProduct(CurLocation - ClimbSurface.SurfacePoint, ClimbSurface.SurfaceNormal);
 
-    return FVector();
+    const float CalibrateDist = ClimbSurface.NormalDistance - (CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleRadius() + WallGap);
+
+    return -ClimbSurface.SurfaceNormal * (CalibrateDist*AttachStrength);
 }
 
 void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds, float InRemainingTime, int32 InIterations)
