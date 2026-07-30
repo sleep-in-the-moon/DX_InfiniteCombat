@@ -43,7 +43,7 @@ struct FClimbSurfaceInfo
 	FVector SurfacePoint;
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
 	FHitResult PrimaryHitResult;
-	//沿法线方向到表面距离
+	//沿表面法线反方向到表面距离
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
 	float NormalDistance=0.0f;
 };
@@ -61,6 +61,7 @@ public:
 
 public:
 	//bool TryTraversalAction(const FTraversalCheckInput& CheckInput);
+	bool IsClimbing() const;
 
 protected:
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
@@ -72,7 +73,9 @@ protected:
 
 	FVector ComputeAttachVelocity(const FClimbSurfaceInfo& InSurface);
 
-	void ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds);
+	void ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds, float InRemainingTime, int32 InIterations);
+
+	FQuat ComputeClimbingRotation(float DeltaTime) const;
 
 private:
 	/*UFUNCTION()

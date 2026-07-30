@@ -113,6 +113,11 @@ UICCharacterMovementComponent::UICCharacterMovementComponent()
     ClimbBrakingDeceleration = MaxAcceleration;
 }
 
+bool UICCharacterMovementComponent::IsClimbing() const
+{
+    return (MovementMode == MOVE_Custom) && (CustomMovementMode == static_cast<uint8>(ECusMovementMode::MOVE_Climb)) && UpdatedComponent;
+}
+
 void UICCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
 {
     switch (CustomMovementMode)
@@ -141,7 +146,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         return;
     }
 
-    //bJustTeleported = false;
+    bJustTeleported = false;
     float remainingTime = deltaTime;
     while ((remainingTime >= MIN_TICK_TIME) && (Iterations < MaxSimulationIterations) && CharacterOwner && (CharacterOwner->Controller || bRunPhysicsWithNoController 
         || HasAnimRootMotion() || CurrentRootMotion.HasOverrideVelocity() || (CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy)))
@@ -175,15 +180,36 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         //应用 RootMotion，动画 RootMotion 或 非动画 RootMotion: 覆盖型和叠加型
         ApplyRootMotionToVelocity(TimeStep);
 
-        if (CustomMovementMode != static_cast<uint8>(ECusMovementMode::MOVE_Climb))
+        if (!IsClimbing())
         {
             StartNewPhysics(remainingTime + TimeStep, Iterations - 1);
             return;
         }
 
         const FVector ClimbVelocity = Velocity;
-        ClimbAlongSurface(ClimbVelocity, TimeStep);
+        ClimbAlongSurface(ClimbVelocity, TimeStep, remainingTime, Iterations);
         
+        if (IsClimbing())
+        {
+            if (!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() && TimeStep >= MIN_TICK_TIME)
+            {
+                Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / TimeStep;
+                // 不把吸附修正积累为下一步的法线速度。
+                Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
+            }
+        }
+
+        // If we didn't move at all this iteration then abort (since future iterations will also be stuck).
+        if (UpdatedComponent->GetComponentLocation() == OldLocation)
+        {
+            remainingTime = 0.f;
+            break;
+        }
+    }
+
+    if (IsClimbing())
+    {
+        Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
     }
 }
 
@@ -194,14 +220,24 @@ bool UICCharacterMovementComponent::FindClimbSurface(FClimbSurfaceInfo& OutSurfa
 
 void UICCharacterMovementComponent::UpdateClimbingAcceleration()
 {
+    /*if (!ClimbSurface.IsClimbableSurface)
+        return;*/
+
+    Acceleration = FVector::VectorPlaneProject(Acceleration, ClimbSurface.SurfaceNormal);
+
+    Acceleration = Acceleration.GetClampedToMaxSize(GetMaxAcceleration());
 }
 
 FVector UICCharacterMovementComponent::ComputeAttachVelocity(const FClimbSurfaceInfo& InSurface)
 {
+    const FVector CurLocation = UpdatedComponent->GetComponentLocation();
+
+    ClimbSurface.NormalDistance = FVector::DotProduct(CurLocation - ClimbSurface.SurfacePoint, ClimbSurface.SurfaceNormal);
+
     return FVector();
 }
 
-void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds)
+void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds, float InRemainingTime, int32 InIterations)
 {
     if (!ClimbSurface.IsClimbableSurface)
         return;
@@ -213,7 +249,7 @@ void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity,
     MoveDelta = (InVelocity + AttachVelocity) * DeltaSeconds;
 
     FHitResult Hit(1.f);
-    SafeMoveUpdatedComponent(MoveDelta, UpdatedComponent->GetComponentQuat(), true, Hit);
+    SafeMoveUpdatedComponent(MoveDelta, ComputeClimbingRotation(DeltaSeconds), true, Hit);
     float LastMoveTimeSlice = DeltaSeconds;
 
     if (Hit.bStartPenetrating)
@@ -228,8 +264,25 @@ void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity,
     }
     else if (Hit.IsValidBlockingHit())
     {
+        HandleImpact(Hit, DeltaSeconds, MoveDelta);
 
+        // HandleImpact 中的事件可能修改移动模式。
+        if (!IsClimbing())
+        {
+            const float UnusedTime = DeltaSeconds * (1.0f - Hit.Time);
+            InRemainingTime += UnusedTime;
+
+            StartNewPhysics(InRemainingTime, InIterations);
+            return;
+        }
+
+        SlideAlongSurface(MoveDelta, 1.0f - Hit.Time, Hit.Normal, Hit, true);
     }
+}
+
+FQuat UICCharacterMovementComponent::ComputeClimbingRotation(float DeltaTime) const
+{
+    return FQuat();
 }
 
 //void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
