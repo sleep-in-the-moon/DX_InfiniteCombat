@@ -208,14 +208,32 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         }
     }
 
-    if (IsClimbing())
+    /*if (IsClimbing())
     {
         Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
-    }
+    }*/
 }
 
 bool UICCharacterMovementComponent::FindClimbSurface(FClimbSurfaceInfo& OutSurface)
 {
+    if (!CharacterOwner || !UpdatedComponent || !GetWorld())
+    {
+        return false;
+    }
+    const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+    if (!Capsule)
+    {
+        return false;
+    }
+    OutSurface = FClimbSurfaceInfo{};
+
+    FVector CapsulCenter = Capsule->GetComponentLocation();
+    float CpasuleRadius = 0.0f;
+    float CpasuleHalfHeight = 0.0f;
+    Capsule->GetScaledCapsuleSize(CpasuleRadius, CpasuleHalfHeight);
+
+    
+
     return false;
 }
 
@@ -285,7 +303,32 @@ void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity,
 
 FQuat UICCharacterMovementComponent::ComputeClimbingRotation(float DeltaTime) const
 {
-    return FQuat();
+    const FQuat CurrentQuat = UpdatedComponent->GetComponentQuat();
+
+    if (ClimbSurface.SurfaceNormal.IsNearlyZero())
+    {
+        return CurrentQuat;
+    }
+
+    // 将墙面法线的 重力反方向分量 剔除，会使角色保持竖直，不会贴合墙面的 pitch
+   /* FVector DesiredForward = FVector::VectorPlaneProject(-ClimbSurface.SurfaceNormal, -GetGravityDirection());
+    if (!DesiredForward.Normalize())
+    {
+        return CurrentRotation;
+    }
+    FQuat TargetQuat = FRotationMatrix::MakeFromXZ(DesiredForward,  - GetGravityDirection()).ToQuat();*/
+
+    // 将 重力反方向 投影到墙面，得到墙面的上方向，会使角色的 pitch 也贴合墙面
+    FVector DesiredUp = FVector::VectorPlaneProject(-GetGravityDirection(), ClimbSurface.SurfaceNormal);
+    if (!DesiredUp.Normalize())
+    {
+        return CurrentQuat;
+    }
+    FQuat TargetQuat = FRotationMatrix::MakeFromXZ(-ClimbSurface.SurfaceNormal, DesiredUp).ToQuat();
+
+    const float Alpha = 1.0f - FMath::Exp(-ClimbRotationSpeed * DeltaTime);
+
+    return FQuat::Slerp(CurrentQuat, TargetQuat, Alpha).GetNormalized();
 }
 
 //void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

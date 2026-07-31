@@ -101,6 +101,8 @@ protected:
 	float WallGap = 7.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
 	float AttachStrength = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
+	float ClimbRotationSpeed = 1.0f;
 
 private:
 	/*FOnMontageEnded MontageEndedDelegate;
