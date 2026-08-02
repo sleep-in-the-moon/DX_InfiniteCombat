@@ -50,6 +50,10 @@ public:
 private:
 	void LerpToControlRotFinish();
 
+public:
+	UPROPERTY(BlueprintReadWrite)
+	bool bCanLuanch = false;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bow|Arrow")
 	int32 ArrowCount = 20;

@@ -72,8 +72,10 @@ bool UBowComponent::TrySetupArrow()
 bool UBowComponent::TryLaunchArrow(float ChargeTime)
 {
 	UCameraComponent* Camera = GetOwner()->FindComponentByClass<UCameraComponent>();
-	if (ChargeTime > 0.7f && CurHoldingArrow && Camera)
+	//if (ChargeTime > 0.7f && CurHoldingArrow && Camera)
+	if (bCanLuanch && CurHoldingArrow && Camera)
 	{
+		bCanLuanch = false;
 		CurHoldingArrow->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
 		FVector LaunchVelocity = Camera->GetForwardVector();
