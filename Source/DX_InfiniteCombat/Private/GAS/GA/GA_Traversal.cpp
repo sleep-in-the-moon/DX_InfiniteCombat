@@ -49,12 +49,15 @@ void UGA_Traversal::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
         FCollisionQueryParams Params = UDX_StaticFunlib::MakeCollisionQueryParam(AvatarActor, TArray<AActor*>(), TEXT("TraversalAction1"));
 
         EDrawDebugTrace::Type DebugType = EDrawDebugTrace::Type::None;
+
+#if WITH_EDITOR
         UICWorldSubsystem* ICSubSystem = UWorld::GetSubsystem<UICWorldSubsystem>(GetWorld());
         if (ICSubSystem && ICSubSystem->GetShowDebug())
         {
             DebugType = EDrawDebugTrace::Type::ForDuration;
             DrawDebugCapsuleTraceSingle(AvatarActor->GetWorld(), Start, End, Capsule->GetScaledCapsuleRadius(), Capsule->GetScaledCapsuleHalfHeight(), DebugType, false, OutHit, FLinearColor::Blue, FLinearColor::Green, 4.0f);
         }
+#endif
 
         if (CollisionChannel != ECollisionChannel::ECC_MAX &&
             GetWorld()->SweepSingleByChannel(OutHit, Start, End, FQuat::Identity, CollisionChannel, FCollisionShape::MakeCapsule(Capsule->GetScaledCapsuleRadius(), Capsule->GetScaledCapsuleHalfHeight()), Params)

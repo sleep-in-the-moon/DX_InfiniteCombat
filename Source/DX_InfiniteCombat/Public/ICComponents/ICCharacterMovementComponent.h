@@ -48,6 +48,13 @@ struct FClimbSurfaceInfo
 	float NormalDistance=0.0f;
 };
 
+UENUM(BlueprintType)
+enum class EClimbProbeLocType: uint8
+{
+	Bone,
+	ZOffset
+};
+
 /**
  * 
  */
@@ -67,7 +74,7 @@ protected:
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
 	void PhysClimbing(float deltaTime, int32 Iterations);
 
-	virtual bool FindClimbSurface(FClimbSurfaceInfo& OutSurface);
+	virtual bool FindAndUpdateClimbSurface();
 
 	void UpdateClimbingAcceleration();
 
@@ -76,6 +83,10 @@ protected:
 	void ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds, float InRemainingTime, int32 InIterations);
 
 	FQuat ComputeClimbingRotation(float DeltaTime) const;
+
+	bool CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection);
+
+	virtual TArray<FVector> GetProbeLocations() const;
 
 private:
 	/*UFUNCTION()
@@ -103,6 +114,21 @@ protected:
 	float AttachStrength = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
 	float ClimbRotationSpeed = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
+	float ClimbProbeRadius=50.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
+	EClimbProbeLocType ClimbProbeLocType;
+	//用于 Climb 物理查询的骨骼名称
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing", meta = (EditCondition = "ClimbProbeLocType==EClimbProbeLocType::Bone"))
+	TArray<FName> ClimbProbeBoneNames;
+	//相对于胶囊体中心的 z 偏移量
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing", meta = (EditCondition = "ClimbProbeLocType==EClimbProbeLocType::Offset"))
+	TArray<float> ClimbProbeZOffsets;
+	UPROPERTY(EditDefaultsOnly, Category = "Climbing")
+	TEnumAsByte<ECollisionChannel> ClimbTraceChannel = ECC_GameTraceChannel2;
+	UPROPERTY(EditDefaultsOnly, Category = "Climbing")
+	float ClimbProbeDistance = 200.0f;
 
 private:
 	/*FOnMontageEnded MontageEndedDelegate;

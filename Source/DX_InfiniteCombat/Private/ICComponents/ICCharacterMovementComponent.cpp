@@ -116,7 +116,7 @@ UICCharacterMovementComponent::UICCharacterMovementComponent()
 
 bool UICCharacterMovementComponent::IsClimbing() const
 {
-    return (MovementMode == MOVE_Custom) && (CustomMovementMode == static_cast<uint8>(ECusMovementMode::MOVE_Climb)) && UpdatedComponent;
+    return ClimbSurface.IsClimbableSurface && (MovementMode == MOVE_Custom) && (CustomMovementMode == static_cast<uint8>(ECusMovementMode::MOVE_Climb)) && UpdatedComponent;
 }
 
 void UICCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
@@ -157,14 +157,12 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         float TimeStep = GetSimulationTimeStep(remainingTime, Iterations);
         remainingTime -= TimeStep;
 
-        //FClimbSurfaceInfo ClimbSurface;
-        if (!FindClimbSurface(ClimbSurface))
+        if (!FindAndUpdateClimbSurface())//TODO::Find ºÍ Mode Âß¼­·Ö¿ª
         {
             SetMovementMode(MOVE_Falling);
             StartNewPhysics(remainingTime + TimeStep, Iterations-1);
             return;
         }
-        //UpdateClimbSurface(ClimbSurface);
 
         const FVector OldLocation = UpdatedComponent->GetComponentLocation();
 
@@ -214,7 +212,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
     }*/
 }
 
-bool UICCharacterMovementComponent::FindClimbSurface(FClimbSurfaceInfo& OutSurface)
+bool UICCharacterMovementComponent::FindAndUpdateClimbSurface()
 {
     if (!CharacterOwner || !UpdatedComponent || !GetWorld())
     {
@@ -225,14 +223,55 @@ bool UICCharacterMovementComponent::FindClimbSurface(FClimbSurfaceInfo& OutSurfa
     {
         return false;
     }
-    OutSurface = FClimbSurfaceInfo{};
 
+    //FClimbSurfaceInfo ClimbSurfaceCp = ClimbSurface;
     FVector CapsulCenter = Capsule->GetComponentLocation();
     float CpasuleRadius = 0.0f;
     float CpasuleHalfHeight = 0.0f;
     Capsule->GetScaledCapsuleSize(CpasuleRadius, CpasuleHalfHeight);
 
+    const TArray<FVector> ProbeLocs = GetProbeLocations();
+    if (ProbeLocs.Num() < 1)
+        return false;
+
+    FVector TraceDirection;
+    if (IsClimbing() && !ClimbSurface.SurfaceNormal.IsNearlyZero())
+    {
+        TraceDirection = -ClimbSurface.SurfaceNormal;
+    }
+    else
+    {
+        TraceDirection = FVector::VectorPlaneProject(UpdatedComponent->GetForwardVector(), -GetGravityDirection());
+    }
+    TraceDirection = TraceDirection.GetSafeNormal();
+    if (TraceDirection.IsNearlyZero())
+    {
+        return false;
+    }
     
+    for (const FVector& ProbeLoc : ProbeLocs)
+    {
+        FCollisionQueryParams QueryParam(SCENE_QUERY_STAT(FindClimbSurface), false, CharacterOwner);
+        const FCollisionShape ProbeShape = FCollisionShape::MakeSphere(ClimbProbeRadius);
+        FVector EndLoc = ProbeLoc + TraceDirection* ClimbProbeDistance;
+        FHitResult HitRes;
+
+#if WITH_EDITOR
+        UICWorldSubsystem* ICSubSystem = UWorld::GetSubsystem<UICWorldSubsystem>(GetWorld());
+        if (ICSubSystem && ICSubSystem->GetShowDebug())
+        {
+            DrawDebugSphereTraceSingle(GetWorld(), ProbeLoc, EndLoc, ClimbProbeRadius, EDrawDebugTrace::Type::ForDuration, false, HitRes, FLinearColor::Blue, FLinearColor::Green, 4.0f);
+        }
+#endif
+        const bool bHit = GetWorld()->SweepSingleByChannel(HitRes, ProbeLoc, EndLoc, FQuat::Identity, ClimbTraceChannel, ProbeShape, QueryParam);
+        if (!bHit || !CheckClimableByHit(HitRes, TraceDirection, -GetGravityDirection()))
+            continue;
+
+        //ClimbSurface.PrimaryHitResult = HitRes;
+        HitRes.ImpactNormal.GetSafeNormal();
+    }
+    //DrawDebugString();
+    //DrawDebugDirectionalArrow();
 
     return false;
 }
@@ -329,6 +368,45 @@ FQuat UICCharacterMovementComponent::ComputeClimbingRotation(float DeltaTime) co
     const float Alpha = 1.0f - FMath::Exp(-ClimbRotationSpeed * DeltaTime);
 
     return FQuat::Slerp(CurrentQuat, TargetQuat, Alpha).GetNormalized();
+}
+
+bool UICCharacterMovementComponent::CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection)
+{
+    return false;
+}
+
+TArray<FVector> UICCharacterMovementComponent::GetProbeLocations() const
+{
+    TArray<FVector> Res;
+    switch (ClimbProbeLocType)
+    {
+    case EClimbProbeLocType::Bone:
+        if (UMeshComponent* Mesh = GetOwner()->FindComponentByClass<UMeshComponent>())
+        {
+            for (const FName& BoneName : ClimbProbeBoneNames)
+            {
+                if (BoneName.IsNone() || !Mesh->DoesSocketExist(BoneName))
+                    continue;
+
+                Res.Add(Mesh->GetSocketLocation(BoneName));
+            }
+        }
+        break;
+
+    case EClimbProbeLocType::ZOffset:
+        if (UCapsuleComponent* CapsulComp = GetOwner()->FindComponentByClass<UCapsuleComponent>())
+        {
+            for (const float ZOffset : ClimbProbeZOffsets)
+            {
+                if(!FMath::IsNearlyEqual(ZOffset, 0.0f))
+                    Res.Add(CapsulComp->GetComponentLocation() + GetGravityDirection() * ZOffset);
+            }
+        }
+        break;
+    }
+
+    Res.Add(UpdatedComponent->GetComponentLocation());
+    return Res;
 }
 
 //void UICCharacterMovementComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
