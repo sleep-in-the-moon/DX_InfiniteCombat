@@ -282,9 +282,9 @@ bool UICCharacterMovementComponent::FindAndUpdateClimbSurface()
     ClimbSurface.SurfaceNormal = NormalSum;
     ClimbSurface.SurfacePoint = PointSum / ProbeLocs.Num();
 #if WITH_EDITOR
-    DrawDebugDirectionalArrow(GetWorld(), ClimbSurface.SurfacePoint, ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 20, 7.0f, FColor::Blue, false, 10.0f, 0U, 7.0f);
-    DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint, "PointSum", 0, FColor::Green, 10.0f, false, 4);
-    DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 20, "NormalSum", 0, FColor::Green, 10.0f, false, 4);
+    DrawDebugDirectionalArrow(GetWorld(), ClimbSurface.SurfacePoint, ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+    DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint, "PointSum", 0, FColor::Green, 10.0f, false, 1);
+    DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 20, "NormalSum", 0, FColor::Green, 10.0f, false, 1);
 #endif
     ClimbSurface.NormalDistance = FVector::DotProduct(Capsule->GetComponentLocation() - ClimbSurface.SurfacePoint, ClimbSurface.SurfaceNormal);
     if (ClimbSurface.NormalDistance < 0.0f)
@@ -395,7 +395,7 @@ bool UICCharacterMovementComponent::CheckClimableByHit(const FHitResult& Hit, co
     if(!Hit.IsValidBlockingHit() || !Hit.bBlockingHit)
         return false;
 
-    const FVector Normal = ClimbSurface.SurfaceNormal.GetSafeNormal();
+    const FVector Normal = Hit.ImpactNormal.GetSafeNormal();
     if (Normal.IsNearlyZero())
     {
         return false;
