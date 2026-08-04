@@ -116,7 +116,7 @@ UICCharacterMovementComponent::UICCharacterMovementComponent()
 
 bool UICCharacterMovementComponent::IsClimbing() const
 {
-    return ClimbSurface.IsClimbableSurface && (MovementMode == MOVE_Custom) && (CustomMovementMode == static_cast<uint8>(ECusMovementMode::MOVE_Climb)) && UpdatedComponent;
+    return /*ClimbSurface.IsClimbableSurface && */(MovementMode == MOVE_Custom) && (CustomMovementMode == static_cast<uint8>(ECusMovementMode::MOVE_Climb)) && UpdatedComponent;
 }
 
 void UICCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
@@ -157,7 +157,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         float TimeStep = GetSimulationTimeStep(remainingTime, Iterations);
         remainingTime -= TimeStep;
 
-        if (!FindAndUpdateClimbSurface())//TODO::Find 和 Mode 逻辑分开
+        if (!FindAndUpdateClimbSurface())
         {
             SetMovementMode(MOVE_Falling);
             StartNewPhysics(remainingTime + TimeStep, Iterations-1);
@@ -249,6 +249,8 @@ bool UICCharacterMovementComponent::FindAndUpdateClimbSurface()
         return false;
     }
     
+    FVector NormalSum = FVector::ZeroVector;
+    FVector PointSum = FVector::ZeroVector;
     for (const FVector& ProbeLoc : ProbeLocs)
     {
         FCollisionQueryParams QueryParam(SCENE_QUERY_STAT(FindClimbSurface), false, CharacterOwner);
@@ -268,12 +270,30 @@ bool UICCharacterMovementComponent::FindAndUpdateClimbSurface()
             continue;
 
         //ClimbSurface.PrimaryHitResult = HitRes;
-        HitRes.ImpactNormal.GetSafeNormal();
+        NormalSum += HitRes.ImpactNormal;
+        PointSum += HitRes.ImpactPoint;
     }
-    //DrawDebugString();
-    //DrawDebugDirectionalArrow();
 
-    return false;
+    NormalSum = NormalSum.GetSafeNormal();
+    if (NormalSum.IsNearlyZero())
+    {
+        return false;
+    }
+    ClimbSurface.SurfaceNormal = NormalSum;
+    ClimbSurface.SurfacePoint = PointSum / ProbeLocs.Num();
+#if WITH_EDITOR
+    DrawDebugDirectionalArrow(GetWorld(), ClimbSurface.SurfacePoint, ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 20, 7.0f, FColor::Blue, false, 10.0f, 0U, 7.0f);
+    DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint, "PointSum", 0, FColor::Green, 10.0f, false, 4);
+    DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 20, "NormalSum", 0, FColor::Green, 10.0f, false, 4);
+#endif
+    ClimbSurface.NormalDistance = FVector::DotProduct(Capsule->GetComponentLocation() - ClimbSurface.SurfacePoint, ClimbSurface.SurfaceNormal);
+    if (ClimbSurface.NormalDistance < 0.0f)
+    {
+        return false;
+    }
+    //ClimbSurface.IsClimbableSurface = true;
+
+    return true;
 }
 
 void UICCharacterMovementComponent::UpdateClimbingAcceleration()
@@ -372,7 +392,29 @@ FQuat UICCharacterMovementComponent::ComputeClimbingRotation(float DeltaTime) co
 
 bool UICCharacterMovementComponent::CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection)
 {
-    return false;
+    if(!Hit.IsValidBlockingHit() || !Hit.bBlockingHit)
+        return false;
+
+    const FVector Normal = ClimbSurface.SurfaceNormal.GetSafeNormal();
+    if (Normal.IsNearlyZero())
+    {
+        return false;
+    }
+
+    const float NormalDotUp = FMath::Abs(FVector::DotProduct(Normal, UpDirection));
+    if (NormalDotUp > 0.5)//cos(倾斜度)
+    {
+        return false;
+    }
+
+    const float FaceDot = FVector::DotProduct(TraceDirection, -Normal);
+    if (FaceDot < 0.8)//相似度
+    {
+        return false;
+    }
+
+    //Hit.PhysMaterial;
+    return true;
 }
 
 TArray<FVector> UICCharacterMovementComponent::GetProbeLocations() const

@@ -13,7 +13,7 @@ struct FTraversalCheckInput
 
 public:
 	UPROPERTY(BlueprintReadWrite)
-	FVector TraceDirection=FVector::Zero();
+	FVector TraceDirection=FVector::ZeroVector;
 	UPROPERTY(BlueprintReadWrite)
 	float TraceDistance=0.0f;
 	UPROPERTY(BlueprintReadWrite)
@@ -38,9 +38,9 @@ struct FClimbSurfaceInfo
 	bool IsClimbableSurface = false;
 	//多个 Probe 结果的平均法线
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
-	FVector SurfaceNormal;
+	FVector SurfaceNormal=FVector::ZeroVector;
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
-	FVector SurfacePoint;
+	FVector SurfacePoint = FVector::ZeroVector;
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
 	FHitResult PrimaryHitResult;
 	//沿表面法线反方向到表面距离
