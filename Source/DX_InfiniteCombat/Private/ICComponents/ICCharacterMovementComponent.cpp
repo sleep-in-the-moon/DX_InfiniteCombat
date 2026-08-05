@@ -169,7 +169,17 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         //将上一次模拟时叠加的叠加型 RootMotion 清除，避免重复叠加
         RestorePreAdditiveRootMotionVelocity();
 
+#if WITH_EDITOR
+        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + Acceleration * 35, 1.0f, FColor::Black, false, 10.0f, 0U, 1.0f);
+        DrawDebugString(GetWorld(), OldLocation + Acceleration * 20, "RawAcceleration", 0, FColor::Green, 10.0f, false, 1);
+#endif
+
         UpdateClimbingAcceleration();
+
+#if WITH_EDITOR
+        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + Acceleration * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+        DrawDebugString(GetWorld(), OldLocation + Acceleration * 20, "Acceleration", 0, FColor::Green, 10.0f, false, 1);
+#endif
 
         if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
         {
@@ -178,6 +188,11 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
 
         //应用 RootMotion，动画 RootMotion 或 非动画 RootMotion: 覆盖型和叠加型
         ApplyRootMotionToVelocity(TimeStep);
+
+#if WITH_EDITOR
+        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + Velocity * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+        DrawDebugString(GetWorld(), OldLocation + Velocity * 20, "Velocity", 0, FColor::Green, 10.0f, false, 1);
+#endif
 
         if (!IsClimbing())
         {
@@ -306,7 +321,7 @@ void UICCharacterMovementComponent::UpdateClimbingAcceleration()
     Acceleration = Acceleration.GetClampedToMaxSize(GetMaxAcceleration());
 }
 
-FVector UICCharacterMovementComponent::ComputeAttachVelocity(const FClimbSurfaceInfo& InSurface)
+FVector UICCharacterMovementComponent::ComputeAttachVelocity()
 {
     const FVector CurLocation = UpdatedComponent->GetComponentLocation();
 
@@ -324,9 +339,21 @@ void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity,
 
     // 速度位于墙面切平面
     FVector MoveDelta = FVector::VectorPlaneProject(InVelocity, ClimbSurface.SurfaceNormal);
+    const FVector AttachVelocity = ComputeAttachVelocity();
 
-    const FVector AttachVelocity = ComputeAttachVelocity(ClimbSurface);
+#if WITH_EDITOR
+    DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + MoveDelta * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+    DrawDebugString(GetWorld(), UpdatedComponent->GetComponentLocation() + MoveDelta * 20, "MoveDeltaBeforeAttach", 0, FColor::Green, 10.0f, false, 1);
+    DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AttachVelocity * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+    DrawDebugString(GetWorld(), UpdatedComponent->GetComponentLocation() + AttachVelocity * 20, "AttachVelocity", 0, FColor::Green, 10.0f, false, 1);
+#endif
+    
     MoveDelta = (InVelocity + AttachVelocity) * DeltaSeconds;
+
+#if WITH_EDITOR
+    DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + MoveDelta * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+    DrawDebugString(GetWorld(), UpdatedComponent->GetComponentLocation() + MoveDelta * 20, "MoveDelta", 0, FColor::Green, 10.0f, false, 1);
+#endif
 
     FHitResult Hit(1.f);
     SafeMoveUpdatedComponent(MoveDelta, ComputeClimbingRotation(DeltaSeconds), true, Hit);

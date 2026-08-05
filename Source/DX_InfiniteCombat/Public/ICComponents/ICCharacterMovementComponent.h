@@ -78,7 +78,7 @@ protected:
 
 	void UpdateClimbingAcceleration();
 
-	FVector ComputeAttachVelocity(const FClimbSurfaceInfo& InSurface);
+	FVector ComputeAttachVelocity();
 
 	void ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds, float InRemainingTime, int32 InIterations);
 
