@@ -170,15 +170,17 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         RestorePreAdditiveRootMotionVelocity();
 
 #if WITH_EDITOR
-        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + Acceleration * 35, 1.0f, FColor::Black, false, 10.0f, 0U, 1.0f);
-        DrawDebugString(GetWorld(), OldLocation + Acceleration * 20, "RawAcceleration", 0, FColor::Green, 10.0f, false, 1);
+        FVector NormalAcceleration = Acceleration.GetSafeNormal();
+        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + NormalAcceleration * 35, 1.0f, FColor::Black, false, 10.0f, 0U, 1.0f);
+        DrawDebugString(GetWorld(), OldLocation + NormalAcceleration * 20, "RawAcceleration", 0, FColor::Green, 10.0f, false, 1);
 #endif
 
         UpdateClimbingAcceleration();
 
 #if WITH_EDITOR
-        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + Acceleration * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
-        DrawDebugString(GetWorld(), OldLocation + Acceleration * 20, "Acceleration", 0, FColor::Green, 10.0f, false, 1);
+        NormalAcceleration = Acceleration.GetSafeNormal();
+        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + NormalAcceleration * 35, 1.0f, FColor::Green, false, 10.0f, 0U, 1.0f);
+        DrawDebugString(GetWorld(), OldLocation + NormalAcceleration * 20, "Acceleration", 0, FColor::Green, 10.0f, false, 1);
 #endif
 
         if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
@@ -190,8 +192,9 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         ApplyRootMotionToVelocity(TimeStep);
 
 #if WITH_EDITOR
-        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + Velocity * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
-        DrawDebugString(GetWorld(), OldLocation + Velocity * 20, "Velocity", 0, FColor::Green, 10.0f, false, 1);
+        FVector NormalVelocity = Velocity.GetSafeNormal();
+        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + NormalVelocity * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+        DrawDebugString(GetWorld(), OldLocation + NormalVelocity * 20, "Velocity", 0, FColor::Green, 10.0f, false, 1);
 #endif
 
         if (!IsClimbing())
