@@ -171,16 +171,16 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
 
 #if WITH_EDITOR
         FVector NormalAcceleration = Acceleration.GetSafeNormal();
-        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + NormalAcceleration * 35, 1.0f, FColor::Black, false, 10.0f, 0U, 1.0f);
+        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + NormalAcceleration * 35, 1.0f, FColor::Purple, false, 10.0f, 0U, 1.0f);
         DrawDebugString(GetWorld(), OldLocation + NormalAcceleration * 20, "RawAcceleration", 0, FColor::Green, 10.0f, false, 1);
 #endif
 
         UpdateClimbingAcceleration();
 
 #if WITH_EDITOR
-        NormalAcceleration = Acceleration.GetSafeNormal();
+        /*FVector NormalAcceleration = Acceleration.GetSafeNormal();
         DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + NormalAcceleration * 35, 1.0f, FColor::Green, false, 10.0f, 0U, 1.0f);
-        DrawDebugString(GetWorld(), OldLocation + NormalAcceleration * 20, "Acceleration", 0, FColor::Green, 10.0f, false, 1);
+        DrawDebugString(GetWorld(), OldLocation + NormalAcceleration * 20, "Acceleration", 0, FColor::Green, 10.0f, false, 1);*/
 #endif
 
         if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
@@ -193,7 +193,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
 
 #if WITH_EDITOR
         FVector NormalVelocity = Velocity.GetSafeNormal();
-        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + NormalVelocity * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+        DrawDebugDirectionalArrow(GetWorld(), OldLocation, OldLocation + NormalVelocity * 35, 1.0f, FColor::Orange, false, 10.0f, 0U, 1.0f);
         DrawDebugString(GetWorld(), OldLocation + NormalVelocity * 20, "Velocity", 0, FColor::Green, 10.0f, false, 1);
 #endif
 
@@ -212,7 +212,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
             {
                 Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / TimeStep;
                 // 不把吸附修正积累为下一步的法线速度。
-                Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
+                //Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
             }
         }
 
@@ -224,10 +224,10 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
         }
     }
 
-    /*if (IsClimbing())
+    if (IsClimbing())
     {
         Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
-    }*/
+    }
 }
 
 bool UICCharacterMovementComponent::FindAndUpdateClimbSurface()
@@ -300,9 +300,9 @@ bool UICCharacterMovementComponent::FindAndUpdateClimbSurface()
     ClimbSurface.SurfaceNormal = NormalSum;
     ClimbSurface.SurfacePoint = PointSum / ProbeLocs.Num();
 #if WITH_EDITOR
-    DrawDebugDirectionalArrow(GetWorld(), ClimbSurface.SurfacePoint, ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+    /*DrawDebugDirectionalArrow(GetWorld(), ClimbSurface.SurfacePoint, ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
     DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint, "PointSum", 0, FColor::Green, 10.0f, false, 1);
-    DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 20, "NormalSum", 0, FColor::Green, 10.0f, false, 1);
+    DrawDebugString(GetWorld(), ClimbSurface.SurfacePoint + ClimbSurface.SurfaceNormal * 20, "NormalSum", 0, FColor::Green, 10.0f, false, 1);*/
 #endif
     ClimbSurface.NormalDistance = FVector::DotProduct(Capsule->GetComponentLocation() - ClimbSurface.SurfacePoint, ClimbSurface.SurfaceNormal);
     if (ClimbSurface.NormalDistance < 0.0f)
@@ -337,24 +337,24 @@ FVector UICCharacterMovementComponent::ComputeAttachVelocity()
 
 void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity, float DeltaSeconds, float InRemainingTime, int32 InIterations)
 {
-    if (!ClimbSurface.IsClimbableSurface)
-        return;
+    /*if (!ClimbSurface.IsClimbableSurface)
+        return;*/
 
     // 速度位于墙面切平面
     FVector MoveDelta = FVector::VectorPlaneProject(InVelocity, ClimbSurface.SurfaceNormal);
     const FVector AttachVelocity = ComputeAttachVelocity();
 
 #if WITH_EDITOR
-    DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + MoveDelta * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
-    DrawDebugString(GetWorld(), UpdatedComponent->GetComponentLocation() + MoveDelta * 20, "MoveDeltaBeforeAttach", 0, FColor::Green, 10.0f, false, 1);
-    DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AttachVelocity * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
-    DrawDebugString(GetWorld(), UpdatedComponent->GetComponentLocation() + AttachVelocity * 20, "AttachVelocity", 0, FColor::Green, 10.0f, false, 1);
+    /*DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + MoveDelta * 35, 1.0f, FColor::Red, false, 10.0f, 0U, 1.0f);
+    DrawDebugString(GetWorld(), UpdatedComponent->GetComponentLocation() + MoveDelta * 20, "MoveDeltaBeforeAttach", 0, FColor::Green, 10.0f, false, 1);*/
+   /* DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AttachVelocity * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+    DrawDebugString(GetWorld(), UpdatedComponent->GetComponentLocation() + AttachVelocity * 20, "AttachVelocity", 0, FColor::Green, 10.0f, false, 1);*/
 #endif
     
     MoveDelta = (InVelocity + AttachVelocity) * DeltaSeconds;
 
 #if WITH_EDITOR
-    DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + MoveDelta * 35, 1.0f, FColor::Blue, false, 10.0f, 0U, 1.0f);
+    DrawDebugDirectionalArrow(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + MoveDelta * 35, 1.0f, FColor::Black, false, 10.0f, 0U, 1.0f);
     DrawDebugString(GetWorld(), UpdatedComponent->GetComponentLocation() + MoveDelta * 20, "MoveDelta", 0, FColor::Green, 10.0f, false, 1);
 #endif
 
@@ -422,7 +422,7 @@ FQuat UICCharacterMovementComponent::ComputeClimbingRotation(float DeltaTime) co
 
 bool UICCharacterMovementComponent::CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection)
 {
-    if(!Hit.IsValidBlockingHit() || !Hit.bBlockingHit)
+    if(/*!Hit.IsValidBlockingHit() ||*/ !Hit.bBlockingHit)
         return false;
 
     const FVector Normal = Hit.ImpactNormal.GetSafeNormal();
