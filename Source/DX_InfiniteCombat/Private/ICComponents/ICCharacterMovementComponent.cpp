@@ -149,6 +149,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
 
     bJustTeleported = false;
     float remainingTime = deltaTime;
+    FVector RawAcceleration = Acceleration;
     while ((remainingTime >= MIN_TICK_TIME) && (Iterations < MaxSimulationIterations) && CharacterOwner && (CharacterOwner->Controller || bRunPhysicsWithNoController 
         || HasAnimRootMotion() || CurrentRootMotion.HasOverrideVelocity() || (CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy)))
     {
@@ -212,7 +213,8 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
             {
                 Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / TimeStep;
                 // 不把吸附修正积累为下一步的法线速度。
-                //Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
+                Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
+                Acceleration = RawAcceleration;
             }
         }
 
@@ -319,9 +321,16 @@ void UICCharacterMovementComponent::UpdateClimbingAcceleration()
     /*if (!ClimbSurface.IsClimbableSurface)
         return;*/
 
-    Acceleration = FVector::VectorPlaneProject(Acceleration, ClimbSurface.SurfaceNormal);
+   /* Acceleration = FVector::VectorPlaneProject(Acceleration, ClimbSurface.SurfaceNormal);
+    Acceleration = Acceleration.GetClampedToMaxSize(GetMaxAcceleration());*/
 
-    Acceleration = Acceleration.GetClampedToMaxSize(GetMaxAcceleration());
+    const FVector OwnerForward = GetOwner()->GetActorForwardVector();
+    const FVector OwnerRight = GetOwner()->GetActorRightVector();
+    const float ForwardAmount = FVector::DotProduct(Acceleration, OwnerForward);
+    const float RightAmount = FVector::DotProduct(Acceleration, OwnerRight);
+    const FVector ClimbUp = FVector::VectorPlaneProject(-GetGravityDirection(), ClimbSurface.SurfaceNormal).GetSafeNormal();
+    const FVector ClimbRight = FVector::CrossProduct(ClimbUp, -ClimbSurface.SurfaceNormal).GetSafeNormal();
+    Acceleration = ClimbUp * ForwardAmount + ClimbRight * RightAmount;
 }
 
 FVector UICCharacterMovementComponent::ComputeAttachVelocity()
