@@ -9,6 +9,7 @@
   拼刀；
 ## 远程
   切换远程武器弓箭；
+  <img src="ReadmeFile/Gif/LuanchArrow.gif">
   瞄准射击，将时间轴封装到 c++ 中，时间轴驱动瞄准视角的切换；
 # 锁定系统
 [代码](Source/DX_InfiniteCombat/Public/LockSystem/WeakLockComponent.h)
