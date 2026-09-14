@@ -18,19 +18,23 @@ void UGA_Block::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	}
 	AActor* const AvatarActor = ActorInfo->AvatarActor.Get();
 	UCombatCharacterComponent* CombatComp = AvatarActor->FindComponentByClass<UCombatCharacterComponent>();
-	if (!CombatComp || !CombatComp->BlockMontage)
+	if (!CombatComp || !CombatComp->BlockMontages.IsValid())
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
-	UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockMontage"), CombatComp->BlockMontage);
+	UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockMontage"), CombatComp->BlockMontages.BlockStartMontage);
+	CurBlockMontage = CombatComp->BlockMontages.BlockStartMontage;
+	MontageTask->OnCompleted.AddUniqueDynamic(this, &UGA_Block::BlockStartMontageEnd);
 	MontageTask->Activate();
 
 	UAbilityTask_ICWaitInputReleased* InputReleasedTask = UAbilityTask_ICWaitInputReleased::ICWaitInputReleased(this);
 	InputReleasedTask->OnReleased.AddUniqueDynamic(this, &UGA_Block::BlockReleased);
 	InputReleasedTask->Activate();
-  
+	
+	//TODO::¼õËÙ
+
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
@@ -48,14 +52,29 @@ void UGA_Block::BlockReleased(float PressTime)
 		K2_EndAbility();
 		return;
 	}
-	UCombatCharacterComponent* CombatComp = AvatarActor->FindComponentByClass<UCombatCharacterComponent>();
 
-	character->StopAnimMontage(CombatComp->BlockMontage);
+	character->StopAnimMontage(CurBlockMontage);
+	if (UCombatCharacterComponent* CombatComp = GetAvatarActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>())
+	{
+		UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockMontage"), CombatComp->BlockMontages.BlockEndMontage, 1.0f, NAME_None, false);
+		MontageTask->Activate();
+	}
 
 	K2_EndAbility();
 }
 
+void UGA_Block::BlockStartMontageEnd()
+{
+	if (UCombatCharacterComponent* CombatComp = GetAvatarActorFromActorInfo()->FindComponentByClass<UCombatCharacterComponent>())
+	{
+		UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockMontage"), CombatComp->BlockMontages.BlockLoopMontage);
+		CurBlockMontage = CombatComp->BlockMontages.BlockLoopMontage;
+		MontageTask->Activate();
+	}
+}
+
 bool UGA_Block::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
+	//TODO::ÎäÆ÷ÏÞÖÆ
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }

@@ -29,13 +29,53 @@ enum class ECusMovementMode : uint8
 	MOVE_Climb UMETA(DisplayName = "Climb")
 };
 
+UENUM(BlueprintType)
+enum class EClimbProbeLayer :uint8
+{
+	Center,
+	Upper,
+	Lower,
+	Anim
+};
+
+USTRUCT(BlueprintType)
+struct FClimbProbeBoneName
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName ClimbProbeBoneName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EClimbProbeLayer ProbeLayer;
+};
+USTRUCT(BlueprintType)
+struct FClimbProbeZOffset
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ClimbProbeZOffset=0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EClimbProbeLayer ProbeLayer;
+};
+USTRUCT(BlueprintType)
+struct FClimbProbeLocation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector ProbeLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EClimbProbeLayer ProbeLayer;
+};
+
 USTRUCT(BlueprintType)
 struct FClimbSurfaceInfo 
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
-	bool IsClimbableSurface = false;
+	/*UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
+	bool IsClimbableSurface = false;*/
 	//多个 Probe 结果的平均法线
 	UPROPERTY(BlueprintReadOnly, Category = "ClimbSurface")
 	FVector SurfaceNormal=FVector::ZeroVector;
@@ -66,9 +106,13 @@ class DX_INFINITECOMBAT_API UICCharacterMovementComponent : public UCharacterMov
 public:
 	UICCharacterMovementComponent();
 
+	virtual void BeginPlay() override;
+
 public:
 	//bool TryTraversalAction(const FTraversalCheckInput& CheckInput);
 	bool IsClimbing() const;
+
+	virtual float GetMaxSpeed() const override;
 
 protected:
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
@@ -86,7 +130,7 @@ protected:
 
 	bool CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection);
 
-	virtual TArray<FVector> GetProbeLocations() const;
+	virtual TArray<FClimbProbeLocation> GetProbeStartLocations() const;
 
 private:
 	/*UFUNCTION()
@@ -98,37 +142,43 @@ public:
 
 	FTraversalCheckInput TraversalCheckInput;
 
+	UPROPERTY(BlueprintReadOnly)
+	float InitMaxWalkSpeed = 0.0;
+
 protected:
 	FClimbSurfaceInfo ClimbSurface;
 
 	//摩擦力
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
-	float ClimbFriction = 8.0f;
+	float ClimbFriction = 12.0f;
 	//制动减速
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
 	float ClimbBrakingDeceleration;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
+	float MaxClimbSpeed = 50.0f;
 
+	//胶囊体与墙之间的间隙
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
-	float WallGap = 7.0f;
+	float WallGap = 24.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
-	float AttachStrength = 1.0f;
+	float AttachStrength = 7.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
-	float ClimbRotationSpeed = 1.0f;
+	float ClimbRotationSpeed = 4.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
-	float ClimbProbeRadius=50.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing|Probe")
+	float ClimbProbeRadius=7.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing|Probe")
 	EClimbProbeLocType ClimbProbeLocType;
 	//用于 Climb 物理查询的骨骼名称
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing", meta = (EditCondition = "ClimbProbeLocType==EClimbProbeLocType::Bone"))
-	TArray<FName> ClimbProbeBoneNames;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing|Probe", meta = (EditCondition = "ClimbProbeLocType==EClimbProbeLocType::Bone"))
+	TArray<FClimbProbeBoneName> ClimbProbeBoneNames;
 	//相对于胶囊体中心的 z 偏移量
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing", meta = (EditCondition = "ClimbProbeLocType==EClimbProbeLocType::Offset"))
-	TArray<float> ClimbProbeZOffsets;
-	UPROPERTY(EditDefaultsOnly, Category = "Climbing")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing|Probe", meta = (EditCondition = "ClimbProbeLocType==EClimbProbeLocType::Offset"))
+	TArray<FClimbProbeZOffset> ClimbProbeZOffsets;
+	UPROPERTY(EditDefaultsOnly, Category = "Climbing|Probe")
 	TEnumAsByte<ECollisionChannel> ClimbTraceChannel = ECC_GameTraceChannel2;
-	UPROPERTY(EditDefaultsOnly, Category = "Climbing")
-	float ClimbProbeDistance = 200.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Climbing|Probe")
+	float ClimbProbeDistance = 80.0f;
 
 private:
 	/*FOnMontageEnded MontageEndedDelegate;

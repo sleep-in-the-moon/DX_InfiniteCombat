@@ -101,6 +101,8 @@ void UWidgetCombatStates::RegisterPersistentWidget(FName UniqueID, const FPersis
 	CanvasSlot->SetAutoSize(true);
 	CanvasSlot->SetZOrder(PersistentWidgetInfos.ZOrder);
 	//CanvasSlot->SetAnchors();
+	if (PersistentWidgets.Contains(UniqueID) && PersistentWidgets.Find(UniqueID)->PersistentWidget != PersistentWidgetInfos.PersistentWidget)
+		PersistentWidgets.Find(UniqueID)->PersistentWidget->RemoveFromParent();
 
 	PersistentWidgets.Add(UniqueID, PersistentWidgetInfos);
 }

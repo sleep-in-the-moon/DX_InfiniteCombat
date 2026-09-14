@@ -9,6 +9,7 @@
 #include "ICComponents/CombatCharacterComponent.h"
 #include "GAS/CharacterAttributeSet.h"
 #include "Subsystem/ICWorldSubsystem.h"
+#include "ICComponents/AttackComponent.h"
 
 // Sets default values
 AEnemyCharacterBase::AEnemyCharacterBase()
@@ -22,8 +23,9 @@ AEnemyCharacterBase::AEnemyCharacterBase()
 
 	StateBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("StateBarUI"));
 	StateBar->SetupAttachment(RootComponent);
-	
 	//StateBar->SetWidget(CreateWidget(UDXWidgetBase::StaticClass()));
+
+	AttackComponent = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
 }
 
 // Called when the game starts or when spawned

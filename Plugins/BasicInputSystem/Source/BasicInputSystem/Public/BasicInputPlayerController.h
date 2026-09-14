@@ -18,14 +18,6 @@ UCLASS()
 class BASICINPUTSYSTEM_API ABasicInputPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultInputMapping;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	UInputAction* LookAction;
 
 public:
 	UPROPERTY(BlueprintReadOnly)
@@ -38,6 +30,26 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float HorizontalSensitivity = 1.0f;
 
+private:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* DefaultInputMapping;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* MoveAction;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* LookAction;
+
+	FVector RightVec;
+	FVector ForwardVec;
+
+public:
+	void GetMoveDirection(FVector& OutForwardVec, FVector& OutRightVec) const
+	{
+		OutForwardVec = ForwardVec;
+		OutRightVec = RightVec;
+	}
+
 protected:
 	virtual void MoveEvent(const FInputActionValue& InputValue);
 	void LookEvent(const FInputActionValue& InputValue);
@@ -47,7 +59,6 @@ protected:
 
 	virtual void SetupInputComponent() override;
 
-protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 };

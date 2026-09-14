@@ -13,6 +13,7 @@ class UICAbilitySystemComponent;
 class UCombatCharacterComponent;
 class UWidgetComponent;
 struct FOnAttributeChangeData;
+class UAttackComponent;
 
 
 UCLASS()
@@ -43,6 +44,8 @@ protected:
 	UCombatCharacterComponent* CombatComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	UWidgetComponent* StateBar;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UAttackComponent* AttackComponent;
 
 private:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;

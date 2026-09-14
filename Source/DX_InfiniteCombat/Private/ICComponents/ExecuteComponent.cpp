@@ -5,6 +5,7 @@
 #include "LockSystem/WeakLockComponent.h"
 #include "GAS/ICAbilitySystemComponent.h"
 #include "GAS/CharacterAttributeSet.h"
+#include "GAS/GA/GA_Execution.h"
 
 // Sets default values for this component's properties
 UExecuteComponent::UExecuteComponent()
@@ -39,9 +40,22 @@ void UExecuteComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	// ...
 }
 
+bool UExecuteComponent::CheckCanDoExecution() const
+{
+	if (UICAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UICAbilitySystemComponent>())
+	{
+		FGameplayAbilitySpec* ExecuteSpec = ASC->FindAbilitySpecFromClass(ExecutionAbilityClass);
+		if (!ExecuteSpec)
+			return false;
+
+		return ExecuteSpec->Ability->CanActivateAbility(ExecuteSpec->Handle, ASC->AbilityActorInfo.Get());//TODO:: Tag Ã»´«
+	}
+	return false;
+}
+
 void UExecuteComponent::CheckExecuteLine(float NewHelth)
 {
-	if (ExecuteLine < 0.0f)
+	if (ExecuteLine <= 0.0f)
 		return;
 
 	if (UICAbilitySystemComponent* ASC = GetOwner()->FindComponentByClass<UICAbilitySystemComponent>())
@@ -60,4 +74,3 @@ void UExecuteComponent::CheckExecuteLine(float NewHelth)
 		}
 	}
 }
-

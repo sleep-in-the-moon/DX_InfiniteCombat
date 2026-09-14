@@ -1,2 +1,5 @@
 Content/KiteDemo/Environments/GroundTiles/AlpinePatch001/T_AlpinePatch001_D_alt_R.uasset filter=lfs diff=lfs merge=lfs -text
 Content/KiteDemo/Environments/GroundTiles/AlpinePatch001/T_AlpinePatch001_N.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Assets/ApexNature/Dolomites/Rocks/Large/Textures/T_APXN_DOLR_Rock_Large_02_COL.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Assets/ApexNature/Dolomites/Rocks/Large/Textures/T_APXN_DOLR_Rock_Large_02_NRM.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Assets/ApexNature/Dolomites/Rocks/Large/Textures/T_APXN_DOLR_Rock_Large_02_ORD.uasset filter=lfs diff=lfs merge=lfs -text

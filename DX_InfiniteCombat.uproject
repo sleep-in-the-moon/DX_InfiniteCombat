@@ -13,8 +13,15 @@
 				"Engine",
 				"GameplayAbilities",
 				"UMG",
-				"MotionWarping"
+				"MotionWarping",
+				"PhysicsCore",
+				"CoreUObject"
 			]
+		},
+		{
+			"Name": "EditorExtension",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [

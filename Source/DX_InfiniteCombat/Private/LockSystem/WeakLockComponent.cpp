@@ -33,23 +33,27 @@ void UWeakLockComponent::BeginPlay()
 	if (APawn* ownerP = Cast<APawn>(GetOwner()))
 	{
 		APlayerController* playerControl = Cast<APlayerController>(ownerP->GetController());
-		if (playerControl && LockedWidgetClass)
+		if (playerControl && LockedWidgetClass && ExecutionWidgetClass)
 		{
 			LockedWidget = CreateWidget<UUserWidget>(playerControl, LockedWidgetClass);
+			ExecutionWidget = CreateWidget<UUserWidget>(playerControl, ExecutionWidgetClass);
 
-			FProperty* CombatStatesWidgetPro = playerControl->GetClass()->FindPropertyByName(TEXT("CombatStatesWidget"));
-			if (CombatStatesWidgetPro)
+			//反射获取蓝图成员
+			FProperty* CombatStatesWidgetProp = playerControl->GetClass()->FindPropertyByName(TEXT("CombatStatesWidget"));
+			if (CombatStatesWidgetProp)
 			{
-				FClassProperty* CombatStatesWidgetClassPro = static_cast<FClassProperty*>(CombatStatesWidgetPro);
-				const void* ValuePtr = CombatStatesWidgetClassPro->ContainerPtrToValuePtr<void>(playerControl);
-				TObjectPtr<UObject> CombatStatesWidgetObj = CombatStatesWidgetClassPro->GetPropertyValue(ValuePtr);
+				FClassProperty* CombatStatesWidgetClassProp = static_cast<FClassProperty*>(CombatStatesWidgetProp);
+				const void* ValuePtr = CombatStatesWidgetClassProp->ContainerPtrToValuePtr<void>(playerControl);
+				TObjectPtr<UObject> CombatStatesWidgetObj = CombatStatesWidgetClassProp->GetPropertyValue(ValuePtr);
 
 				if (Cast<UWidgetCombatStates>(CombatStatesWidgetObj))
 					CombatStatesWidget = Cast<UWidgetCombatStates>(CombatStatesWidgetObj);
 			}
 		}
 	}
-	
+
+	MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>();
+	OwnerExecuteComponent = GetOwner()->FindComponentByClass<UExecuteComponent>();
 }
 
 
@@ -57,8 +61,10 @@ void UWeakLockComponent::BeginPlay()
 void UWeakLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (!LockActor)
+		return;
 
-	if (bControllerFollow && GetOwner() && LockActor && GetOwnerController())
+	if (bControllerFollow && GetOwner() && GetOwnerController())
 	{
 		FVector2D ScreenPos;
 		UGameplayStatics::ProjectWorldToScreen(GetOwnerController(), LockActor->GetActorLocation(), ScreenPos);
@@ -102,24 +108,54 @@ void UWeakLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 		CheckLockActorState();
 	}
+
+	if (bIsAttackFollow)
+	{
+		UpdateAttackFollowWarp();
+	}
+
+	if (LockActorExecuteComponent && LockActorExecuteComponent->bCanBeExecuted && OwnerExecuteComponent 
+		&& OwnerExecuteComponent->CheckCanDoExecution() && CombatStatesWidget.IsValid() && ExecutionWidget)
+	{
+		CombatStatesWidget->RegisterPersistentWidget(LockedWidgetPersistentID, FPersistentWidgetInfos(ExecutionWidget, LockActor));
+	}
 }
 
-void UWeakLockComponent::Trigger()
+void UWeakLockComponent::TryLockByTrace()
 {
-	if (DoOnceTrace() && LockActor)
+	if (DoOnceTrace())
+	{
+		TriggerLock();
+	}
+}
+
+void UWeakLockComponent::SetLockByActor(AActor* Actor)
+{
+	if (!Actor)
+		return;
+
+	LockActor = Actor;
+	TriggerLock();
+}
+
+void UWeakLockComponent::TriggerLock()
+{
+	if (LockActor)
 	{
 		bControllerFollow = true;
 
-		//锁定 UI 显示
-		if (LockActor && CombatStatesWidget.IsValid() && LockedWidget)
-			CombatStatesWidget->RegisterPersistentWidget(LockedWidgetPersistentID, FPersistentWidgetInfos(LockedWidget, LockActor));
+		UUserWidget* TempWidget= LockedWidget;
 
 		//处决系统检测
-		UExecuteComponent* ExecuteComponent = LockActor->FindComponentByClass<UExecuteComponent>();
-		if (ExecuteComponent && ExecuteComponent->bCanBeExecuted)
+		LockActorExecuteComponent = LockActor->FindComponentByClass<UExecuteComponent>();
+		if (LockActorExecuteComponent && LockActorExecuteComponent->bCanBeExecuted && OwnerExecuteComponent && OwnerExecuteComponent->CheckCanDoExecution())
 		{
-			
+			//按键 UI 提示
+			TempWidget = ExecutionWidget;
 		}
+		//锁定 UI 显示
+		if(LockActor && CombatStatesWidget.IsValid() && TempWidget)
+			CombatStatesWidget->RegisterPersistentWidget(LockedWidgetPersistentID, FPersistentWidgetInfos(TempWidget, LockActor));
 
 		// 过时清除
 		GetWorld()->GetTimerManager().SetTimer(ControllerTimer, [this]() {
@@ -130,40 +166,23 @@ void UWeakLockComponent::Trigger()
 		GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, LookRot.Yaw, GetOwner()->GetActorRotation().Roll));
 
 		// 判断距离，触发攻击吸附
-		DrawDebugCircle(GetWorld(), FVector(FVector2D(GetOwner()->GetActorLocation()), GetOwner()->GetActorLocation().Z - 89), AttackFollowDist, 12, FColor::Green, false, 3.0f, SDPG_World, 2, GetOwner()->GetActorRightVector(), GetOwner()->GetActorForwardVector(), false);
+		if (!MotionWarpingComp)
+			return;
+#if WITH_EDITOR
+		//DrawDebugCircle(GetWorld(), FVector(FVector2D(GetOwner()->GetActorLocation()), GetOwner()->GetActorLocation().Z - 89), AttackFollowDist, 12, FColor::Green, false, 3.0f, SDPG_World, 2, GetOwner()->GetActorRightVector(), GetOwner()->GetActorForwardVector(), false);
+#endif
 		if (FVector::Dist(GetOwner()->GetActorLocation(), LockActor->GetActorLocation()) <= AttackFollowDist)
 		{
-			if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
-			{
-				FVector TargetLoc = LockActor->GetActorLocation();
-
-				if (UCapsuleComponent* CapsuleComponent = LockActor->FindComponentByClass<UCapsuleComponent>())
-				{
-					TargetLoc += (GetOwner()->GetActorLocation()-LockActor->GetActorLocation()).GetSafeNormal() * CapsuleComponent->GetScaledCapsuleRadius();
-				}
-
-				DrawDebugPoint(GetWorld(), TargetLoc, 10, FColor::Blue, false, 3);
-
-				MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("AttackFollow"), TargetLoc);
-				bIsAttackFollow = true;
-			}
+			UpdateAttackFollowWarp();
 		}
 		else if(bIsAttackFollow)
 		{
-			if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
-			{
-				MotionWarpingComp->RemoveWarpTarget(TEXT("AttackFollow"));
-				bIsAttackFollow = false;
-			}
+			RemoveAttackFollowWarp();
 		}
 	}
 	else if(bIsAttackFollow)
 	{
-		if (UMotionWarpingComponent* MotionWarpingComp = GetOwner()->FindComponentByClass<UMotionWarpingComponent>())
-		{
-			MotionWarpingComp->RemoveWarpTarget(TEXT("AttackFollow"));
-			bIsAttackFollow = false;
-		}
+		RemoveAttackFollowWarp();
 	}
 }
 
@@ -184,9 +203,11 @@ bool UWeakLockComponent::DoOnceTrace()
 
 		FCollisionShape TraceShape = FCollisionShape::MakeSphere(TraceHalf);
 
+#if WITH_EDITOR
 		UICWorldSubsystem* ICSubSystem = UWorld::GetSubsystem<UICWorldSubsystem>(GetWorld());
 		if (ICSubSystem && ICSubSystem->GetShowDebug())
 			DrawDebugSphereTraceMulti(GetOwner()->GetWorld(), StartLoc, EndLoc, TraceHalf, EDrawDebugTrace::Type::ForDuration, false, OutHits, FLinearColor::Blue, FLinearColor::Green, 10.0f);
+#endif
 
 		FCollisionQueryParams CollisionQueryParams;
 		FCollisionObjectQueryParams CollisionObjectQueryParams;
@@ -290,4 +311,23 @@ void UWeakLockComponent::CheckLockActorState()
 			ClearLock();
 		}
 	}
+}
+
+void UWeakLockComponent::UpdateAttackFollowWarp()
+{
+	if (!LockActor || !MotionWarpingComp)
+		return;
+
+	//MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(TEXT("AttackFollow"), TargetLoc);
+	MotionWarpingComp->AddOrUpdateWarpTargetFromComponent(TEXT("AttackFollow"), LockActor->GetRootComponent(), NAME_None, true, FVector(AttackFollowOffset, 0, 0));
+	bIsAttackFollow = true;
+}
+
+void UWeakLockComponent::RemoveAttackFollowWarp()
+{
+	if (!MotionWarpingComp)
+		return;
+
+	bIsAttackFollow = false;
+	MotionWarpingComp->RemoveWarpTarget(TEXT("AttackFollow"));
 }

@@ -24,5 +24,12 @@ protected:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo
 		, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
+private:
+	UFUNCTION()
 	void BlockReleased(float PressTime);
+	UFUNCTION()
+	void BlockStartMontageEnd();
+
+private:
+	UAnimMontage* CurBlockMontage = nullptr;
 };

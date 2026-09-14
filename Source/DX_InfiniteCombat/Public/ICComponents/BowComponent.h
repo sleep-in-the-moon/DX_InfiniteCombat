@@ -73,7 +73,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Bow|Aim")
 	FGameplayTag AimTag = FGameplayTag::RequestGameplayTag(TEXT("State.InAiming"), false);
 	UPROPERTY(EditDefaultsOnly, Category = "Bow|Aim")
-	FVector AimModeCameraOffset = FVector(277.0f, 0.0f, -7.0f);
+	FVector AimModeCameraOffset = FVector(277.0f, 28.0f, 23.0f);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Bow|UI")
 	TSubclassOf<UForesightWidgeBase> ForesightWidgeClass;

@@ -15,6 +15,48 @@ class UAnimMontage;
 class UStaticMeshComponent;
 class UWeaponDataAsset;
 
+USTRUCT(BlueprintType)
+struct FBlockMontages
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* BlockStartMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* BlockLoopMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* BlockHitedMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* BlockEndMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* BlockCounterMontage = nullptr;
+
+	bool IsValid() const
+	{
+		return BlockStartMontage && BlockLoopMontage && BlockHitedMontage && BlockEndMontage;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FGetHitMontageFourDirection
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* ForwardHitedMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* BackHitedMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* LeftHitedMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* RightHitedMontage = nullptr;
+
+	bool IsValid() const
+	{
+		return ForwardHitedMontage && BackHitedMontage && LeftHitedMontage && RightHitedMontage;
+	}
+};
+
 /*
 	战斗角色组件，主要包含武器装备，死亡，受击动画配置等逻辑
 */
@@ -83,9 +125,9 @@ public:
 
 	//TODO::改成软引用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|Combat|Montage")
-	UAnimMontage* GetHurtMontage=nullptr;
+	FGetHitMontageFourDirection GetHurtMontages;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IC|Combat|Montage")
-	UAnimMontage* BlockMontage = nullptr;
+	FBlockMontages BlockMontages;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RespawnTime = -1;

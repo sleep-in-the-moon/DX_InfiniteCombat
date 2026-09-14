@@ -16,8 +16,8 @@ void ABasicInputPlayerController::MoveEvent(const FInputActionValue& InputValue)
 	FRotator ControllRot = GetControlRotation();
 	FRotator ControllRotYaw = FRotator(0, ControllRot.Yaw, 0);
 
-	FVector RightVec = FRotationMatrix(ControllRotYaw).GetUnitAxis(EAxis::Y);
-	FVector ForwardVec = FRotationMatrix(ControllRotYaw).GetUnitAxis(EAxis::X);
+	RightVec = FRotationMatrix(ControllRotYaw).GetUnitAxis(EAxis::Y);
+	ForwardVec = FRotationMatrix(ControllRotYaw).GetUnitAxis(EAxis::X);
 
 	if (APawn* pawn = GetPawn<APawn>())
 	{

@@ -137,6 +137,11 @@ void UBowComponent::EnterAimMode()
 		{
 			ForesightWidge->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		}
+		if (USpringArmComponent* SpringArm = GetOwner()->FindComponentByClass<USpringArmComponent>())
+		{
+			SpringArm->bEnableCameraLag = false;
+			SpringArm->bEnableCameraRotationLag = false;
+		}
 	}
 }
 
@@ -156,6 +161,12 @@ void UBowComponent::ExitAimMode()
 			ForesightWidge->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}, 0.9, false);
+
+	if (USpringArmComponent* SpringArm = GetOwner()->FindComponentByClass<USpringArmComponent>())
+	{
+		SpringArm->bEnableCameraLag = true;
+		SpringArm->bEnableCameraRotationLag = true;
+	}
 }
 
 bool UBowComponent::TryHoldingBow()

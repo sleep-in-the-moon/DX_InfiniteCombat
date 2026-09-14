@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "Engine/EngineTypes.h"
+#include "ICComponents/AttackComponent.h"
 
 #include "AN_AttackTrace.generated.h"
 
@@ -15,12 +16,7 @@ struct FCollisionQueryParams;
 struct FCollisionObjectQueryParams;
 //struct FGameplayEffectContextHandle;
 
-UENUM(BlueprintType)
-enum class EAttackTraceShape : uint8
-{
-	Line,
-	Box
-};
+
 
 /**
  * UANS_AttackTrace
@@ -79,12 +75,13 @@ private:
 	TObjectPtr<UStaticMeshComponent> CurWeapon;
 	TMap<FName, FVector> PreSocketLoc;
 
-	FCollisionQueryParams Params;
-	FCollisionObjectQueryParams ObjectQueryParams;
 	UPROPERTY()
 	TObjectPtr<UICAbilitySystemComponent> OwnerASC;
 	UPROPERTY()
 	TArray<AActor*> ApplyedObjs;
+
+	UPROPERTY()
+	UAttackComponent* AttackComp = nullptr;
 
 	bool bOnce = true;
 
