@@ -4,6 +4,9 @@
 # 战斗系统
 ## 近战
   近战使用武士刀进行攻击；
+
+  <img src="ReadmeFile/Gif/KatanaAttack.gif">
+
   格挡；
   处决；
   拼刀；
