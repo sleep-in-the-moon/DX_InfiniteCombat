@@ -50,13 +50,20 @@
   DamageEffect 中触发一个 [受击 GameplayCue](Source/DX_InfiniteCombat/Private/GAS/GC_AttakHit.cpp), 在 GameplayCue 中触发伤害跳字，命中音效以及播放受击 Montage；
   根据不同受击方向会播放不同 Montage ，受击方向由命中点法线和命中目标的前向和右向向量夹角大小计算得出。
 
-  后向
+  <p align="center">后向</p>
+  
   <img src="ReadmeFile/Gif/GetHitBack.gif">
-  前向
+  
+  <p align="center">前向</p>
+  
   <img src="ReadmeFile/Gif/GetHitFront.gif">
-  左向
+  
+  <p align="center">左向</p>
+  
   <img src="ReadmeFile/Gif/GetHitLeft.gif">
-  右向
+  
+  <p align="center">右向</p>
+  
   <img src="ReadmeFile/Gif/GetHitRight.gif">
   
   ### 伤害免疫
