@@ -73,26 +73,61 @@
   <img src="ReadmeFile/Gif/Dodge3.gif">
   
 # 锁定系统
-[锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp)
-锁定策略偏软锁定；为避免限制玩家操作，不会强制将控制器完全锁定在目标中心处，只会保持一定的可视屏幕边距，锁定到目标时，控制器仍然能够转动，只有在目标超出了屏幕范围，控制器才会平滑到锁定点离屏幕边缘 x 像素处，x 可配置，目前只在 [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp) 中配置一个值，但可改为每个锁定目标配置单独的值，从而在锁定不同体型敌人时保持不同的屏幕边距。
+  [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp)
+  锁定策略偏软锁定；为避免限制玩家操作，不会强制将控制器完全锁定在目标中心处，只会保持一定的可视屏幕边距，在一定时间内没有再触发锁定操作会自动取消锁定，锁定到目标时，控制器仍然能够转动，只有在目标超出了屏幕范围，控制器才会平滑到锁定点离屏幕边缘 x 像素处，x 可配置，目前只在 [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp) 中配置一个值，但可改为每个锁定目标配置单独的值，从而在锁定不同体型敌人时保持不同的屏幕边距。
 
-<img src="ReadmeFile/Gif/WeakLock1.gif">
-<img src="ReadmeFile/Gif/WeakLock2.gif">
+  <img src="ReadmeFile/Gif/WeakLock1.gif">
+  <img src="ReadmeFile/Gif/WeakLock2.gif">
 
-# GAS
-  GA;
-  GE;
-  GC;
+# GamplayAbilitySystem
+  本项目使用了 UE 的 GAS 插件，除了基础移动输入其他主要行为触发基本都由 Ability 实现，主要是运用其 GamePlayTag 就能轻松配置各种行为之间的互斥，打断，阻挡关系，GE 对属性的修改，Debuff 施加也十分方便，但介于本项目是单机，对 GAS 网络同步方面的研究较浅；
+  主要的 Ability C++ 类 在[GA文件夹](Source/DX_InfiniteCombat/Private/GAS/GA)下，还有一些 Ability 是纯蓝图；
+  此外还[继承了 ASC ](Source/DX_InfiniteCombat/Private/GAS/ICAbilitySystemComponent.cpp)，对能力系统组件进行了扩展，主要是输入与 Ability 的绑定，让某些输入通过配置就能直接触发只能 Ability，然后还有一些对 ActivateAbility 和 SetByCaller 的封装。
+  
 # 运动系统
-## 攀越障碍
+## 攀上障碍
+  在[Traversal Ability](Source/DX_InfiniteCombat/Private/GAS/GA/GA_Traversal.cpp) 中，使用胶囊体扫描，模拟角色攀登路径，确认碰撞条件满足，再判断落点是否满足可站立条件，都满足后触发 Montage 播放；
+  使用 MotionWarping ，实现了同一个根运动动画能够精确攀上不同高度障碍物的效果。
+
+  <img src="ReadmeFile/Gif/Traversal1.gif">
+  <img src="ReadmeFile/Gif/Traversal3.gif">
+  
 ## 攀爬墙体
-## 动画
-### 动画重定向
-### 基础运动
-### IK
+  继承移动组件，重写 PhysCustom 扩展了新的移动模式，PhysClimbing，沿用了 PhysWalking 的分步模拟思路；
+  检测；
+  攀上墙顶则是复用的上面的攀上障碍逻辑；
+
+# 动画表现
+## IK
+  ### 脚部 IK
+  ### 手部 IK
+  
+## 基础运动
+  Locomotion;
+  脚同步；
+  过渡；
+  瞄准空间；
+  混合空间；
+  分层混合上半身动画；
+
+## 动画重定向
+
 # 资源管理
   AssetManager;
   软引用；
+  
 # 存档
+  存档管理器；
+  存档索引；
+  版本号，版本转换；
+  
 # AI
+  感官组件；
+  EQS 环境查询;
+  
+# 用户自定义输入
+# 编辑器扩展
+  slate 编程；
+
 # 连招系统
+  前缀树...
