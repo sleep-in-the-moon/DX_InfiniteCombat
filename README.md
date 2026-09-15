@@ -73,8 +73,12 @@
   <img src="ReadmeFile/Gif/Dodge3.gif">
   
 # 锁定系统
-[源码文件](Source/DX_InfiniteCombat/Public/LockSystem/WeakLockComponent.h)
-  锁定策略，软锁定；
+[锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp)
+锁定策略偏软锁定；为避免限制玩家操作，不会强制将控制器完全锁定在目标中心处，只会保持一定的可视屏幕边距，锁定到目标时，控制器仍然能够转动，只有在目标超出了屏幕范围，控制器才会平滑到锁定点离屏幕边缘 x 像素处，x 可配置，目前只在 [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp) 中配置一个值，但可改为每个锁定目标配置单独的值，从而在锁定不同体型敌人时保持不同的屏幕边距。
+
+<img src="ReadmeFile/Gif/WeakLock1.gif">
+<img src="ReadmeFile/Gif/WeakLock2.gif">
+
 # GAS
   GA;
   GE;
