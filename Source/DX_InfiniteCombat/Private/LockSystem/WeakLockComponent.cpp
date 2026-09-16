@@ -279,7 +279,7 @@ FVector2D UWeakLockComponent::GetMargin_VH()
 	{
 		FVector2D HalfFOV = GetHalfFOV_VH();
 		GetOwnerController()->GetViewportSize(ViewX, ViewY);
-		float marginH = (MarginPx / ViewX)*(HalfFOV.Y*2);
+		float marginH = (MarginPx / ViewX)*(HalfFOV.Y*2);//TODO::MarginPx 可改为读取被锁定目标身上配置，从而在锁定不同体型敌人时保持不同屏幕边距
 		float marginV = (MarginPx / ViewY)*(HalfFOV.X*2);
 
 		return FVector2D(marginV, marginH);

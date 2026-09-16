@@ -404,15 +404,15 @@ void UICCharacterMovementComponent::UpdateClimbingAcceleration()
    /* Acceleration = FVector::VectorPlaneProject(Acceleration, ClimbSurface.SurfaceNormal);
     Acceleration = Acceleration.GetClampedToMaxSize(GetMaxAcceleration());*/
 
-    FVector OwnerForward = GetOwner()->GetActorForwardVector();
-    FVector OwnerRight = GetOwner()->GetActorRightVector();
+    FVector MoveForward = GetOwner()->GetActorForwardVector();
+    FVector MoveRight = GetOwner()->GetActorRightVector();
     if (ABasicInputPlayerController* ICController = Cast<ABasicInputPlayerController>(CharacterOwner->Controller.Get()))
     {
-        ICController->GetMoveDirection(OwnerForward, OwnerRight);
+        ICController->GetMoveDirection(MoveForward, MoveRight);
     }
     
-    const float ForwardAmount = FVector::DotProduct(Acceleration, OwnerForward);
-    const float RightAmount = FVector::DotProduct(Acceleration, OwnerRight);
+    const float ForwardAmount = FVector::DotProduct(Acceleration, MoveForward);// MoveForward 是单位向量，Acceleration 点积 MoveForward 得到 Acceleration 在 MoveForward 方向上的投影长度
+    const float RightAmount = FVector::DotProduct(Acceleration, MoveRight);
     const FVector ClimbUp = FVector::VectorPlaneProject(-GetGravityDirection(), ClimbSurface.SurfaceNormal).GetSafeNormal();
     const FVector ClimbRight = FVector::CrossProduct(ClimbUp, -ClimbSurface.SurfaceNormal).GetSafeNormal();
     Acceleration = ClimbUp * ForwardAmount + ClimbRight * RightAmount;
