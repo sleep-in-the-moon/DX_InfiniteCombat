@@ -11,13 +11,12 @@
   <img src="ReadmeFile/Gif/KatanaAttack.gif">
 
   ### 格挡反击
-  使用输入触发 Ability，播放 Montage，Ability 持续期间若角色前向受击，则免疫该伤害且对敌人进行反击。\
-  [源码文件](Source/DX_InfiniteCombat/Private/GAS/GA/GA_Block.cpp)
+  使用输入触发 [格挡 Ability](Source/DX_InfiniteCombat/Private/GAS/GA/GA_Block.cpp)，播放 Montage，Ability 持续期间若角色前向受击，则免疫该伤害且对敌人进行反击。
 
   <img src="ReadmeFile/Gif/Block1.gif">
   
   ### 处决
-  当敌人生命值到达斩杀线且 [GA_Execution](Source/DX_InfiniteCombat/Private/GAS/GA/GA_Execution.cpp) 的 CanActivateAbility 为 true 后，将显示处决按键，按下对应按键后触发处决 Ability ,使用 MotionWarping 令处决动画精准命中处决目标，LevelSequence 进行运镜。\
+  当敌人生命值到达斩杀线且 [GA_Execution](Source/DX_InfiniteCombat/Private/GAS/GA/GA_Execution.cpp) 的 CanActivateAbility 为 true 后，将显示处决按键，按下对应按键后触发处决 Ability ,使用 MotionWarping 令处决动画精准命中处决目标，LevelSequence 进行运镜。
   
   <img src="ReadmeFile/Gif/Execution2.gif">
   <img src="ReadmeFile/Gif/Execution1.gif">
@@ -74,7 +73,8 @@
   
 # 锁定系统
   [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp)
-  锁定策略偏软锁定；为避免限制玩家操作，不会强制将控制器完全锁定在目标中心处，只会保持一定的可视屏幕边距，在一定时间内没有再触发锁定操作会自动取消锁定，锁定到目标时，控制器仍然能够转动，只有在目标超出了屏幕范围，控制器才会平滑到锁定点离屏幕边缘 x 像素处，x 可配置，目前只在 [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp) 中配置一个值，但可改为每个锁定目标配置单独的值，从而在锁定不同体型敌人时保持不同的屏幕边距。
+  锁定策略偏软锁定；为避免限制玩家操作，不会强制将控制器完全锁定在目标中心处，只会保持一定的可视屏幕边距，在一定时间内没有再触发锁定操作会自动取消锁定；\
+  锁定到目标时，控制器仍然能够转动，只有在目标超出了屏幕范围，控制器才会平滑到锁定点离屏幕边缘 x 像素处，x 可配置，目前只在 [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp) 中配置一个值，但可改为每个锁定目标配置单独的值，从而在锁定不同体型敌人时保持不同的屏幕边距。
 
   <img src="ReadmeFile/Gif/WeakLock1.gif">
   <img src="ReadmeFile/Gif/WeakLock2.gif">
@@ -82,7 +82,7 @@
 # GamplayAbilitySystem
   本项目使用了 UE 的 GAS 插件，除了基础移动输入其他主要行为触发基本都由 Ability 实现，主要是运用其 GamePlayTag 就能轻松配置各种行为之间的互斥，打断，阻挡关系，GE 对属性的修改，Debuff 施加也十分方便，但介于本项目是单机，对 GAS 网络同步方面的研究较浅；\
   主要的 Ability C++ 类 在[GA文件夹](Source/DX_InfiniteCombat/Private/GAS/GA)下，还有一些 Ability 是纯蓝图；\
-  此外还[继承了 ASC ](Source/DX_InfiniteCombat/Private/GAS/ICAbilitySystemComponent.cpp)，对能力系统组件进行了扩展，主要是输入与 Ability 的绑定，让某些输入通过配置就能直接触发只能 Ability，然后还有一些对 ActivateAbility 和 SetByCaller 的封装。\
+  此外还[继承了 ASC ](Source/DX_InfiniteCombat/Private/GAS/ICAbilitySystemComponent.cpp)，对能力系统组件进行了扩展，主要是输入与 Ability 的绑定，让某些输入通过配置就能直接触发只能 Ability，然后还有一些对 ActivateAbility 和 SetByCaller 的封装。
   
 # 运动系统
 ## 攀上障碍
@@ -97,8 +97,8 @@
   UpdateClimbingAcceleration() 中对获取到的墙面法线进行投影和叉乘，获得墙面坐标系，然后用点积的方式获取加速度在移动输入前向和右向的投影长度，将其分别乘到墙面坐标系的上方向向量和右方向向量， 最后将这两个向量相加得到最新的加速度，由 CalcVelocity 由加速度和摩擦力等计算出速度后，在 ClimbAlongSurface() 中将速度转换为实际的位移 MoveDelta，SafeMoveUpdatedComponent 做实际的移动；\
   当攀爬到墙壁顶部时，上半身的球形探测未命中，下半身球形探测命中，此时将尝试攀上墙顶，攀上墙顶则是复用的上面的攀上障碍逻辑；
 
-  <img src="ReadmeFile/Gif/ClimbTop1.gif">
   <img src="ReadmeFile/Gif/ClimbTop3Debug.gif">
+  <img src="ReadmeFile/Gif/ClimbTop1.gif">
 
 # 动画表现
 ## IK
