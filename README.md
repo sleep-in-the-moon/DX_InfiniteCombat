@@ -35,7 +35,8 @@
   
 ## 远程
   远程武器弓箭；\
-  瞄准射击逻辑，将[时间轴封装到 c++ ](Source/DX_InfiniteCombat/Public/Utils/TimelineUtils.h)中，时间轴驱动[瞄准视角的切换](Source/DX_InfiniteCombat/Private/Character/DXCharacterExtensionComponent.cpp)；\
+  瞄准射击逻辑，将[时间轴封装到 c++ ](Source/DX_InfiniteCombat/Public/Utils/TimelineUtils.h)中，时间轴驱动[瞄准视角的切换](Source/DX_InfiniteCombat/Private/Character/DXCharacterExtensionComponent.cpp)；
+  
   箭矢发射使用了 UE 的 UProjectileMovementComponent，实现了一个 [ProjectorActorBase](Source/DX_InfiniteCombat/Private/Projector/ProjectorActorBase.cpp) 作为所有发射物的基类，其中扩展了伤害判定以及投射物命中后消失或附加到命中目标上的逻辑。
   
   <img src="ReadmeFile/Gif/LuanchArrow.gif">
@@ -74,15 +75,18 @@
   
 # 锁定系统
   [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp)
-  锁定策略偏软锁定；为避免限制玩家操作，不会强制将控制器完全锁定在目标中心处，只会保持一定的可视屏幕边距，在一定时间内没有再触发锁定操作会自动取消锁定；\
+  锁定策略偏软锁定；为避免限制玩家操作，不会强制将控制器完全锁定在目标中心处，只会保持一定的可视屏幕边距，在一定时间内没有再触发锁定操作会自动取消锁定；
+  
   锁定到目标时，控制器仍然能够转动，只有在目标超出了屏幕范围，控制器才会平滑到锁定点离屏幕边缘 x 像素处，x 可配置，目前只在 [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp) 中配置一个值，但可改为每个锁定目标配置单独的值，从而在锁定不同体型敌人时保持不同的屏幕边距。
 
   <img src="ReadmeFile/Gif/WeakLock1.gif">
   <img src="ReadmeFile/Gif/WeakLock2.gif">
 
 # GamplayAbilitySystem
-  本项目使用了 UE 的 GAS 插件，除了基础移动输入其他主要行为触发基本都由 Ability 实现，主要是运用其 GamePlayTag 就能轻松配置各种行为之间的互斥，打断，阻挡关系，GE 对属性的修改，Debuff 施加也十分方便，但介于本项目是单机，对 GAS 网络同步方面的研究较浅；\
-  主要的 Ability C++ 类 在[GA文件夹](Source/DX_InfiniteCombat/Private/GAS/GA)下，还有一些 Ability 是纯蓝图；\
+  本项目使用了 UE 的 GAS 插件，除了基础移动输入其他主要行为触发基本都由 Ability 实现，主要是运用其 GamePlayTag 就能轻松配置各种行为之间的互斥，打断，阻挡关系，GE 对属性的修改，Debuff 施加也十分方便，但介于本项目是单机，对 GAS 网络同步方面的研究较浅；
+  
+  主要的 Ability C++ 类 在[GA文件夹](Source/DX_InfiniteCombat/Private/GAS/GA)下，还有一些 Ability 是纯蓝图；
+  
   此外还[继承了 ASC ](Source/DX_InfiniteCombat/Private/GAS/ICAbilitySystemComponent.cpp)，对能力系统组件进行了扩展，主要是输入与 Ability 的绑定，让某些输入通过配置就能直接触发只能 Ability，然后还有一些对 ActivateAbility 和 SetByCaller 的封装。
   
 # 运动系统
@@ -94,8 +98,10 @@
   <img src="ReadmeFile/Gif/Traversal3.gif">
   
 ## 攀爬墙体
-  [扩展移动组件](Source/DX_InfiniteCombat/Private/ICComponents/ICCharacterMovementComponent.cpp)，重写 PhysCustom 扩展了新的移动模式 PhysClimbing，沿用了 PhysWalking 的分步模拟思路，每个子步中, FindAndUpdateClimbSurface() 分部位进行多个球形探测，对多个命中结果进行筛选和加权平均获取墙面信息；\
-  UpdateClimbingAcceleration() 中对获取到的墙面法线进行投影和叉乘，获得墙面坐标系，然后用点积的方式获取加速度在移动输入前向和右向的投影长度，将其分别乘到墙面坐标系的上方向向量和右方向向量， 最后将这两个向量相加得到最新的加速度，由 CalcVelocity 由加速度和摩擦力等计算出速度后，在 ClimbAlongSurface() 中将速度转换为实际的位移 MoveDelta，SafeMoveUpdatedComponent 做实际的移动；\
+  [扩展移动组件](Source/DX_InfiniteCombat/Private/ICComponents/ICCharacterMovementComponent.cpp)，重写 PhysCustom 扩展了新的移动模式 PhysClimbing，沿用了 PhysWalking 的分步模拟思路，每个子步中, FindAndUpdateClimbSurface() 分部位进行多个球形探测，对多个命中结果进行筛选和加权平均获取墙面信息；
+  
+  UpdateClimbingAcceleration() 中对获取到的墙面法线进行投影和叉乘，获得墙面坐标系，然后用点积的方式获取加速度在移动输入前向和右向的投影长度，将其分别乘到墙面坐标系的上方向向量和右方向向量， 最后将这两个向量相加得到最新的加速度，由 CalcVelocity 由加速度和摩擦力等计算出速度后，在 ClimbAlongSurface() 中将速度转换为实际的位移 MoveDelta，SafeMoveUpdatedComponent 做实际的移动；
+  
   当攀爬到墙壁顶部时，上半身的球形探测未命中，下半身球形探测命中，此时将尝试攀上墙顶，攀上墙顶则是复用的上面的攀上障碍逻辑；
 
   <img src="ReadmeFile/Gif/ClimbTop3Debug.gif">
