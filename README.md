@@ -93,9 +93,12 @@
   <img src="ReadmeFile/Gif/Traversal3.gif">
   
 ## 攀爬墙体
-  继承移动组件，重写 PhysCustom 扩展了新的移动模式，PhysClimbing，沿用了 PhysWalking 的分步模拟思路；
-  检测；
-  攀上墙顶则是复用的上面的攀上障碍逻辑；
+  [扩展移动组件](Source/DX_InfiniteCombat/Private/ICComponents/ICCharacterMovementComponent.cpp)，重写 PhysCustom 扩展了新的移动模式 PhysClimbing，沿用了 PhysWalking 的分步模拟思路，每个子步中, FindAndUpdateClimbSurface() 分部位进行多个球形探测，对多个命中结果进行筛选和加权平均获取墙面信息；
+  UpdateClimbingAcceleration() 中对获取到的墙面法线进行投影和叉乘，获得墙面坐标系，然后用点积的方式获取加速度在移动输入前向和右向的投影长度，将其分别乘到墙面坐标系的上方向向量和右方向向量， 最后将这两个向量相加得到最新的加速度，由 CalcVelocity 由加速度和摩擦力等计算出速度后，在 ClimbAlongSurface() 中将速度转换为实际的位移 MoveDelta，SafeMoveUpdatedComponent 做实际的移动；
+  当攀爬到墙壁顶部时，上半身的球形探测未命中，下半身球形探测命中，此时将尝试攀上墙顶，攀上墙顶则是复用的上面的攀上障碍逻辑；
+
+  <img src="ReadmeFile/Gif/ClimbTop1.gif">
+  <img src="ReadmeFile/Gif/ClimbTop3Debug.gif">
 
 # 动画表现
 ## IK
@@ -103,12 +106,15 @@
   ### 手部 IK
   
 ## 基础运动
+  多线程；
+  GAS GameplayTag 绑定；
   Locomotion;
   脚同步；
   过渡；
   瞄准空间；
   混合空间；
   分层混合上半身动画；
+  原地转向；
 
 ## 动画重定向
 
