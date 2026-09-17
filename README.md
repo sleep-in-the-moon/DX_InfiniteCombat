@@ -1,9 +1,21 @@
 # 简介
   基于 UE5.5 C++ 开发的综合型 3D 动作战斗项目。独立完成战斗系统，运动系统，动画，AI 行为，资源管理及工具链等多模块开发。围绕 Gameplay Ability System 构建角色能力与战斗框架、
   扩展 CharacterMovementComponent 实现了攀爬等自定义移动模式、结合 ControlRig，MotionWarping 实现流畅动画及运动表现、
-  子类化 UAssetManager 实现软引用资源管理器、EQS 搭建复杂 AI、使用 Slate 开发对编辑器进行功能扩展。项目约 90% 逻辑使用 c++ 实现，蓝图占比低。
+  子类化 UAssetManager 实现软引用资源管理器、EQS 搭建复杂 AI、使用 Slate 开发对编辑器进行功能扩展。项目约 90% 逻辑使用 C++ 实现，蓝图占比低。
 
 # 目录
+-[战斗系统](#战斗系统)
+  -[近战](#近战)
+    -[普通攻击连段](#普通攻击连段)
+    -[格挡反击](#格挡反击)
+    -[处决](#处决)
+    -[蓄力攻击](#蓄力攻击)
+    -[打击感/命中反馈](#打击感/命中反馈)
+  -[远程](#远程)
+  -[伤害判定/应用](#伤害判定/应用)
+    -[受击](#受击)
+    -[伤害免疫](#伤害免疫)
+-[锁定系统](锁定系统)
   
 
 # 战斗系统
@@ -37,6 +49,8 @@
   使用 Montage_SetPlayRate 对当前播放的攻击 Montage 进行缓速从而实现顿帧感；\
   可配置跳过当前播放的攻击 Montage 的一定帧数，从而实现抽帧效果；\
   伤害跳字，造成伤害时会跳出伤害数字，该跳字 UI 使用了对象池，避免频繁创建销毁，UI 对象池统一由一个[主 UI](Source/DX_InfiniteCombat/Private/UMG/WidgetCombatStates.cpp) 管理。
+
+  [回到顶部](#目录)
   
 ## 远程
   远程武器弓箭；\
@@ -77,6 +91,8 @@
 
   <img src="ReadmeFile/Gif/Dodge2.gif">
   <img src="ReadmeFile/Gif/Dodge3.gif">
+
+  [回到顶部](#目录)
   
 # 锁定系统
   [锁定组件](Source/DX_InfiniteCombat/Private/LockSystem/WeakLockComponent.cpp)
@@ -93,6 +109,8 @@
   主要的 Ability C++ 类 在[GA文件夹](Source/DX_InfiniteCombat/Private/GAS/GA)下，还有一些 Ability 是纯蓝图；
   
   此外还[继承了 ASC ](Source/DX_InfiniteCombat/Private/GAS/ICAbilitySystemComponent.cpp)，对能力系统组件进行了扩展，主要是输入与 Ability 的绑定，让某些输入通过配置就能直接触发只能 Ability，然后还有一些对 ActivateAbility 和 SetByCaller 的封装。
+
+  [回到顶部](#目录)
   
 # 运动系统
 ## 攀上障碍
@@ -112,6 +130,8 @@
   <img src="ReadmeFile/Gif/ClimbTop3Debug.gif">
   <img src="ReadmeFile/Gif/ClimbTop1.gif">
 
+  [回到顶部](#目录)
+
 # 动画表现
 ## IK
   本项目 IK 都使用 [ControlRig](Content/Character/Assets/Samurai2/Character/CtrlRig_Samurai.uasset) 实现，主要使用了 BasicIK 节点，脚踝旋转则使用了 Aim 节点，对各复杂地形贴合效果都很好。
@@ -130,6 +150,8 @@
   <img src="ReadmeFile/Images/ControlRig_ClimbDebug.png">
   
   <img src="ReadmeFile/Gif/Climb1.gif">
+
+  [回到顶部](#目录)
   
 ## 基础运动
   移动数值，状态的更新都使用了动画多线程 BlueprintThreadSafeUpdateAnimation 更新，减少游戏线程开销；
@@ -140,7 +162,7 @@
   
   <img src="ReadmeFile/Images/ABP_UpperBody.png">
 
-  原地转向；
+  TurnInplace 原地转向；
 
 ## 逻辑复用
   使用了 LinkedAnimLayer 和 动画层接口 AnimLayerInterface ，对同一骨骼的动画逻辑进行复用，且可在运行时动态切换，详情见 [ALIBase](Content/Character/BP/ALI/ABP_ALIBase.uasset) 和 [ALI_Character](Content/Character/BP/ALI/ALI_Character.uasset) ，
@@ -160,6 +182,8 @@
   
   <img src="ReadmeFile/Gif/Retarget.gif">
 
+  [回到顶部](#目录)
+
 # 软引用资源管理
   本项目参考了 Lyra 示例项目，子类化 UAssetManager，实现了[自己的 AssetManager](Source/DX_InfiniteCombat/Public/Data/ICAssetManager.h)，对一些非常态加载，以及能接受一定延迟的资源，实现动态加卸载，以及使用软引用的方式，避免过多的硬引用，只在必要时加载进内存；
 
@@ -177,6 +201,8 @@
   <img src="ReadmeFile/Images/EQS1.png">
 
   <img src="ReadmeFile/Images/EQS2.png">
+
+  [回到顶部](#目录)
 
   # 编辑器扩展
   使用 Slate 编程，实现了一个编辑器扩展模块 [EditorExtension](Source/EditorExtension/Private/EditorExtensionModule.cpp)，由于本项目没什么编辑器工具需求，这里只是简单实现了一个编辑器中英文快速切换的功能。
@@ -196,6 +222,8 @@
   按键设置界面，UI 随便做的，比较简陋。
   
   <img src="ReadmeFile/Images/PlayerCusInput2.png">
+
+  [回到顶部](#目录)
 
 # 物理破坏
   GeometryCollection 组件，物理场...
