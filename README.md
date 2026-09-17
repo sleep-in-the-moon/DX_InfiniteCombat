@@ -160,7 +160,7 @@
 # 软引用资源管理
   本项目参考了 Lyra 示例项目，子类化 UAssetManager，实现了[自己的 AssetManager](Source/DX_InfiniteCombat/Public/Data/ICAssetManager.h)，对一些非常态加载，以及能接受一定延迟的资源，实现动态加卸载，以及使用软引用的方式，避免过多的硬引用，只在必要时加载进内存；
 
-  <img src="ReadmeFile/Gif/AssetManager.png">
+  <img src="ReadmeFile/Images/AssetManager.png">
 
   # AI
   AI 行为使用了常规的行为树，黑板架构，创建了一些自定义的行为树任务 BTTask，还使用了感知组件，主要使用了痛觉，视觉，听觉，应用伤害时使用 UAISense_Damage::ReportDamageEvent 向目标发送痛觉感知；
