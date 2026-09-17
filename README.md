@@ -165,13 +165,13 @@
 
   [回到顶部](#目录)
   
-  ### 地面脚部 IK
+  ### 地面脚部IK
   <img src="ReadmeFile/Gif/FootIk.gif">\
   <img src="ReadmeFile/Gif/GroundIK.gif">
 
   [回到顶部](#目录)
   
-  ### 攀爬时的手部 IK 和 脚部 IK
+  ### 攀爬时的手部IK和脚部IK
   攀爬时脚部 IK 是从 Y 方向(骨骼空间前向)进行的检测，并且因为是用脚尖抵墙，所以需要加上 Foot 骨骼和 Ball 骨骼的距离的长度偏移，同理手部也会加上手指到 Hand 骨骼的距离偏移。
 
   <img src="ReadmeFile/Images/ControlRig_ClimbDebug.png">
