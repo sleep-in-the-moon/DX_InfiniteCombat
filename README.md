@@ -1,6 +1,8 @@
 # 简介
   UE5.5，基于 GAS 框架，
 # 目录
+  
+
 # 战斗系统
 ## 近战
   近战使用武士刀进行攻击。
@@ -139,6 +141,7 @@
 
 ## 逻辑复用
   使用了 LinkedAnimLayer 和 动画层接口 AnimLayerInterface ，对同一骨骼的动画逻辑进行复用，且可在运行时动态切换，详情见 [ALIBase](Content/Character/BP/ALI/ABP_ALIBase.uasset) 和 [ALI_Character](Content/Character/BP/ALI/ALI_Character.uasset) ，
+  
   对于同一个骨骼，当需要替换成另一套动画表现而不需要改变 AnimGraph 逻辑时，只需创建一个 [ALIBase](Content/Character/BP/ALI/ABP_ALIBase.uasset) 的子类，然后更改动画序列成员默认值，无需将整个动画逻辑重写，运行时，使用 LinkAnimClassLayers 进行切换；
 
   <img src="ReadmeFile/Images/ALI.png">
@@ -155,14 +158,18 @@
   <img src="ReadmeFile/Gif/Retarget.gif">
 
 # 软引用资源管理
-  本项目参考了 Lyra 示例项目，子类化 UAssetManager，实现了[自己的 AssetManager](Source/DX_InfiniteCombat/Public/Data/ICAssetManager.h)，对一些非常态加载，以及能接受一定延迟的资源，实现动态加卸载，以及使用软引用的方式，避免过多的硬引用，只在必要时加载进内存。
+  本项目参考了 Lyra 示例项目，子类化 UAssetManager，实现了[自己的 AssetManager](Source/DX_InfiniteCombat/Public/Data/ICAssetManager.h)，对一些非常态加载，以及能接受一定延迟的资源，实现动态加卸载，以及使用软引用的方式，避免过多的硬引用，只在必要时加载进内存；
+
+  <img src="ReadmeFile/Gif/AssetManager.png">
 
   # AI
   AI 行为使用了常规的行为树，黑板架构，创建了一些自定义的行为树任务 BTTask，还使用了感知组件，主要使用了痛觉，视觉，听觉，应用伤害时使用 UAISense_Damage::ReportDamageEvent 向目标发送痛觉感知；
 
   在 [自定义的 AIController](Source/DX_InfiniteCombat/Public/AI/ICAIController.h) 中重写了 GetGenericTeamId() 来对 AI 单位进行团队分组，并对黑板键和感知的更新做了封装；
   
-  此外为了构建更智能的 AI 行为，还使用了 EQS 环境查询系统，构建了环境查询树，以令 AI 寻找一个合适的移动目标点为例，使用 查询生成器(EnvQueryGenerator) 在 查询情景(EnvQueryContext) 周围生成规则点，根据查询测试(EnvQueryTest)，为这些点打分或过滤，选择得分最高的点或者得分前 5%/25% 中的随机一点，在行为树中将其更新到黑板键里，作为 AI 最终的移动目标位置。
+  此外为了构建更智能的 AI 行为，还使用了 EQS 环境查询系统，构建了环境查询树，
+  
+  以令 AI 寻找一个合适的移动目标点为例，使用 查询生成器(EnvQueryGenerator) 在 查询情景(EnvQueryContext) 周围生成规则点，根据查询测试(EnvQueryTest)，为这些点打分或过滤，选择得分最高的点或者得分前 5%/25% 中的随机一点，在行为树中将其更新到黑板键里，作为 AI 最终的移动目标位置。
   
   <img src="ReadmeFile/Images/EQS1.png">
 
