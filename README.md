@@ -15,8 +15,23 @@
   - [伤害判定/应用](#伤害判定/应用)
     - [受击](#受击)
     - [伤害免疫](#伤害免疫)
-- [锁定系统](锁定系统)
-  
+- [锁定系统](#锁定系统)
+- [GamplayAbilitySystem](#GamplayAbilitySystem)
+- [运动系统](#运动系统)
+  - [攀上障碍](#攀上障碍)
+  - [攀爬墙体](#攀爬墙体)
+- [动画表现](#动画表现)
+  - [IK](#IK)
+    - [地面脚部 IK](#地面脚部 IK)
+    - [攀爬时的手部 IK 和 脚部 IK](#攀爬时的手部 IK 和 脚部 IK)
+  - [基础运动](#基础运动)
+  - [逻辑复用](#逻辑复用)
+  - [动画重定向](#动画重定向)
+- [软引用资源管理](#软引用资源管理)
+- [AI](#AI)
+- [编辑器扩展](#编辑器扩展)
+- [存档](#存档)
+- [用户自定义输入](#用户自定义输入)
 
 # 战斗系统
 ## 近战
@@ -60,6 +75,8 @@
   
   <img src="ReadmeFile/Gif/LuanchArrow.gif">
 
+[回到顶部](#目录)
+  
 ## 伤害判定/应用
   在 [AttackComponent](Source/DX_InfiniteCombat/Private/ICComponents/AttackComponent.cpp) 中提供攻击检测逻辑，在动画通知中调用;\
   命中目标后 调用 [AttackComponent](Source/DX_InfiniteCombat/Private/ICComponents/AttackComponent.cpp) 中接口构造 GameplayEffectContext 并对命中目标施加伤害 GE DamageEffect，发送伤害感知;\
@@ -85,6 +102,8 @@
   右向
   
   <img src="ReadmeFile/Gif/GetHitRight.gif">
+
+  [回到顶部](#目录)
   
   ### 伤害免疫
   将 ASC 中的 OnImmunityBlockGameplayEffectDelegate 绑定到免疫事件，角色在冲刺时对自己施加一个免疫 DamageEffect 效果的 GE，在冲刺过程中受到伤害就会免疫伤害 GE 并触发免疫事件，用 PoseableMesh 制作定格残影，后处理材质实现色差效果。
@@ -103,6 +122,8 @@
   <img src="ReadmeFile/Gif/WeakLock1.gif">
   <img src="ReadmeFile/Gif/WeakLock2.gif">
 
+  [回到顶部](#目录)
+
 # GamplayAbilitySystem
   本项目使用了 UE 的 GAS 插件，除了基础移动输入其他主要行为触发基本都由 Ability 实现，主要是运用其 GamePlayTag 就能轻松配置各种行为之间的互斥，打断，阻挡关系，GE 对属性的修改，Debuff 施加也十分方便，但介于本项目是单机，对 GAS 网络同步方面的研究较浅；
   
@@ -119,6 +140,8 @@
 
   <img src="ReadmeFile/Gif/Traversal1.gif">
   <img src="ReadmeFile/Gif/Traversal3.gif">
+
+  [回到顶部](#目录)
   
 ## 攀爬墙体
   [扩展移动组件](Source/DX_InfiniteCombat/Private/ICComponents/ICCharacterMovementComponent.cpp)，重写 PhysCustom 扩展了新的移动模式 PhysClimbing，沿用了 PhysWalking 的分步模拟思路，每个子步中, FindAndUpdateClimbSurface() 分部位进行多个球形探测，对多个命中结果进行筛选和加权平均获取墙面信息；
@@ -139,10 +162,14 @@
   <img src="ReadmeFile/Images/ControlRig_FootIk.png">
   
   <img src="ReadmeFile/Images/ControlRig_Aim.png">
+
+  [回到顶部](#目录)
   
   ### 地面脚部 IK
   <img src="ReadmeFile/Gif/FootIk.gif">\
   <img src="ReadmeFile/Gif/GroundIK.gif">
+
+  [回到顶部](#目录)
   
   ### 攀爬时的手部 IK 和 脚部 IK
   攀爬时脚部 IK 是从 Y 方向(骨骼空间前向)进行的检测，并且因为是用脚尖抵墙，所以需要加上 Foot 骨骼和 Ball 骨骼的距离的长度偏移，同理手部也会加上手指到 Hand 骨骼的距离偏移。
@@ -164,6 +191,8 @@
 
   TurnInplace 原地转向；
 
+  [回到顶部](#目录)
+
 ## 逻辑复用
   使用了 LinkedAnimLayer 和 动画层接口 AnimLayerInterface ，对同一骨骼的动画逻辑进行复用，且可在运行时动态切换，详情见 [ALIBase](Content/Character/BP/ALI/ABP_ALIBase.uasset) 和 [ALI_Character](Content/Character/BP/ALI/ALI_Character.uasset) ，
   
@@ -174,6 +203,8 @@
   而对于不同骨骼之间的动画蓝图逻辑复用则使用[动画蓝图模板](Content/Character/EnemyBP/ABPI_EnemyBase.uasset)，在各自的动画图表中，使用 LinkedAnimGraph 链接到同一个模板；
 
   <img src="ReadmeFile/Images/ABPI.png">
+
+  [回到顶部](#目录)
 
 ## 动画重定向
   不同骨骼的动画序列资源复用；
@@ -189,7 +220,9 @@
 
   <img src="ReadmeFile/Images/AssetManager.png">
 
-  # AI
+  [回到顶部](#目录)
+  
+# AI
   AI 行为使用了常规的行为树，黑板架构，创建了一些自定义的行为树任务 BTTask，还使用了感知组件，主要使用了痛觉，视觉，听觉，应用伤害时使用 UAISense_Damage::ReportDamageEvent 向目标发送痛觉感知；
 
   在 [自定义的 AIController](Source/DX_InfiniteCombat/Public/AI/ICAIController.h) 中重写了 GetGenericTeamId() 来对 AI 单位进行团队分组，并对黑板键和感知的更新做了封装；
@@ -213,6 +246,8 @@
   [存档管理器](Source/DX_InfiniteCombat/Public/SaveGameManager.h)管理存档的读取，自动保存，手动保存，版本转换；
   
   [存档索引](Source/DX_InfiniteCombat/Public/SaveIndex.h) SaveIndex 本身也是一个 USaveGame 文件，存放在一个固定槽位名下，它内部维护所有槽位的元数据，元数据中包含版本号，时间戳，显示名称，缩略图等。
+
+  [回到顶部](#目录)
   
 # 用户自定义输入
   在输入映射上下文中重载设置，为按键配置一个 Name, 然后调用增强输入用户设置中的 MapPlayerKey ，根据对应的 Name 就能更改按键映射，最后使用 ApplySettings 应用更改，SaveSettings 持久化。
