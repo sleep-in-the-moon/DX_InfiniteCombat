@@ -41,7 +41,7 @@
   
   还使用了 MontionWarping 进行攻击吸附，在近距离攻击时会将角色吸附到锁定目标的固定距离前。
 
-  <img src="ReadmeFile/Gif/KatanaAttack2.gif">
+  <img src="ReadmeFile/Gif/KatanaAttack.gif">
 
   ### 格挡反击
   使用输入触发 [格挡 Ability](Source/DX_InfiniteCombat/Private/GAS/GA/GA_Block.cpp)，播放 Montage，Ability 持续期间若角色前向受击，则免疫该伤害且对敌人进行反击。
