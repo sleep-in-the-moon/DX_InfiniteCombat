@@ -1,7 +1,7 @@
 # 简介
-  基于 UE5.5 C++ 开发的综合型 3D 动作战斗项目。独立完成战斗系统，运动系统，动画，AI 行为，资源管理及工具链等多模块开发。围绕 Gameplay Ability System 构建角色能力与战斗框架、
+  基于 UE5.5 C++ 开发的综合型 3D 动作战斗项目。独立完成运动系统，战斗系统，动画，AI 行为，资源管理及工具链等多模块开发。围绕 Gameplay Ability System 构建角色能力与战斗框架、 
   扩展 CharacterMovementComponent 实现了攀爬等自定义移动模式、结合 ControlRig，MotionWarping 实现流畅动画及运动表现、
-  子类化 UAssetManager 实现软引用资源管理器、EQS 搭建复杂 AI、使用 Slate 开发对编辑器进行功能扩展。项目约 90% 逻辑使用 C++ 实现，蓝图占比低。
+  子类化 UAssetManager 实现软引用资源管理器、使用 EQS 和感知系统搭建复杂 AI、使用 Slate 开发对编辑器进行功能扩展。项目约 80% 逻辑使用 C++ 实现，蓝图占比低。
 
 # 目录
 - [战斗系统](#战斗系统)
@@ -41,7 +41,7 @@
   
   还使用了 MontionWarping 进行攻击吸附，在近距离攻击时会将角色吸附到锁定目标的固定距离前。
 
-  <img src="ReadmeFile/Gif/KatanaAttack.gif">
+  <img src="ReadmeFile/Gif/KatanaAttack2.gif">
 
   ### 格挡反击
   使用输入触发 [格挡 Ability](Source/DX_InfiniteCombat/Private/GAS/GA/GA_Block.cpp)，播放 Montage，Ability 持续期间若角色前向受击，则免疫该伤害且对敌人进行反击。
