@@ -28,6 +28,8 @@ void ABasicInputPlayerController::MoveEvent(const FInputActionValue& InputValue)
 			pawn->AddMovementInput(ForwardVec * MoveInputVector.X);
 
 	}
+
+	MoveInputElapsedTime = 0.0f;
 }
 
 void ABasicInputPlayerController::LookEvent(const FInputActionValue& InputValue)
@@ -38,6 +40,18 @@ void ABasicInputPlayerController::LookEvent(const FInputActionValue& InputValue)
 	{
 		pawn->AddControllerPitchInput(value.Y * VerticalSensitivity);
 		pawn->AddControllerYawInput(value.X * HorizontalSensitivity);
+	}
+}
+
+void ABasicInputPlayerController::OnMoveCompleted(const FInputActionInstance& Instance)
+{
+	//MoveInputElapsedTime = Instance.GetElapsedTime();
+	MoveInputElapsedTime = Instance.GetTriggeredTime();
+
+	MoveInputLastVelocity = GetPawn<ACharacter>()->GetVelocity();
+	if(UCharacterMovementComponent* MoveComp = GetPawn<ACharacter>()->FindComponentByClass<UCharacterMovementComponent>())
+	{
+		MoveInputLastVelocity = MoveComp->GetLastUpdateVelocity();
 	}
 }
 
@@ -79,6 +93,7 @@ void ABasicInputPlayerController::SetupInputComponent()
 		if (MoveAction && LookAction)
 		{
 			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABasicInputPlayerController::MoveEvent);
+			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ABasicInputPlayerController::OnMoveCompleted);
 			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABasicInputPlayerController::LookEvent);
 		}
 	}

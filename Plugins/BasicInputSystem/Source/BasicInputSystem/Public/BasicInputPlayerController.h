@@ -10,6 +10,7 @@
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
+struct FInputActionInstance;
 
 /**
  *
@@ -29,6 +30,11 @@ public:
 	//可能会被 SaveGame 覆盖
 	UPROPERTY(BlueprintReadWrite)
 	float HorizontalSensitivity = 1.0f;
+
+	UPROPERTY(BlueprintReadWrite)
+	float MoveInputElapsedTime = 0.0f;
+	UPROPERTY(BlueprintReadWrite)
+	FVector MoveInputLastVelocity = FVector::ZeroVector;
 
 private:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
@@ -53,6 +59,9 @@ public:
 protected:
 	virtual void MoveEvent(const FInputActionValue& InputValue);
 	void LookEvent(const FInputActionValue& InputValue);
+
+	UFUNCTION()
+	void OnMoveCompleted(const FInputActionInstance& Instance);
 
 	void CharacterStartJump();
 	void CharacterStopJump();
