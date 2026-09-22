@@ -1,4 +1,4 @@
-// Copyright DX_IC
+ï»¿// Copyright DX_IC
 
 
 #include "ICComponents/ICCharacterMovementComponent.h"
@@ -110,7 +110,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
 
         const FVector OldLocation = UpdatedComponent->GetComponentLocation();
 
-        //½«ÉÏÒ»´ÎÄ£ÄâÊ±µþ¼ÓµÄµþ¼ÓÐÍ RootMotion Çå³ý£¬±ÜÃâÖØ¸´µþ¼Ó
+        //å°†ä¸Šä¸€æ¬¡æ¨¡æ‹Ÿæ—¶å åŠ çš„å åŠ åž‹ RootMotion æ¸…é™¤ï¼Œé¿å…é‡å¤å åŠ 
         RestorePreAdditiveRootMotionVelocity();
 
 #if WITH_EDITOR
@@ -136,7 +136,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
             CalcVelocity(TimeStep, ClimbFriction, false, ClimbBrakingDeceleration);
         }
 
-        //Ó¦ÓÃ RootMotion£¬¶¯»­ RootMotion »ò ·Ç¶¯»­ RootMotion: ¸²¸ÇÐÍºÍµþ¼ÓÐÍ
+        //åº”ç”¨ RootMotionï¼ŒåŠ¨ç”» RootMotion æˆ– éžåŠ¨ç”» RootMotion: è¦†ç›–åž‹å’Œå åŠ åž‹
         ApplyRootMotionToVelocity(TimeStep);
 
 #if WITH_EDITOR
@@ -162,7 +162,7 @@ void UICCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
             if (!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() && TimeStep >= MIN_TICK_TIME)
             {
                 Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / TimeStep;
-                // ²»°ÑÎü¸½ÐÞÕý»ýÀÛÎªÏÂÒ»²½µÄ·¨ÏßËÙ¶È¡£
+                // ä¸æŠŠå¸é™„ä¿®æ­£ç§¯ç´¯ä¸ºä¸‹ä¸€æ­¥çš„æ³•çº¿é€Ÿåº¦ã€‚
                 Velocity = FVector::VectorPlaneProject(Velocity, ClimbSurface.SurfaceNormal);
                 Acceleration = RawAcceleration;
             }
@@ -313,7 +313,7 @@ void UICCharacterMovementComponent::UpdateClimbingAcceleration()
         ICController->GetMoveDirection(MoveForward, MoveRight);
     }
     
-    const float ForwardAmount = FVector::DotProduct(Acceleration, MoveForward);// MoveForward ÊÇµ¥Î»ÏòÁ¿£¬Acceleration µã»ý MoveForward µÃµ½ Acceleration ÔÚ MoveForward ·½ÏòÉÏµÄÍ¶Ó°³¤¶È
+    const float ForwardAmount = FVector::DotProduct(Acceleration, MoveForward);// MoveForward æ˜¯å•ä½å‘é‡ï¼ŒAcceleration ç‚¹ç§¯ MoveForward å¾—åˆ° Acceleration åœ¨ MoveForward æ–¹å‘ä¸Šçš„æŠ•å½±é•¿åº¦
     const float RightAmount = FVector::DotProduct(Acceleration, MoveRight);
     const FVector ClimbUp = FVector::VectorPlaneProject(-GetGravityDirection(), ClimbSurface.SurfaceNormal).GetSafeNormal();
     const FVector ClimbRight = FVector::CrossProduct(ClimbUp, -ClimbSurface.SurfaceNormal).GetSafeNormal();
@@ -336,7 +336,7 @@ void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity,
     /*if (!ClimbSurface.IsClimbableSurface)
         return;*/
 
-    // ËÙ¶ÈÎ»ÓÚÇ½ÃæÇÐÆ½Ãæ
+    // é€Ÿåº¦ä½äºŽå¢™é¢åˆ‡å¹³é¢
     FVector MoveDelta = FVector::VectorPlaneProject(InVelocity, ClimbSurface.SurfaceNormal);
     const FVector AttachVelocity = ComputeAttachVelocity();
 
@@ -376,7 +376,7 @@ void UICCharacterMovementComponent::ClimbAlongSurface(const FVector& InVelocity,
     {
         HandleImpact(Hit, DeltaSeconds, MoveDelta);
 
-        // HandleImpact ÖÐµÄÊÂ¼þ¿ÉÄÜÐÞ¸ÄÒÆ¶¯Ä£Ê½¡£
+        // HandleImpact ä¸­çš„äº‹ä»¶å¯èƒ½ä¿®æ”¹ç§»åŠ¨æ¨¡å¼ã€‚
         if (!IsClimbing())
         {
             const float UnusedTime = DeltaSeconds * (1.0f - Hit.Time);
@@ -399,7 +399,7 @@ FQuat UICCharacterMovementComponent::ComputeClimbingRotation(float DeltaTime) co
         return CurrentQuat;
     }
 
-    // ½«Ç½Ãæ·¨ÏßµÄ ÖØÁ¦·´·½Ïò·ÖÁ¿ ÌÞ³ý£¬»áÊ¹½ÇÉ«±£³ÖÊúÖ±£¬²»»áÌùºÏÇ½ÃæµÄ pitch
+    // å°†å¢™é¢æ³•çº¿çš„ é‡åŠ›åæ–¹å‘åˆ†é‡ å‰”é™¤ï¼Œä¼šä½¿è§’è‰²ä¿æŒç«–ç›´ï¼Œä¸ä¼šè´´åˆå¢™é¢çš„ pitch
    /* FVector DesiredForward = FVector::VectorPlaneProject(-ClimbSurface.SurfaceNormal, -GetGravityDirection());
     if (!DesiredForward.Normalize())
     {
@@ -407,7 +407,7 @@ FQuat UICCharacterMovementComponent::ComputeClimbingRotation(float DeltaTime) co
     }
     FQuat TargetQuat = FRotationMatrix::MakeFromXZ(DesiredForward,  - GetGravityDirection()).ToQuat();*/
 
-    // ½« ÖØÁ¦·´·½Ïò Í¶Ó°µ½Ç½Ãæ£¬µÃµ½Ç½ÃæµÄÉÏ·½Ïò£¬»áÊ¹½ÇÉ«µÄ pitch Ò²ÌùºÏÇ½Ãæ
+    // å°† é‡åŠ›åæ–¹å‘ æŠ•å½±åˆ°å¢™é¢ï¼Œå¾—åˆ°å¢™é¢çš„ä¸Šæ–¹å‘ï¼Œä¼šä½¿è§’è‰²çš„ pitch ä¹Ÿè´´åˆå¢™é¢
     FVector DesiredUp = FVector::VectorPlaneProject(-GetGravityDirection(), ClimbSurface.SurfaceNormal);
     if (!DesiredUp.Normalize())
     {
@@ -432,14 +432,16 @@ bool UICCharacterMovementComponent::CheckClimableByHit(const FHitResult& Hit, co
     }
 
     const float NormalDotUp = FMath::Abs(FVector::DotProduct(Normal, UpDirection));
-    if (NormalDotUp > 0.5)//cos(ÇãÐ±¶È)
+    if (NormalDotUp > 0.5)//cos(å€¾æ–œåº¦)
     {
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("å€¾æ–œåº¦ %d"), NormalDotUp));
         return false;
     }
-
+    
     const float FaceDot = FVector::DotProduct(TraceDirection, -Normal);
-    if (FaceDot < 0.8)//ÏàËÆ¶È
+    if (FaceDot < 0.8)//ç›¸ä¼¼åº¦
     {
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("ç›¸ä¼¼åº¦ %d"), FaceDot));
         return false;
     }
 
