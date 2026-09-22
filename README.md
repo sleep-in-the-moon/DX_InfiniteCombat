@@ -189,7 +189,9 @@
   
   <img src="ReadmeFile/Images/ABP_UpperBody.png">
 
-  TurnInplace 原地转向；
+  TurnInplace 原地转向，短按移动键；
+
+  <img src="ReadmeFile/Gif/TurnInplace1.gif">
 
   [回到顶部](#目录)
 
