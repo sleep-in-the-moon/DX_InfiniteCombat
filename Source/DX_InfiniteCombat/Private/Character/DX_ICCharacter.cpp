@@ -78,6 +78,7 @@ void ADX_ICCharacter::Jump()
 		MoveComp->TraversalCheckInput.TraceDirection = GetControlMoveInput();
 
 		ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(TEXT("Ability.Action.Traversal"), false)));
+		//ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(TEXT("Ability.Action.TryClimb"), false)));
 	}
 }
 

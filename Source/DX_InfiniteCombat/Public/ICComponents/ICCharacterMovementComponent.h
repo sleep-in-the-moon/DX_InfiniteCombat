@@ -32,6 +32,7 @@ enum class ECusMovementMode : uint8
 UENUM(BlueprintType)
 enum class EClimbProbeLayer :uint8
 {
+	None,
 	Center,
 	Upper,
 	Lower,
@@ -128,7 +129,7 @@ protected:
 
 	FQuat ComputeClimbingRotation(float DeltaTime) const;
 
-	bool CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection);
+	bool CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection, EClimbProbeLayer DebugLayer = EClimbProbeLayer::None);
 
 	virtual TArray<FClimbProbeLocation> GetProbeStartLocations() const;
 

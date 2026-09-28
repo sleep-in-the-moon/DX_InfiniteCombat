@@ -240,7 +240,7 @@ bool UICCharacterMovementComponent::FindAndUpdateClimbSurface()
         }
 #endif
         const bool bHit = GetWorld()->SweepSingleByChannel(HitRes, ProbeLoc.ProbeLocation, EndLoc, FQuat::Identity, ClimbTraceChannel, ProbeShape, QueryParam);
-        if (!bHit || !CheckClimableByHit(HitRes, TraceDirection, -GetGravityDirection()))
+        if (!bHit || !CheckClimableByHit(HitRes, TraceDirection, -GetGravityDirection(), ProbeLoc.ProbeLayer))
             continue;
 
         if (ProbeLoc.ProbeLayer != EClimbProbeLayer::Anim)
@@ -420,7 +420,7 @@ FQuat UICCharacterMovementComponent::ComputeClimbingRotation(float DeltaTime) co
     return FQuat::Slerp(CurrentQuat, TargetQuat, Alpha).GetNormalized();
 }
 
-bool UICCharacterMovementComponent::CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection)
+bool UICCharacterMovementComponent::CheckClimableByHit(const FHitResult& Hit, const FVector& TraceDirection, const FVector& UpDirection, EClimbProbeLayer DebugLayer)
 {
     if(/*!Hit.IsValidBlockingHit() ||*/ !Hit.bBlockingHit)
         return false;
@@ -434,14 +434,22 @@ bool UICCharacterMovementComponent::CheckClimableByHit(const FHitResult& Hit, co
     const float NormalDotUp = FMath::Abs(FVector::DotProduct(Normal, UpDirection));
     if (NormalDotUp > 0.5)//cos(倾斜度)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("倾斜度 %d"), NormalDotUp));
+#if WITH_EDITOR
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d 倾斜度 %f"), DebugLayer, (180.0) / UE_DOUBLE_PI * FMath::Acos(NormalDotUp)));
+        DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 20, FColor::Purple, false, 4);
+        DrawDebugDirectionalArrow(GetWorld(), Hit.ImpactPoint, Hit.ImpactPoint + Normal * 35, 1.0f, FColor::Purple, false, 4.0f, 0U, 1.0f);
+#endif
         return false;
     }
     
     const float FaceDot = FVector::DotProduct(TraceDirection, -Normal);
     if (FaceDot < 0.8)//相似度
     {
-        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("相似度 %d"), FaceDot));
+#if WITH_EDITOR
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d 相似度 %f"), DebugLayer, FaceDot));
+        DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 20, FColor::Yellow, false, 4);
+        DrawDebugDirectionalArrow(GetWorld(), Hit.ImpactPoint, Hit.ImpactPoint + Normal * 35, 1.0f, FColor::Blue, false, 4.0f, 0U, 1.0f);
+#endif
         return false;
     }
 

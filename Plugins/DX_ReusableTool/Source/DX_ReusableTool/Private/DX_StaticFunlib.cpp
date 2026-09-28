@@ -168,3 +168,13 @@ ECollisionChannel UDX_StaticFunlib::GetCustomTraceChannelByName(FName ChannelNam
 	}
 	return ECollisionChannel::ECC_MAX;
 }
+
+bool UDX_StaticFunlib::CheckFacingInAngle(AActor* CheckActor, AActor* AnotherActor, float Angle)
+{
+	if (CheckActor && AnotherActor)
+	{
+		return (180.0) / UE_DOUBLE_PI * FMath::Acos(FVector::DotProduct(CheckActor->GetActorForwardVector(), AnotherActor->GetActorForwardVector())) >= 180 - Angle;
+	}
+	
+	return false;
+}

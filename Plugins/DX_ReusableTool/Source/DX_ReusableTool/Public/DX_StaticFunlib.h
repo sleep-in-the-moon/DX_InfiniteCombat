@@ -35,4 +35,6 @@ public:
 
 	static ECollisionChannel GetCustomTraceChannelByName(FName ChannelName);
 
+	static bool CheckFacingInAngle(AActor* CheckActor, AActor* AnotherActor, float Angle);
+
 };

@@ -184,10 +184,11 @@ void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float 
 		}
 	}
 
-	if (UAbilitySystemComponent* TargetASC = HitRes.GetActor()->FindComponentByClass<UAbilitySystemComponent>())
+	AActor* TargetActor = HitRes.GetActor();
+	if (UAbilitySystemComponent* TargetASC = TargetActor->FindComponentByClass<UAbilitySystemComponent>())
 	{
 		//格挡 招架
-		if (bCanBeBlock && TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Blocking"), false)))//TODO::受击与格挡面朝方向角度限制
+		if (bCanBeBlock && TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Blocking"), false)) && UDX_StaticFunlib::CheckFacingInAngle(TargetActor, GetOwner(), 50))
 		{
 			FGameplayEventData EventData;
 			EventData.Instigator = GetOwner();
@@ -195,7 +196,7 @@ void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float 
 			EventDataObj->HitLocation = HitRes.ImpactPoint;
 			EventDataObj->ImpactNormal = HitRes.ImpactNormal;
 			EventData.OptionalObject = EventDataObj;
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(HitRes.GetActor(), FGameplayTag::RequestGameplayTag(TEXT("GameplayEvent.BlockTrigger"), false), EventData);
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(TargetActor, FGameplayTag::RequestGameplayTag(TEXT("GameplayEvent.BlockTrigger"), false), EventData);
 		}
 		//应用伤害 GE
 		else if (const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclassBySoftPtr(UICDataAsset::Get().DamageGEClass))
@@ -207,16 +208,16 @@ void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float 
 	}
 
 	//伤害感知事件发送
-	UAISense_Damage::ReportDamageEvent(MeshComp->GetOwner()->GetWorld(), HitRes.GetActor(), MeshComp->GetOwner(), 0.f, MeshComp->GetOwner()->GetActorLocation(), HitRes.GetActor()->GetActorLocation());
+	UAISense_Damage::ReportDamageEvent(MeshComp->GetOwner()->GetWorld(), TargetActor, MeshComp->GetOwner(), 0.f, MeshComp->GetOwner()->GetActorLocation(), TargetActor->GetActorLocation());
 
 	//击退
 	if (!FMath::IsNearlyEqual(KnockbackDist, 0.0f))
 	{
-		UCharacterMovementComponent* CharaMoveCom = HitRes.GetActor()->FindComponentByClass<UCharacterMovementComponent>();
-		ACharacter* HitCharacter = Cast<ACharacter>(HitRes.GetActor());
+		UCharacterMovementComponent* CharaMoveCom = TargetActor->FindComponentByClass<UCharacterMovementComponent>();
+		ACharacter* HitCharacter = Cast<ACharacter>(TargetActor);
 		if (CharaMoveCom && HitCharacter)
 		{
-			FVector LaunchDirect = HitRes.GetActor()->GetActorLocation() - MeshComp->GetOwner()->GetActorLocation();
+			FVector LaunchDirect = TargetActor->GetActorLocation() - MeshComp->GetOwner()->GetActorLocation();
 			HitCharacter->LaunchCharacter(FMath::Sqrt(2 * CharaMoveCom->BrakingDecelerationWalking * KnockbackDist) * LaunchDirect.GetSafeNormal(), true, false);
 		}
 	}
