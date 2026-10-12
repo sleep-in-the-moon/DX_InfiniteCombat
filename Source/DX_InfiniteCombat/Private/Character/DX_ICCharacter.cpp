@@ -105,7 +105,7 @@ void ADX_ICCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	//GetCharacterMovement()->bOrientRotationToMovement = true;
 	//GetCharacterMovement()->RotationRate = FRotator();
 
 	GetCharacterMovement()->AirControl = 1;

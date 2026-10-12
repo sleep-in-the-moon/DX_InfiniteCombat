@@ -20,6 +20,8 @@ UICCharacterMovementComponent::UICCharacterMovementComponent()
     TraversalCheckInput.TraceDistance = 60.0f;
     TraversalCheckInput.MaxLedgeHeight = 173.0f;
     TraversalCheckInput.MinLedgeHeight = 40.0f;
+
+    bOrientRotationToMovement = true;
 }
 
 void UICCharacterMovementComponent::BeginPlay()
