@@ -73,7 +73,9 @@
   
   箭矢发射使用了 UE 的 UProjectileMovementComponent，实现了一个 [ProjectorActorBase](Source/DX_InfiniteCombat/Private/Projector/ProjectorActorBase.cpp) 作为所有发射物的基类，其中扩展了伤害判定，听觉感知发送，以及投射物命中后消失或附加到命中目标上的逻辑。
   
-  <img src="ReadmeFile/Gif/LuanchArrow.gif">
+  <img src="ReadmeFile/Gif/ArrowHit.gif">
+  
+  <img src="ReadmeFile/Gif/ArrowHit2.gif">
 
 [回到顶部](#目录)
   
@@ -221,6 +223,8 @@
   本项目参考了 Lyra 示例项目，子类化 UAssetManager，实现了[自己的 AssetManager](Source/DX_InfiniteCombat/Public/Data/ICAssetManager.h)，对一些非常态加载，以及能接受一定延迟的资源，实现动态加卸载，以及使用软引用的方式，避免过多的硬引用，只在必要时加载进内存；
 
   <img src="ReadmeFile/Images/AssetManager.png">
+  
+  <img src="ReadmeFile/Images/WeaonConfig.png">
 
   [回到顶部](#目录)
   
