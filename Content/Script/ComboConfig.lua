@@ -9,8 +9,10 @@
 ---@type BP_MainCharacter_C
 local M = UnLua.Class()
 
--- function M:Initialize(Initializer)
--- end
+local Screen = require "Tutorials.Sceen"
+
+function M:Initialize(Initializer)
+end
 
 -- function M:UserConstructionScript()
 -- end
