@@ -33,8 +33,7 @@ const UWeaponDataAsset* UICAssetManager::GetWeaponDataAssetByTag(const FGameplay
             UnloadPrimaryAsset((*pResult)->GetPrimaryAssetId()); // 卸载掉已经加载了的相同type资源
         }
 
-        return CastChecked<const UWeaponDataAsset>(LoadGameDataByAssetId(UWeaponDataAsset::StaticClass()
-                , FPrimaryAssetId(UWeaponDataAsset::StaticClass()->GetFName(), WeaponTag.GetTagName())));
+        return CastChecked<const UWeaponDataAsset>(LoadGameDataByAssetId(UWeaponDataAsset::StaticClass(), FPrimaryAssetId(UWeaponDataAsset::StaticClass()->GetFName(), WeaponTag.GetTagName())));
     }
     return nullptr;
 }

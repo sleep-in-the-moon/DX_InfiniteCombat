@@ -69,7 +69,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HitFeedback(UAnimMontage* CurAttackAnimMontage, bool bSlowdown, float SlowdownScale, float SlowdownTime, bool bSkipFrames, float SkipSeconds);
 	UFUNCTION(BlueprintCallable)
-	void ApplyHitResToTargetActor(const FHitResult& HitRes, float DamageATKCoefficient = 1.0f, float KnockbackDist = 0.0f, bool bCanBeBlock = true);
+	void ApplyHitResToTargetActor(const FHitResult& HitRes, float DamageATKCoefficient = 1.0f, float KnockbackDist = 0.0f, float KnockUpHeight = 0.0f, bool bCanBeBlock = true);
 	
 	UFUNCTION(BlueprintCallable)
 	void AddOrUpdateAttackFollowWarp(const FVector& NewFollowLocation);

@@ -121,7 +121,7 @@ bool UAttackComponent::TraceBySocketsForTick(USceneComponent* SocketOwner, const
 
 void UAttackComponent::HitFeedback(UAnimMontage* CurAttackAnimMontage, bool bSlowdown, float SlowdownScale, float SlowdownTime, bool bSkipFrames, float SkipSeconds)
 {
-	//镜头抖动，时间膨胀 等GEGC
+	// 镜头抖动，时间膨胀 等GEGC
 	if (ICSubSystem->AttackFeedbackGE)
 	{
 		if (UGameplayEffect* GECDO = Cast<UGameplayEffect>(ICSubSystem->AttackFeedbackGE->GetDefaultObject()))
@@ -131,7 +131,7 @@ void UAttackComponent::HitFeedback(UAnimMontage* CurAttackAnimMontage, bool bSlo
 	if (!MeshComp || !CurAttackAnimMontage)
 		return;
 
-	//缓速 顿感
+	// 缓速 顿感
 	if (bSlowdown && SlowdownScale > 0.0f && SlowdownTime > 0.0f)
 	{
 		MeshComp->GetAnimInstance()->Montage_SetPlayRate(CurAttackAnimMontage, SlowdownScale);
@@ -142,7 +142,7 @@ void UAttackComponent::HitFeedback(UAnimMontage* CurAttackAnimMontage, bool bSlo
 			}, SlowdownTime, false);
 	}
 
-	//抽帧
+	// 抽帧
 	if (bSkipFrames && SkipSeconds > 0.0f)
 	{
 		MeshComp->GetAnimInstance()->Montage_Pause(CurAttackAnimMontage);
@@ -164,12 +164,12 @@ void UAttackComponent::HitFeedback(UAnimMontage* CurAttackAnimMontage, bool bSlo
 
 }
 
-void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float DamageATKCoefficient, float KnockbackDist, bool bCanBeBlock)
+void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float DamageATKCoefficient, float KnockbackDist, float KnockUpHeight, bool bCanBeBlock)
 {
 	if (!HitRes.bBlockingHit || !HitRes.GetActor())
 		return;
 
-	//根据物理材质分部位叠加计算
+	// 根据物理材质分部位叠加计算
 	float BodyPartDamageATKCoefficient = 1.0f;
 	UPhysicalMaterialWithTags* PhysicalMaterialWithTags = Cast<UPhysicalMaterialWithTags>(HitRes.PhysMaterial);
 	UCombatCharacterComponent* combatCom = MeshComp->GetOwner()->FindComponentByClass<UCombatCharacterComponent>();
@@ -187,7 +187,7 @@ void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float 
 	AActor* TargetActor = HitRes.GetActor();
 	if (UAbilitySystemComponent* TargetASC = TargetActor->FindComponentByClass<UAbilitySystemComponent>())
 	{
-		//格挡 招架
+		// 格挡 招架
 		if (bCanBeBlock && TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("State.Blocking"), false)) && UDX_StaticFunlib::CheckFacingInAngle(TargetActor, GetOwner(), 50))
 		{
 			FGameplayEventData EventData;
@@ -198,7 +198,7 @@ void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float 
 			EventData.OptionalObject = EventDataObj;
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(TargetActor, FGameplayTag::RequestGameplayTag(TEXT("GameplayEvent.BlockTrigger"), false), EventData);
 		}
-		//应用伤害 GE
+		// 应用伤害 GE
 		else if (const TSubclassOf<UGameplayEffect> DamageGE = UICAssetManager::GetSubclassBySoftPtr(UICDataAsset::Get().DamageGEClass))
 		{
 			FGameplayEffectSpecHandle GESpecHandle = AttackUtils::MakeAttackGESpecHandle(MeshComp->GetOwner(), DamageGE, HitRes, DamageATKCoefficient * BodyPartDamageATKCoefficient);
@@ -207,22 +207,24 @@ void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float 
 
 	}
 
-	//伤害感知事件发送
+	// 伤害感知事件发送
 	UAISense_Damage::ReportDamageEvent(MeshComp->GetOwner()->GetWorld(), TargetActor, MeshComp->GetOwner(), 0.f, MeshComp->GetOwner()->GetActorLocation(), TargetActor->GetActorLocation());
 
-	//击退
-	if (!FMath::IsNearlyEqual(KnockbackDist, 0.0f))
+	// 击退,击飞
+	if (!FMath::IsNearlyEqual(KnockbackDist, 0.0f) || !FMath::IsNearlyEqual(KnockUpHeight, 0.0f))
 	{
 		UCharacterMovementComponent* CharaMoveCom = TargetActor->FindComponentByClass<UCharacterMovementComponent>();
 		ACharacter* HitCharacter = Cast<ACharacter>(TargetActor);
 		if (CharaMoveCom && HitCharacter)
 		{
-			FVector LaunchDirect = TargetActor->GetActorLocation() - MeshComp->GetOwner()->GetActorLocation();
-			HitCharacter->LaunchCharacter(FMath::Sqrt(2 * CharaMoveCom->BrakingDecelerationWalking * KnockbackDist) * LaunchDirect.GetSafeNormal(), true, false);
+			//FVector LaunchDirect = TargetActor->GetActorLocation() - MeshComp->GetOwner()->GetActorLocation();
+			FVector LaunchDirect = -TargetActor->GetActorForwardVector();
+			//HitCharacter->LaunchCharacter(FMath::Sqrt(2 * CharaMoveCom->BrakingDecelerationWalking * KnockbackDist) * LaunchDirect.GetSafeNormal(), true, false);
+			HitCharacter->LaunchCharacter( KnockbackDist * LaunchDirect.GetSafeNormal2D() + TargetActor->GetActorUpVector()* KnockUpHeight, true, true);
 		}
 	}
 
-	//物理混合
+	// 物理混合
 	/*if (USkeletalMeshComponent* Skele = res.GetActor()->FindComponentByClass<USkeletalMeshComponent>())
 	{
 		Skele->SetPhysicsBlendWeight(0.5);
@@ -253,7 +255,7 @@ void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float 
 	//	OwnerASC->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data.Get(), TargetASC);
 	//}
 
-	//..其它
+	// ..其它
 }
 
 void UAttackComponent::AddOrUpdateAttackFollowWarp(const FVector& NewFollowLocation)

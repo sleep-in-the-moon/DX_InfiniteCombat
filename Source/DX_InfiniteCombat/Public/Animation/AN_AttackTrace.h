@@ -54,6 +54,9 @@ protected:
 	//击退距离
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Hit")
 	float KnockbackDist = 0.0f;
+	//击飞高度
+	UPROPERTY(EditAnywhere, Category = "IC|HitApply|Hit")
+	float KnockUpHeight = 0.0f;
 
 	//减速 顿感
 	UPROPERTY(EditAnywhere, Category = "IC|HitApply|FeedBack")

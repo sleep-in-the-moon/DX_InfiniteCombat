@@ -73,7 +73,7 @@ void UAN_AttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequence
 		if (ApplyedObjs.Contains(HitRes.GetActor()))//一次通知对同一 Actor 只执行一次
 			continue;
 
-		AttackComp->ApplyHitResToTargetActor(HitRes, DamageATKCoefficient, KnockbackDist);
+		AttackComp->ApplyHitResToTargetActor(HitRes, DamageATKCoefficient, KnockbackDist, KnockUpHeight);
 
 		ApplyedObjs.AddUnique(HitRes.GetActor());
 	}
