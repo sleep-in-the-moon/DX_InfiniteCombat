@@ -217,8 +217,7 @@ void UAttackComponent::ApplyHitResToTargetActor(const FHitResult& HitRes, float 
 		ACharacter* HitCharacter = Cast<ACharacter>(TargetActor);
 		if (CharaMoveCom && HitCharacter)
 		{
-			//FVector LaunchDirect = TargetActor->GetActorLocation() - MeshComp->GetOwner()->GetActorLocation();
-			FVector LaunchDirect = -TargetActor->GetActorForwardVector();
+			FVector LaunchDirect = TargetActor->GetActorLocation() - MeshComp->GetOwner()->GetActorLocation();
 			//HitCharacter->LaunchCharacter(FMath::Sqrt(2 * CharaMoveCom->BrakingDecelerationWalking * KnockbackDist) * LaunchDirect.GetSafeNormal(), true, false);
 			HitCharacter->LaunchCharacter( KnockbackDist * LaunchDirect.GetSafeNormal2D() + TargetActor->GetActorUpVector()* KnockUpHeight, true, true);
 		}
