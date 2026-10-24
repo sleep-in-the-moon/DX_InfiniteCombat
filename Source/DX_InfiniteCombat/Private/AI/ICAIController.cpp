@@ -16,7 +16,7 @@ void AICAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	SetGenericTeamId(FGenericTeamId(1));
+	//SetGenericTeamId(FGenericTeamId(TeamId));
 
 	RunBehaviorTree(BTAsset);
 

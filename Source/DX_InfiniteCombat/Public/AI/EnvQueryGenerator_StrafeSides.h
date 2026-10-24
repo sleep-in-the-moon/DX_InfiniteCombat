@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "EnvironmentQuery/Generators/EnvQueryGenerator_ProjectedPoints.h"
+#include "DataProviders/AIDataProvider.h"
+
 #include "EnvQueryGenerator_StrafeSides.generated.h"
 
 
@@ -26,6 +28,6 @@ protected:
 	TSubclassOf<UEnvQueryContext> StrafeSidesCenterActorContext;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Generator", meta = (ClampMin="0.0"))
-	float StrafeDistance = 200.0f;
+	FAIDataProviderFloatValue  StrafeDistance;
 
 };

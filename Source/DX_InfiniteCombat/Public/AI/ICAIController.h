@@ -27,8 +27,18 @@ public:
 	void UpdateTargetKey(AActor* TargetActor);
 	UFUNCTION(BlueprintCallable, meta = (Category = "BlackboardKey"))
 	void UpdateSightKey(bool HasLineSight);
+	
+	virtual FGenericTeamId GetGenericTeamId() const override { return FGenericTeamId(TeamId); }
 
-	virtual FGenericTeamId GetGenericTeamId() const override { return FGenericTeamId::FGenericTeamId(TeamId); }
+	UFUNCTION(BlueprintCallable)
+	FGenericTeamId GetGenericTeamIdBP() const { return FGenericTeamId(TeamId); }
+	UFUNCTION(BlueprintCallable)
+	ETeamAttitude::Type TeamAttitudeTest(FGenericTeamId B)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("CurTeamId::%d"), GetGenericTeamId().GetId()));
+		UE_LOG(LogTemp, Warning, TEXT("CurTeamId::%d"), GetGenericTeamId().GetId());
+		return GetGenericTeamId() != B ? ETeamAttitude::Hostile : ETeamAttitude::Friendly;
+	}
 
 private:
 	UFUNCTION()

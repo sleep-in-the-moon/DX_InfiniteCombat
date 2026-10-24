@@ -21,13 +21,14 @@ void UEnvQueryGenerator_StrafeSides::GenerateItems(FEnvQueryInstance& QueryInsta
     }
     AActor* ContextActor = ContextActors[0];
 
-    
+    StrafeDistance.BindData(QueryInstance.Owner.Get(), QueryInstance.QueryID);
+    float StrafeDistanceValue = StrafeDistance.GetValue();
 
     TArray<FNavLocation> CandidatePoints;
     CandidatePoints.Reserve(2);
 
-    CandidatePoints.Emplace(ContextActor->GetActorLocation() + ContextActor->GetActorRightVector()* StrafeDistance);
-    CandidatePoints.Emplace(ContextActor->GetActorLocation() - ContextActor->GetActorRightVector()* StrafeDistance);
+    CandidatePoints.Emplace(ContextActor->GetActorLocation() + ContextActor->GetActorRightVector()* StrafeDistanceValue);
+    CandidatePoints.Emplace(ContextActor->GetActorLocation() - ContextActor->GetActorRightVector()* StrafeDistanceValue);
 
     //投影到导航网格并筛选
     ProjectAndFilterNavPoints(CandidatePoints, QueryInstance);

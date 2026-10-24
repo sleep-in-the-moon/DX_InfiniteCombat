@@ -15,7 +15,8 @@
 				"UMG",
 				"MotionWarping",
 				"PhysicsCore",
-				"CoreUObject"
+				"CoreUObject",
+				"AIModule"
 			]
 		},
 		{
