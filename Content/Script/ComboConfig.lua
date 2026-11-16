@@ -7,17 +7,27 @@
 --
 
 ---@type BP_MainCharacter_C
+local Screen = require "Utils.Screen"
+
 local M = UnLua.Class()
 
-local Screen = require "Tutorials.Sceen"
 
-function M:Initialize(Initializer)
+function M:Initialize(Initializer)  
+	local msg = [[ 
+	Hellow 
+	Unlua
+	]]
+	print(msg)
+	Screen.Print(msg)
 end
 
 -- function M:UserConstructionScript()
 -- end
 
--- function M:ReceiveBeginPlay()
+-- function M:ReceiveBeginplay()
+	-- local msg = "Unlua beginplay"
+	-- print(msg)
+	-- Screen.Print(msg)
 -- end
 
 -- function M:ReceiveEndPlay()
